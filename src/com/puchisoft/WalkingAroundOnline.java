@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -28,6 +29,8 @@ public class WalkingAroundOnline implements ApplicationListener{
 	
 	private WaoServer server;
 	private WaoClient client;
+	
+	private FPSLogger fps = new FPSLogger();
 	
 	@Override
 	public void create() {
@@ -84,6 +87,7 @@ public class WalkingAroundOnline implements ApplicationListener{
 		player.render(spriteBatch);
 				
 		spriteBatch.end();
+		fps.log();
 	}
 
 	@Override
