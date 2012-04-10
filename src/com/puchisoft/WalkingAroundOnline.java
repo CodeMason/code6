@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
+import com.puchisoft.net.Network.MovementChange;
 import com.puchisoft.net.Network.PlayerJoinLeave;
 import com.puchisoft.net.WaoClient;
 import com.puchisoft.net.WaoServer;
@@ -25,12 +26,11 @@ public class WalkingAroundOnline implements ApplicationListener{
 	private SpriteBatch spriteBatch;
 	private BitmapFont font;
 	
-	private String status="Hello World";
+	private String status="Loading";
 	
 	Map<Integer,Player> players = new HashMap<Integer,Player>();
 	
 	private Player playerLocal;
-	private int playerLocalId;
 	
 	private Texture texturePlayer;	
 	
@@ -95,10 +95,10 @@ public class WalkingAroundOnline implements ApplicationListener{
 			Log.info("changed input");
 			client.sendMessage(playerLocal.getMovementState());
 		}
+		
 		for(Map.Entry<Integer, Player> playerEntry: players.entrySet()){
 			playerEntry.getValue().render(spriteBatch);
 		}
-//		playerLocal.render(spriteBatch);
 				
 		spriteBatch.end();
 		fps.log();
@@ -122,7 +122,6 @@ public class WalkingAroundOnline implements ApplicationListener{
 	// TODO may only happen once...
 	public void setNetworkId(int id){
 		if(players.isEmpty()){
-			this.playerLocalId = id;
 			this.playerLocal.setId(id);
 			players.put(id,playerLocal);
 		}else{
@@ -131,13 +130,21 @@ public class WalkingAroundOnline implements ApplicationListener{
 	}
 
 	public void addPlayer(PlayerJoinLeave msg) {
+		Log.info("add player");
 		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50));
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
 	}
 	
 	public void removePlayer(PlayerJoinLeave msg){
+		Log.info("remove player");
 		players.remove(msg.playerId);
+	}
+
+	public void playerMoved(MovementChange msg) {
+		Player player = players.get(msg.playerId);
+		player.setMovementState(msg);
+		
 	}
 
 }

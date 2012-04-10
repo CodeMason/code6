@@ -13,14 +13,14 @@ public class Network {
 	static public void register (EndPoint endPoint) {
 		Kryo kryo = endPoint.getKryo();
 		kryo.register(Ping.class);
-		kryo.register(RegisterName.class);
+		kryo.register(Login.class);
 		kryo.register(LogMessage.class);
 		kryo.register(PlayerJoinLeave.class);
 		kryo.register(MovementChange.class);
 		kryo.register(Vector2.class);
 	}
 	
-	static public class RegisterName {
+	static public class Login {
 		public String name;
 	}
 

@@ -23,6 +23,7 @@ public class Player {
 
 	// Returns whether there was a change
 	public boolean handleInput() {
+		
 		boolean wasMoving = isMoving; 
 		double oldAngle = angle;
 		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
@@ -59,11 +60,7 @@ public class Player {
 		}
 		return wasMoving != isMoving || oldAngle != angle;
 	}
-	
-	public MovementChange getMovementState(){
-		return new MovementChange(id,angle,isMoving,position);
-	}
-	
+		
 	private void move(){
 		if(isMoving){
 			position.y += Math.sin(angle) * speed;
@@ -90,5 +87,15 @@ public class Player {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public MovementChange getMovementState(){
+		return new MovementChange(id,angle,isMoving,position);
+	}
+
+	public void setMovementState(MovementChange msg) {
+		this.angle = msg.angle;
+		this.isMoving = msg.isMoving;
+		this.position = msg.position;
 	}
 }
