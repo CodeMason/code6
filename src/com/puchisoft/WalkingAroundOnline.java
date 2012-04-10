@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.net.Network.MovementChange;
 import com.puchisoft.net.Network.PlayerJoinLeave;
+import com.puchisoft.net.Network;
 import com.puchisoft.net.WaoClient;
 import com.puchisoft.net.WaoServer;
 
@@ -52,7 +53,7 @@ public class WalkingAroundOnline implements ApplicationListener{
 		
 		//Connect
 		client = new WaoClient(this);
-		client.connectLocal();
+		client.connect("puchisoft.servegame.com", Network.port);
 	}
 
 	@Override

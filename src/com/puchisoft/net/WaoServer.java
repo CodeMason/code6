@@ -6,9 +6,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.minlog.Log;
+import com.puchisoft.net.Network.Login;
 import com.puchisoft.net.Network.MovementChange;
 import com.puchisoft.net.Network.PlayerJoinLeave;
-import com.puchisoft.net.Network.Login;
 
 public class WaoServer {
 	Server server;
@@ -36,18 +37,23 @@ public class WaoServer {
 				WaoConnection connection = (WaoConnection) c;
 				
 				if (message instanceof Login) {
+					Login msg = ((Login)message);
 					// Ignore the object if a client has already registered a name. This is
 					// impossible with our client, but a hacker could send messages at any time.
 					if (connection.name != null) return;
 					// Ignore the object if the name is invalid.
-					String name = ((Login)message).name;
+					String name = msg.name;
 					if (name == null) return;
 					name = name.trim();
 					if (name.length() == 0) return;
 					// Store the name on the connection.
 					connection.name = name;
+					if(msg.version != Network.version){
+						Log.error("wrong version");
+						connection.close();
+					}
 					
-					server.sendToAllExceptTCP(connection.getID(), (Login)message);
+					server.sendToAllExceptTCP(connection.getID(), msg);
 					
 					// Tell old people about new person
 					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true);

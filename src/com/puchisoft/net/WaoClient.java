@@ -31,8 +31,7 @@ public class WaoClient {
 			public void connected (Connection connection) {
 				game.setStatus("Connected to "+connection.getRemoteAddressTCP());
 				game.setNetworkId(connection.getID());
-				Login registerName = new Login();
-				registerName.name = "USER"+Math.random();
+				Login registerName = new Login("USER"+Math.random(), Network.version);
 				client.sendTCP(registerName);
 				client.updateReturnTripTime();
 			}
