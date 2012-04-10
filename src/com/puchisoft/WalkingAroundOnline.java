@@ -1,18 +1,21 @@
 package com.puchisoft;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.FPSLogger;
+import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
+import com.puchisoft.net.Network.PlayerJoinLeave;
 import com.puchisoft.net.WaoClient;
 import com.puchisoft.net.WaoServer;
 
@@ -24,7 +27,11 @@ public class WalkingAroundOnline implements ApplicationListener{
 	
 	private String status="Hello World";
 	
-	private Player player;
+	Map<Integer,Player> players = new HashMap<Integer,Player>();
+	
+	private Player playerLocal;
+	private int playerLocalId;
+	
 	private Texture texturePlayer;	
 	
 	private WaoServer server;
@@ -39,7 +46,7 @@ public class WalkingAroundOnline implements ApplicationListener{
 		font.setScale(1.2f);
 		
 		texturePlayer = new Texture(Gdx.files.internal("data/player.png"));
-		player = new Player(texturePlayer, new Vector2(50, 50));
+		playerLocal = new Player(texturePlayer, new Vector2(50, 50));
 		
 		spriteBatch = new SpriteBatch();
 		
@@ -84,7 +91,14 @@ public class WalkingAroundOnline implements ApplicationListener{
 		
 		font.draw(spriteBatch, status, 5, font.getLineHeight());
 		
-		player.render(spriteBatch);
+		if(playerLocal.handleInput()){
+			Log.info("changed input");
+			client.sendMessage(playerLocal.getMovementState());
+		}
+		for(Map.Entry<Integer, Player> playerEntry: players.entrySet()){
+			playerEntry.getValue().render(spriteBatch);
+		}
+//		playerLocal.render(spriteBatch);
 				
 		spriteBatch.end();
 		fps.log();
@@ -103,6 +117,27 @@ public class WalkingAroundOnline implements ApplicationListener{
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	// TODO may only happen once...
+	public void setNetworkId(int id){
+		if(players.isEmpty()){
+			this.playerLocalId = id;
+			this.playerLocal.setId(id);
+			players.put(id,playerLocal);
+		}else{
+			Log.error("setNetworkId called twice?");
+		}
+	}
+
+	public void addPlayer(PlayerJoinLeave msg) {
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50));
+		newPlayer.setId(msg.playerId);
+		players.put(msg.playerId, newPlayer);
+	}
+	
+	public void removePlayer(PlayerJoinLeave msg){
+		players.remove(msg.playerId);
 	}
 
 }

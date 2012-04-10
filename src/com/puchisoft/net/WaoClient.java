@@ -8,6 +8,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.WalkingAroundOnline;
 import com.puchisoft.net.Network.LogMessage;
+import com.puchisoft.net.Network.PlayerJoinLeave;
 import com.puchisoft.net.Network.RegisterName;
 
 public class WaoClient {
@@ -28,6 +29,7 @@ public class WaoClient {
 		client.addListener(new Listener() {
 			public void connected (Connection connection) {
 				game.setStatus("Connected to "+connection.getRemoteAddressTCP());
+				game.setNetworkId(connection.getID());
 				RegisterName registerName = new RegisterName();
 				registerName.name = "USER"+Math.random();
 				client.sendTCP(registerName);
@@ -73,8 +75,19 @@ public class WaoClient {
 	public void handleMessage(int playerId, Object message) {
 
 		if (message instanceof LogMessage) {
-			LogMessage cc = (LogMessage) message;
-			game.setStatus(cc.message);
+			LogMessage msg = (LogMessage) message;
+			game.setStatus(msg.message);
+		}
+		else if(message instanceof PlayerJoinLeave){
+			PlayerJoinLeave msg = (PlayerJoinLeave) message;
+			if(msg.hasJoined){
+				game.setStatus(msg.name + " joined");
+				game.addPlayer(msg);
+			}
+			else{
+				game.setStatus(msg.name + " left");
+				game.removePlayer(msg);
+			}
 		}
 
 	}

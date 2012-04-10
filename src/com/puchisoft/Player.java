@@ -5,10 +5,11 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.esotericsoftware.minlog.Log;
+import com.puchisoft.net.Network.MovementChange;
 
 public class Player {
 	private Texture texture;
+	private int id;
 
 	private Vector2 position = new Vector2(50, 50);
 	private double angle = 0;
@@ -21,7 +22,7 @@ public class Player {
 	}
 
 	// Returns whether there was a change
-	private boolean handleInput() {
+	public boolean handleInput() {
 		boolean wasMoving = isMoving; 
 		double oldAngle = angle;
 		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
@@ -59,6 +60,10 @@ public class Player {
 		return wasMoving != isMoving || oldAngle != angle;
 	}
 	
+	public MovementChange getMovementState(){
+		return new MovementChange(id,angle,isMoving,position);
+	}
+	
 	private void move(){
 		if(isMoving){
 			position.y += Math.sin(angle) * speed;
@@ -73,12 +78,17 @@ public class Player {
 	}
 
 	public void render(SpriteBatch spriteBatch) {
-		if(this.handleInput()){
-			Log.info("changed input");
-		}
 		this.move();
 
 		spriteBatch.draw(texture, position.x, position.y, 0, 0,
 				texture.getWidth(), texture.getHeight());
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }
