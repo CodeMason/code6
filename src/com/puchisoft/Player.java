@@ -10,6 +10,8 @@ public class Player {
 	Texture texture;
 	
 	Vector2 position = new Vector2(50, 50);
+	int speed = 3;
+	//TODO Angle
 	
 	public Player(Texture texture, Vector2 position){
 		this.texture = texture;
@@ -18,16 +20,16 @@ public class Player {
 
 	public void render(SpriteBatch spriteBatch) {
 		if (Gdx.input.isKeyPressed(Keys.W)) {
-			position.y += 3;
+			position.y += speed;
 		}
 		else if(Gdx.input.isKeyPressed(Keys.S)) {
-			position.y -= 3;
+			position.y -= speed;
 		}
 		if (Gdx.input.isKeyPressed(Keys.A)) {
-			position.x -= 3;
+			position.x -= speed;
 		}
 		else if(Gdx.input.isKeyPressed(Keys.D)) {
-			position.x += 3;
+			position.x += speed;
 		}
 		
 		spriteBatch.draw(texture, position.x, position.y, 0, 0, texture.getWidth(), texture.getHeight());
