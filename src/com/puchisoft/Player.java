@@ -11,14 +11,16 @@ public class Player {
 	private Texture texture;
 	private int id;
 
-	private Vector2 position = new Vector2(50, 50);
+	public Vector2 maxPosition;
+	public Vector2 position;
 	private double angle = 0;
 	private double speed = 5;
 	private boolean isMoving = false;
 
-	public Player(Texture texture, Vector2 position) {
+	public Player(Texture texture, Vector2 position, Vector2 maxPosition) {
 		this.texture = texture;
 		this.position = position;
+		this.maxPosition = maxPosition;
 	}
 
 	// Returns whether there was a change
@@ -68,9 +70,9 @@ public class Player {
 			
 			// Prevent escape
 			position.x = Math.max(0, Math.min(
-					Gdx.graphics.getWidth() - texture.getWidth(), position.x));
+					maxPosition.x - texture.getWidth(), position.x));
 			position.y = Math.max(0, Math.min(
-					Gdx.graphics.getHeight() - texture.getHeight(), position.y));
+					maxPosition.y - texture.getHeight(), position.y));
 		}
 	}
 

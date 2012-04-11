@@ -10,6 +10,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -24,7 +25,9 @@ import com.puchisoft.net.WaoServer;
 
 public class WalkingAroundOnline implements ApplicationListener{
 
+	OrthographicCamera cam;
 	private SpriteBatch spriteBatch;
+	private SpriteBatch spriteBatchStationary;
 	private BitmapFont font;
 	
 	private String status="Loading";
@@ -33,7 +36,11 @@ public class WalkingAroundOnline implements ApplicationListener{
 	
 	private Player playerLocal;
 	
-	private Texture texturePlayer;	
+	private Texture texturePlayer;
+	private Texture textureBg;
+	private int tilesCount = 5;
+	
+	private Vector2 maxPosition;
 	
 	private WaoServer server;
 	private WaoClient client;
@@ -46,10 +53,18 @@ public class WalkingAroundOnline implements ApplicationListener{
 		font.setColor(Color.GREEN);
 		font.setScale(1.2f);
 		
+		textureBg = new Texture(Gdx.files.internal("data/background.png"));
+		
 		texturePlayer = new Texture(Gdx.files.internal("data/player.png"));
-		playerLocal = new Player(texturePlayer, new Vector2(50, 50));
+		
+		maxPosition = new Vector2(textureBg.getWidth()*tilesCount, textureBg.getHeight()*tilesCount);
+		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition);
+		
+		this.cam = new OrthographicCamera(800, 600);
+		this.cam.position.set(playerLocal.position.x, playerLocal.position.y, 0);
 		
 		spriteBatch = new SpriteBatch();
+		spriteBatchStationary = new SpriteBatch();
 		
 		//Connect
 		client = new WaoClient(this);
@@ -62,6 +77,7 @@ public class WalkingAroundOnline implements ApplicationListener{
 		if(server !=null) server.shutdown();
 		texturePlayer.dispose();
 		spriteBatch.dispose();
+		spriteBatchStationary.dispose();
 	}
 
 	@Override
@@ -85,12 +101,20 @@ public class WalkingAroundOnline implements ApplicationListener{
 			}
 		}
 		
+		this.cam.position.set(playerLocal.position.x, playerLocal.position.y, 0);
+		cam.update();
+		
+		spriteBatch.setProjectionMatrix(cam.combined);
 		spriteBatch.begin();
 		spriteBatch.setColor(Color.WHITE);
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
-		font.draw(spriteBatch, status, 5, font.getLineHeight());
+		for(int i = 0; i < tilesCount; i++){
+			for(int j = 0; j < tilesCount; j++){
+				spriteBatch.draw(textureBg, textureBg.getWidth()*i, textureBg.getHeight()*j, 0, 0, textureBg.getWidth(), textureBg.getHeight());
+			}
+		}
 		
 		if(playerLocal.handleInput()){
 			Log.info("changed input");
@@ -102,6 +126,11 @@ public class WalkingAroundOnline implements ApplicationListener{
 		}
 				
 		spriteBatch.end();
+		
+		spriteBatchStationary.begin();
+		font.draw(spriteBatchStationary, status, 5, font.getLineHeight());
+		spriteBatchStationary.end();
+		
 		fps.log();
 	}
 
@@ -132,7 +161,7 @@ public class WalkingAroundOnline implements ApplicationListener{
 
 	public void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50));
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50),maxPosition);
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
 	}

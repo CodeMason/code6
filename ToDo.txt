@@ -1,0 +1,2 @@
+-Create Map class to house current game logic
+-Use Screens (Game Screen, Menu Screen, Connecting Screen?) to toggle between
