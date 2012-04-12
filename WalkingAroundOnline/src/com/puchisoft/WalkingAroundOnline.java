@@ -60,7 +60,7 @@ public class WalkingAroundOnline implements ApplicationListener{
 		maxPosition = new Vector2(textureBg.getWidth()*tilesCount, textureBg.getHeight()*tilesCount);
 		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition);
 		
-		this.cam = new OrthographicCamera(800, 600);
+		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		this.cam.position.set(playerLocal.position.x, playerLocal.position.y, 0);
 		
 		spriteBatch = new SpriteBatch();
@@ -87,7 +87,7 @@ public class WalkingAroundOnline implements ApplicationListener{
 
 	@Override
 	public void render() {
-		if (Gdx.input.isKeyPressed(Keys.G) || Gdx.input.isTouched(2)) {
+		if (Gdx.input.isKeyPressed(Keys.G) || Gdx.input.isKeyPressed(Keys.MENU) || Gdx.input.isTouched(2)) {
 			if(server == null){
 				//Start server
 				Log.info("Starting server...");
