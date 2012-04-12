@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.esotericsoftware.minlog.Log;
 import com.puchisoft.net.Network.MovementChange;
 
 public class Player {
@@ -16,7 +17,6 @@ public class Player {
 	private Vector2 direction = new Vector2();
 	private Vector2 oldDirection = new Vector2();
 	
-	private double angle = 0;
 	private float speed = 5;
 	
 	private boolean isMoving = false;
@@ -32,31 +32,32 @@ public class Player {
 		
 		boolean wasMoving = isMoving; 
 		oldDirection.set(direction);
-		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
+		
+		if (Gdx.input.isTouched() || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
 				|| Gdx.input.isKeyPressed(Keys.S)
 				|| Gdx.input.isKeyPressed(Keys.D)) {
 			
-			if (Gdx.input.isKeyPressed(Keys.W)) {
-				if (Gdx.input.isKeyPressed(Keys.A)) {
-					direction.set(-1,1).nor().mul(speed);
-				} else if (Gdx.input.isKeyPressed(Keys.D)) {
-					direction.set(1,1).nor().mul(speed);
-				} else {
-					direction.set(0,1).nor().mul(speed);
-				}
-			} else if (Gdx.input.isKeyPressed(Keys.S)) {
-				if (Gdx.input.isKeyPressed(Keys.A)) {
-					direction.set(-1,-1).nor().mul(speed);
-				} else if (Gdx.input.isKeyPressed(Keys.D)) {
-					direction.set(1,-1).nor().mul(speed);
-				} else {
-					direction.set(0,-1).nor().mul(speed);
-				}
-			} else if (Gdx.input.isKeyPressed(Keys.A)) {
-				direction.set(-1,0).nor().mul(speed);
-			} else if (Gdx.input.isKeyPressed(Keys.D)) {
-				direction.set(1,0).nor().mul(speed);
+			direction.set(0,0);
+			if(Gdx.input.isTouched()){
+				Log.info(Gdx.input.getX()+" "+Gdx.input.getY());
+				direction.x = Gdx.input.getX() > Gdx.graphics.getWidth()/2 ? 1 : -1;
+				direction.y = Gdx.input.getY() > Gdx.graphics.getHeight()/2 ? -1 : 1;
 			}
+			
+			if (Gdx.input.isKeyPressed(Keys.W)) {
+				direction.y = 1;
+			}
+			if (Gdx.input.isKeyPressed(Keys.S)) {
+				direction.y = -1;
+			}
+			if (Gdx.input.isKeyPressed(Keys.A)) {
+				direction.x = -1;
+			}
+			if (Gdx.input.isKeyPressed(Keys.D)) {
+				direction.x = 1;
+			}
+//			
+			direction.nor().mul(speed);
 			isMoving = true;
 			
 		}

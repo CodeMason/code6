@@ -67,7 +67,7 @@ public class WalkingAroundOnline implements ApplicationListener{
 		spriteBatchStationary = new SpriteBatch();
 		
 		//Connect
-		client = new WaoClient(this);
+		client = new WaoClient(this);		
 		client.connect("puchisoft.servegame.com", Network.port);
 	}
 
@@ -87,7 +87,7 @@ public class WalkingAroundOnline implements ApplicationListener{
 
 	@Override
 	public void render() {
-		if (Gdx.input.isKeyPressed(Keys.G)) {
+		if (Gdx.input.isKeyPressed(Keys.G) || Gdx.input.isTouched(2)) {
 			if(server == null){
 				//Start server
 				Log.info("Starting server...");
