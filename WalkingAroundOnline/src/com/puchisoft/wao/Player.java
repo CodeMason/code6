@@ -1,4 +1,4 @@
-package com.puchisoft;
+package com.puchisoft.wao;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.net.Network.MovementChange;
+import com.puchisoft.wao.net.Network.MovementChange;
 
 public class Player {
 	private Texture texture;

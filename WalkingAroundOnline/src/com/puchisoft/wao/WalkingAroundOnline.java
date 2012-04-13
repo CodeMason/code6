@@ -1,4 +1,4 @@
-package com.puchisoft;
+package com.puchisoft.wao;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,11 +16,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.net.Network.MovementChange;
-import com.puchisoft.net.Network.PlayerJoinLeave;
-import com.puchisoft.net.Network;
-import com.puchisoft.net.WaoClient;
-import com.puchisoft.net.WaoServer;
+import com.puchisoft.wao.net.Network;
+import com.puchisoft.wao.net.WaoClient;
+import com.puchisoft.wao.net.WaoServer;
+import com.puchisoft.wao.net.Network.MovementChange;
+import com.puchisoft.wao.net.Network.PlayerJoinLeave;
 
 
 public class WalkingAroundOnline implements ApplicationListener{

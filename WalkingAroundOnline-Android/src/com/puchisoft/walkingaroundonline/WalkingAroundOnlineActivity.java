@@ -3,7 +3,7 @@ package com.puchisoft.walkingaroundonline;
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
-import com.puchisoft.WalkingAroundOnline;
+import com.puchisoft.wao.WalkingAroundOnline;
 
 public class WalkingAroundOnlineActivity extends AndroidApplication {
     /** Called when the activity is first created. */

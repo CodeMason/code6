@@ -1,4 +1,4 @@
-package com.puchisoft;
+package com.puchisoft.wao;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 
