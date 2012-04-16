@@ -1,3 +1,4 @@
+// TEST
 package com.puchisoft.wao;
 
 import java.util.HashMap;
@@ -58,7 +59,7 @@ public class GameMap {
 		this.cam.position
 				.set(playerLocal.position.x, playerLocal.position.y, 0);
 
-		spriteBatch = new SpriteBatch();
+		spriteBatch = new SpriteBatch(); //
 
 	}
 
