@@ -54,6 +54,9 @@ public class ScreenGame extends ScreenCore {
 				client.connectLocal();
 			}
 		}
+		else if(Gdx.input.isKeyPressed(Keys.ESCAPE)){
+			game.setScreen(new ScreenMenu(game));
+		}
 		
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
@@ -68,9 +71,9 @@ public class ScreenGame extends ScreenCore {
 	public void resize(int width, int height) {
 		map.cam.setToOrtho(false, width, height);
 	}
-
+	
 	@Override
-	public void dispose() {
+	public void hide() {
 		client.shutdown();
 		if(server !=null) server.shutdown();
 		map.dispose();
