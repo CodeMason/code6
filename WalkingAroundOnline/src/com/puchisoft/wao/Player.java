@@ -14,19 +14,23 @@ public class Player {
 
 	public Vector2 maxPosition;
 	public Vector2 position;
-	private Vector2 direction = new Vector2();
+	public Vector2 direction = new Vector2();
 	private Vector2 oldDirection = new Vector2();
 	
 	private float speed = 5;
 	
 	private boolean isMoving = false;
 
+	public boolean isMoving() {
+		return isMoving;
+	}
+
 	public Player(Texture texture, Vector2 position, Vector2 maxPosition) {
 		this.texture = texture;
 		this.position = position;
 		this.maxPosition = maxPosition;
 	}
-
+	
 	// Returns whether there was a change
 	public boolean handleInput() {
 		

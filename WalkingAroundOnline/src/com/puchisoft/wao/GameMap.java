@@ -17,69 +17,112 @@ import com.puchisoft.wao.net.WaoClient;
 public class GameMap {
 	public OrthographicCamera cam;
 	private SpriteBatch spriteBatch;
-	
-	
-	private Map<Integer,Player> players = new HashMap<Integer,Player>();
-	
+
+	private Map<Integer, Player> players = new HashMap<Integer, Player>();
+
 	private Player playerLocal;
-	
+
 	private Texture texturePlayer;
 	private Texture textureBg;
 	private int tilesCount = 5;
-	
+
+	private Texture texturedog;
+	private Vector2 sizedog;
+
 	private Vector2 maxPosition;
-	
+
 	private WaoClient client;
 	private HUD hud;
-	
+	private Dog dogLocal;
+
 	public GameMap(HUD hud) {
-		this.hud= hud;
+		this.hud = hud;
 		Gdx.files.internal("data/background.png");
 		textureBg = new Texture(Gdx.files.internal("data/background.png"));
-		
+
 		texturePlayer = new Texture(Gdx.files.internal("data/player.png"));
+		texturedog = new Texture(Gdx.files.internal("data/dog.png"));
+
+		maxPosition = new Vector2(textureBg.getWidth() * tilesCount,
+				textureBg.getHeight() * tilesCount);
+		playerLocal = new Player(texturePlayer, new Vector2(50, 50),
+				maxPosition);
+		dogLocal = new Dog(texturedog, new Vector2(50, 50));
+		sizedog = new Vector2(texturedog.getWidth(), texturedog.getHeight());
 		
-		maxPosition = new Vector2(textureBg.getWidth()*tilesCount, textureBg.getHeight()*tilesCount);
-		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition);
-		
-		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		this.cam.position.set(playerLocal.position.x, playerLocal.position.y, 0);
-		
+		//sizedog.x = texturedog.getWidth();
+		//sizedog.y = texturedog.getHeight();
+
+		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(),
+				Gdx.graphics.getHeight());
+		this.cam.position
+				.set(playerLocal.position.x, playerLocal.position.y, 0);
+
 		spriteBatch = new SpriteBatch();
-		
+
 	}
-	
-	public void render(){
-		if(client == null){
+
+	public void render() {
+		if (client == null) {
 			return;
 		}
-		this.cam.position.set(playerLocal.position.x, playerLocal.position.y, 0);
+		this.cam.position
+				.set(playerLocal.position.x, playerLocal.position.y, 0);
 		cam.update();
-		
+
 		spriteBatch.setProjectionMatrix(cam.combined);
 		spriteBatch.begin();
 		spriteBatch.setColor(Color.WHITE);
-		
-		for(int i = 0; i < tilesCount; i++){
-			for(int j = 0; j < tilesCount; j++){
-				spriteBatch.draw(textureBg, textureBg.getWidth()*i, textureBg.getHeight()*j, 0, 0, textureBg.getWidth(), textureBg.getHeight());
+
+		for (int i = 0; i < tilesCount; i++) {
+			for (int j = 0; j < tilesCount; j++) {
+				spriteBatch.draw(textureBg, textureBg.getWidth() * i,
+						textureBg.getHeight() * j, 0, 0, textureBg.getWidth(),
+						textureBg.getHeight());
 			}
 		}
-		
-		if(playerLocal.handleInput()){
+
+		if (playerLocal.handleInput()) {
 			Log.info("changed input");
 			client.sendMessage(playerLocal.getMovementState());
 		}
+	/*	if (playerLocal.direction.x > 0) {
+			dogLocal.position.x = playerLocal.position.x - (texturedog.getWidth() - 5);
+		}
+
+		if (playerLocal.direction.y > 0) {
+			dogLocal.position.y = playerLocal.position.y - texturedog.getHeight() - 5;
+		}
+		if (playerLocal.direction.x < 0) {
+			dogLocal.position.x = playerLocal.position.x + 20;
+		}
+
+		if (playerLocal.direction.y < 0) {
+			dogLocal.position.y = playerLocal.position.y + 20;
+		} 
+	*/
+		//dogLocal.position.set(playerLocal.position);
 		
-		for(Map.Entry<Integer, Player> playerEntry: players.entrySet()){
+		dogLocal.position.lerp(playerLocal.position, 0.01f);
+		
+		if (playerLocal.isMoving() == true){
+		//dogLocal.position.add(playerLocal.direction);
+		//dogLocal.position.sub(sizedog);
+		
+		}
+		//else dogLocal.position.set(playerLocal.position);
+			
+		dogLocal.render(spriteBatch);
+
+		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 			playerEntry.getValue().render(spriteBatch);
 		}
-				
+
 		spriteBatch.end();
-		
+
 	}
-	
-	public void dispose(){
+
+	public void dispose() {
 		texturePlayer.dispose();
 		textureBg.dispose();
 		spriteBatch.dispose();
@@ -87,17 +130,17 @@ public class GameMap {
 
 	// OnConnect
 	public void setNetworkClient(WaoClient client) {
-		
+
 		if (this.client == null) {
 			this.client = client;
 			this.playerLocal.setId(client.id);
 			players.put(client.id, playerLocal);
-			setStatus("Connected to "+client.remoteIP);
+			setStatus("Connected to " + client.remoteIP);
 		} else {
 			Log.error("setNetworkClient called twice");
 		}
 	}
-	
+
 	public void onDisconnect() {
 		this.client = null;
 		this.players.clear();
@@ -122,10 +165,9 @@ public class GameMap {
 		player.setMovementState(msg);
 
 	}
-	
+
 	public void setStatus(String status) {
 		hud.setStatus(status);
 	}
-
 
 }
