@@ -20,15 +20,17 @@ public class Player {
 	private float speed = 5;
 	
 	private boolean isMoving = false;
+	private Dog dog;
 
 	public boolean isMoving() {
 		return isMoving;
 	}
 
-	public Player(Texture texture, Vector2 position, Vector2 maxPosition) {
+	public Player(Texture texture, Vector2 position, Vector2 maxPosition, Dog dog) {
 		this.texture = texture;
 		this.position = position;
 		this.maxPosition = maxPosition;
+		this.dog = dog;
 	}
 	
 	// Returns whether there was a change
@@ -85,7 +87,11 @@ public class Player {
 
 	public void render(SpriteBatch spriteBatch) {
 		this.move();
-
+		
+		dog.position.lerp(this.position, 0.01f);
+		
+		dog.render(spriteBatch);
+		
 		spriteBatch.draw(texture, position.x, position.y, 0, 0,
 				texture.getWidth(), texture.getHeight());
 	}

@@ -28,13 +28,14 @@ public class GameMap {
 	private int tilesCount = 5;
 
 	private Texture texturedog;
+	private Texture textureChasedog;
 	private Vector2 sizedog;
 
 	private Vector2 maxPosition;
 
 	private WaoClient client;
 	private HUD hud;
-	private Dog dogLocal;
+	private Dog dogChase;
 
 	public GameMap(HUD hud) {
 		this.hud = hud;
@@ -43,12 +44,16 @@ public class GameMap {
 
 		texturePlayer = new Texture(Gdx.files.internal("data/player.png"));
 		texturedog = new Texture(Gdx.files.internal("data/dog.png"));
+		textureChasedog = new Texture(Gdx.files.internal("data/dogchase.png"));
 
 		maxPosition = new Vector2(textureBg.getWidth() * tilesCount,
 				textureBg.getHeight() * tilesCount);
+		Dog dogLocal = new Dog(texturedog, new Vector2(50, 50));
 		playerLocal = new Player(texturePlayer, new Vector2(50, 50),
-				maxPosition);
-		dogLocal = new Dog(texturedog, new Vector2(50, 50));
+				maxPosition, dogLocal);
+		
+		dogChase = new Dog(textureChasedog, new Vector2(50, 50));
+		
 		sizedog = new Vector2(texturedog.getWidth(), texturedog.getHeight());
 		
 		//sizedog.x = texturedog.getWidth();
@@ -87,38 +92,26 @@ public class GameMap {
 			Log.info("changed input");
 			client.sendMessage(playerLocal.getMovementState());
 		}
-	/*	if (playerLocal.direction.x > 0) {
-			dogLocal.position.x = playerLocal.position.x - (texturedog.getWidth() - 5);
-		}
-
-		if (playerLocal.direction.y > 0) {
-			dogLocal.position.y = playerLocal.position.y - texturedog.getHeight() - 5;
-		}
-		if (playerLocal.direction.x < 0) {
-			dogLocal.position.x = playerLocal.position.x + 20;
-		}
-
-		if (playerLocal.direction.y < 0) {
-			dogLocal.position.y = playerLocal.position.y + 20;
-		} 
-	*/
-		//dogLocal.position.set(playerLocal.position);
-		
-		dogLocal.position.lerp(playerLocal.position, 0.01f);
-		
-		if (playerLocal.isMoving() == true){
-		//dogLocal.position.add(playerLocal.direction);
-		//dogLocal.position.sub(sizedog);
-		
-		}
-		//else dogLocal.position.set(playerLocal.position);
-			
-		dogLocal.render(spriteBatch);
 
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 			playerEntry.getValue().render(spriteBatch);
 		}
 
+		Player closestPlayer = playerLocal;
+		float dogChaseDist = 999999999;
+		
+		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+			float currentdist = playerEntry.getValue().position.dst2(dogChase.position);
+			if (currentdist < dogChaseDist) {
+				dogChaseDist = currentdist;
+				closestPlayer = playerEntry.getValue();
+			}
+		}
+		
+		dogChase.position.lerp(closestPlayer.position, 0.01f);
+		
+		dogChase.render(spriteBatch);
+		
 		spriteBatch.end();
 
 	}
@@ -151,7 +144,7 @@ public class GameMap {
 	public void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
 		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50),
-				maxPosition);
+				maxPosition, new Dog(texturedog, new Vector2(50, 50)));
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
 	}
