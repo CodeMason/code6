@@ -3,7 +3,6 @@
     package="com.puchisoft.walkingaroundonline"
     android:versionCode="1"
     android:versionName="1.0"
-    android:screenOrientation="landscape"
     android:installLocation="auto" >
 
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="15" />
@@ -17,7 +16,9 @@
         android:label="@string/app_name" >
         <activity
             android:name="com.puchisoft.walkingaroundonline.WalkingAroundOnlineActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape">
+            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -6,7 +6,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.wao.WalkingAroundOnline;
+import com.puchisoft.wao.GameMap;
 import com.puchisoft.wao.net.Network.LogMessage;
 import com.puchisoft.wao.net.Network.Login;
 import com.puchisoft.wao.net.Network.MovementChange;
@@ -15,10 +15,12 @@ import com.puchisoft.wao.net.Network.PlayerJoinLeave;
 public class WaoClient {
 	
 	private Client client;
-	private WalkingAroundOnline game;
+	private GameMap map;
+	public int id;
+	public String remoteIP;
 
-	public WaoClient(final WalkingAroundOnline game) {
-		this.game = game;
+	public WaoClient(final GameMap game) { //
+		this.map = game;
 		
 		client = new Client();
 		client.start();
@@ -29,11 +31,7 @@ public class WaoClient {
 
 		client.addListener(new Listener() {
 			public void connected (Connection connection) {
-				game.setStatus("Connected to "+connection.getRemoteAddressTCP());
-				game.setNetworkId(connection.getID());
-				Login registerName = new Login("USER"+Math.random(), Network.version);
-				client.sendTCP(registerName);
-				client.updateReturnTripTime();
+				handleConnect(connection);
 			}
 
 			public void received (Connection connection, Object object) {
@@ -41,12 +39,27 @@ public class WaoClient {
 			}
 
 			public void disconnected (Connection connection) {
-				game.setStatus("Disconnected");
+				handleDisonnect(connection);
 			}
 		});
 
 	}
-	
+		
+
+	protected void handleDisonnect(Connection connection) {
+		map.onDisconnect();
+	}
+
+
+	protected void handleConnect(Connection connection) {
+		id = connection.getID();
+		remoteIP = connection.getRemoteAddressTCP().toString();
+		Login registerName = new Login("USER"+Math.random(), Network.version);
+		client.sendTCP(registerName);
+		client.updateReturnTripTime();
+		map.setNetworkClient(this);
+	}
+
 
 	public void connectLocal() {
 		connect("localhost", Network.port);
@@ -57,7 +70,7 @@ public class WaoClient {
 			client.connect(5000, host, port);
 		} catch (IOException e) {
 //			e.printStackTrace();
-			game.setStatus("Can't connect to "+host);
+			map.setStatus("Can't connect to "+host);
 			Log.error("Can't connect to "+host);
 		}
 	}
@@ -76,22 +89,22 @@ public class WaoClient {
 
 		if (message instanceof LogMessage) {
 			LogMessage msg = (LogMessage) message;
-			game.setStatus(msg.message);
+			map.setStatus(msg.message);
 		}
 		else if(message instanceof PlayerJoinLeave){
 			PlayerJoinLeave msg = (PlayerJoinLeave) message;
 			if(msg.hasJoined){
-				game.setStatus(msg.name + " joined");
-				game.addPlayer(msg);
+				map.setStatus(msg.name + " joined");
+				map.addPlayer(msg);
 			}
 			else{
-				game.setStatus(msg.name + " left");
-				game.removePlayer(msg);
+				map.setStatus(msg.name + " left");
+				map.removePlayer(msg);
 			}
 		}
 		else if(message instanceof MovementChange){
 			MovementChange msg = (MovementChange) message;
-			game.playerMoved(msg);
+			map.playerMoved(msg);
 		}
 
 	}
