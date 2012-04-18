@@ -101,15 +101,17 @@ public class Player {
 		spriteBatch.draw(texture, position.x, position.y, texture.getRegionWidth()*0.5f, texture.getRegionHeight()*0.5f, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, direction.angle()); 
 	}
 	
-	public Vector3 getDesiredCameraPosition(float delta){
-		Vector2 offset = velocity.cpy().mul(600*delta);
+	public Vector3 getDesiredCameraPosition(Vector3 camPos, float delta){
+		Vector2 offset = velocity.cpy().mul(400*delta);
 
 		// Clamp cam position to always show our player
-		offset.x = Math.max(-1*Gdx.graphics.getWidth()*0.5f + texture.getRegionWidth(), Math.min(Gdx.graphics.getWidth()*0.5f, offset.x));
-		offset.y = Math.max(-1*Gdx.graphics.getHeight()*0.5f +texture.getRegionHeight(),Math.min(Gdx.graphics.getHeight()*0.5f, offset.y));
+		offset.x = Math.max(-1*Gdx.graphics.getWidth()*0.3f , Math.min(Gdx.graphics.getWidth()*0.3f, offset.x));
+		offset.y = Math.max(-1*Gdx.graphics.getHeight()*0.3f ,Math.min(Gdx.graphics.getHeight()*0.3f, offset.y));
 		
 		Vector2 dest = position.cpy().add(offset);
-		return new Vector3(dest.x,dest.y,0);
+		camPos.lerp(new Vector3(dest.x,dest.y,0), 30f* delta);
+		
+		return camPos;
 	}
 	
 	public MovementChange getMovementState(){

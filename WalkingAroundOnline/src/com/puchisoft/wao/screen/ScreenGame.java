@@ -63,7 +63,14 @@ public class ScreenGame extends ScreenCore {
 		map.render(delta);
 		hud.render(delta);
 		
-//		Log.info(Float.toString(delta)+" "+Float.toString(1/delta));
+		// emulate terrible fps
+//		try {
+//			Thread.sleep(30);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+		
+		Log.info(Float.toString(delta)+" "+Float.toString(1/delta)+" "+30f* delta);
 //		fps.log();
 	}
 	

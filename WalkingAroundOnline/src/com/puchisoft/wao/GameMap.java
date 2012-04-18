@@ -53,7 +53,7 @@ public class GameMap {
 		if(client == null){
 			return;
 		}
-		this.cam.position.lerp(playerLocal.getDesiredCameraPosition(delta),Math.min(Math.max(delta*8,0.2f),0.8f));
+		this.cam.position.set(playerLocal.getDesiredCameraPosition(this.cam.position, delta));
 		cam.update();
 		
 		spriteBatch.setProjectionMatrix(cam.combined);
