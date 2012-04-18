@@ -2,14 +2,14 @@ package com.puchisoft.wao;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.wao.net.Network.MovementChange;
 
 public class Player {
-	private Texture texture;
+	private TextureRegion texture;
 	private int id;
 
 	public Vector2 maxPosition;
@@ -21,7 +21,7 @@ public class Player {
 	
 	private boolean isMoving = false;
 
-	public Player(Texture texture, Vector2 position, Vector2 maxPosition) {
+	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition) {
 		this.texture = texture;
 		this.position = position;
 		this.maxPosition = maxPosition;
@@ -73,17 +73,16 @@ public class Player {
 			
 			// Prevent escape
 			position.x = Math.max(0, Math.min(
-					maxPosition.x - texture.getWidth(), position.x));
+					maxPosition.x - texture.getRegionWidth(), position.x));
 			position.y = Math.max(0, Math.min(
-					maxPosition.y - texture.getHeight(), position.y));
+					maxPosition.y - texture.getRegionHeight(), position.y));
 		}
 	}
 
 	public void render(SpriteBatch spriteBatch) {
 		this.move();
 
-		spriteBatch.draw(texture, position.x, position.y, 0, 0,
-				texture.getWidth(), texture.getHeight());
+		spriteBatch.draw(texture, position.x, position.y, texture.getRegionWidth()/2, texture.getRegionHeight()/2, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, direction.angle()); 
 	}
 
 	public int getId() {

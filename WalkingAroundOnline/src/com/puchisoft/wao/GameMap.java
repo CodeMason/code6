@@ -1,4 +1,3 @@
-// TEST
 package com.puchisoft.wao;
 
 import java.util.HashMap;
@@ -9,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.wao.net.Network.MovementChange;
@@ -24,9 +24,9 @@ public class GameMap {
 	
 	private Player playerLocal;
 	
-	private Texture texturePlayer;
+	private TextureRegion texturePlayer;
 	private Texture textureBg;
-	private int tilesCount = 5;
+	private int tilesCount = 3;
 	
 	private Vector2 maxPosition;
 	
@@ -38,7 +38,7 @@ public class GameMap {
 		Gdx.files.internal("data/background.png");
 		textureBg = new Texture(Gdx.files.internal("data/background.png"));
 		
-		texturePlayer = new Texture(Gdx.files.internal("data/player.png"));
+		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/ship.png")), 0, 0, 42, 32);
 		
 		maxPosition = new Vector2(textureBg.getWidth()*tilesCount, textureBg.getHeight()*tilesCount);
 		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition);
@@ -81,7 +81,7 @@ public class GameMap {
 	}
 	
 	public void dispose(){
-		texturePlayer.dispose();
+		texturePlayer.getTexture().dispose();
 		textureBg.dispose();
 		spriteBatch.dispose();
 	}
