@@ -10,8 +10,15 @@ import com.esotericsoftware.minlog.Log;
 import com.puchisoft.wao.net.Network.MovementChange;
 
 public class Player {
+	private static final int   FIRE_DELAY = 500;
+	private static final float speedAcc = 20.0f;
+	private static final float speedAccTouch = 1.0f;
+	private static final float speedRot = 180.0f; //angle degrees
+	private static final float speedMax = 50.0f;
+	
 	private TextureRegion texture;
 	private int id;
+	private GameMap map;
 
 	public Vector2 maxPosition;
 	public Vector2 position;
@@ -28,17 +35,15 @@ public class Player {
 	private int accelerating = 0; // -1, 0, 1
 	private int acceleratingOld = turning;
 	
-	final private float speedAcc = 20.0f;
-	final private float speedAccTouch = 1.0f;
-	final private float speedRot = 180.0f; //angle degrees
-	final private float speedMax = 50.0f;
 	
 	boolean wasTouched = false;
+	long mayFireTime = System.nanoTime()/1000000; //ms
 	
-	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition) {
+	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition,GameMap map) {
 		this.texture = texture;
 		this.position = position;
 		this.maxPosition = maxPosition;
+		this.map = map;
 	}
 
 	// Returns whether there was a change
@@ -53,6 +58,8 @@ public class Player {
 		boolean touchMove = false;
 		
 		
+		//Android
+		// Movement
 		if(Gdx.input.isTouched()){
 			if(!wasTouched){ //touchPos == null // just started touching
 				touchPos = new Vector2(Gdx.input.getX(),Gdx.input.getY());
@@ -74,6 +81,8 @@ public class Player {
 			touchMove = true;
 		}
 		
+		//Desktop
+		// Movement
 		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
 				|| Gdx.input.isKeyPressed(Keys.S)
 				|| Gdx.input.isKeyPressed(Keys.D)) {
@@ -90,6 +99,11 @@ public class Player {
 			else if (Gdx.input.isKeyPressed(Keys.D)) {
 				turning = -1;
 			}
+		}
+		//Shooting
+		if (Gdx.input.isKeyPressed(Keys.SPACE) && mayFireTime < System.nanoTime()/1000000){
+			map.addBullet(this, position.cpy(), velocity.cpy(), direction.cpy());
+			mayFireTime = (System.nanoTime()/1000000) + FIRE_DELAY;
 		}
 		return turning != turningOld || accelerating != acceleratingOld || touchMove;
 	}

@@ -1,6 +1,8 @@
 package com.puchisoft.wao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
@@ -21,10 +23,12 @@ public class GameMap {
 	
 	
 	private Map<Integer,Player> players = new HashMap<Integer,Player>();
+	private List<Bullet> bullets = new ArrayList<Bullet>();
 	
 	private Player playerLocal;
 	
 	private TextureRegion texturePlayer;
+	private TextureRegion textureBullet;
 	private Texture textureBg;
 	private int tilesCount = 3;
 	
@@ -39,9 +43,10 @@ public class GameMap {
 		textureBg = new Texture(Gdx.files.internal("data/background.png"));
 		
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
+		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
 		
 		maxPosition = new Vector2(textureBg.getWidth()*tilesCount, textureBg.getHeight()*tilesCount);
-		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition);
+		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition,this);
 		
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
@@ -65,14 +70,21 @@ public class GameMap {
 				spriteBatch.draw(textureBg, textureBg.getWidth()*i, textureBg.getHeight()*j, 0, 0, textureBg.getWidth(), textureBg.getHeight());
 			}
 		}
-		
+
+		// Handle local input and sent over network if changed
 		if(playerLocal.handleInput()){
 			Log.info("changed input");
 			client.sendMessage(playerLocal.getMovementState());
 		}
 		
+		// Render Players
 		for(Map.Entry<Integer, Player> playerEntry: players.entrySet()){
 			playerEntry.getValue().render(spriteBatch, delta);
+		}
+		
+		// Render Bullets
+		for(Bullet bullet: bullets){
+			bullet.render(spriteBatch, delta);
 		}
 				
 		spriteBatch.end();
@@ -106,7 +118,7 @@ public class GameMap {
 	public void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
 		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50),
-				maxPosition);
+				maxPosition,this);
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
 		
@@ -128,6 +140,14 @@ public class GameMap {
 	
 	public void setStatus(String status) {
 		hud.setStatus(status);
+	}
+
+	public void addBullet(Player player, Vector2 position, Vector2 velocity,
+			Vector2 direction) {
+		bullets.add(new Bullet(textureBullet, position, velocity, direction, maxPosition));
+		if(player == playerLocal ){
+			// network code here
+		}
 	}
 
 }
