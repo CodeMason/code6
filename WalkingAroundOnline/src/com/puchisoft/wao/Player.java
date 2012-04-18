@@ -25,9 +25,9 @@ public class Player {
 	private int accelerating = 0; // -1, 0, 1
 	private int acceleratingOld = turning;
 	
-	final private float speedAcc = 0.5f;
-	final private float speedRot = 5f; //angle degrees
-	final private float speedMax = 80f;
+	final private float speedAcc = 30.0f;
+	final private float speedRot = 180.0f; //angle degrees
+	final private float speedMax = 80.0f;
 	
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition) {
 		this.texture = texture;
@@ -69,24 +69,24 @@ public class Player {
 		return turning != turningOld || accelerating != acceleratingOld;
 	}
 
-	private void move() {
+	private void move(float delta) {
 		
-		direction.rotate(turning * speedRot);
+		direction.rotate(turning * delta * speedRot);
 		
-		velocity.add(direction.cpy().mul(speedAcc * accelerating));
+		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
 		
 		if(velocity.len() > speedMax) {
 			velocity.nor().mul(speedMax);
 		}
 		
-		position.add(velocity);
+		position.add(velocity.tmp().mul(delta*60));
 
 		// Prevent escape
 		if(position.x < 0 || position.x > maxPosition.x - texture.getRegionWidth()){
-			velocity.x *= -0.5;
+			velocity.x *= -0.3;
 		}	
 		else if(position.y < 0 || position.y > maxPosition.y - texture.getRegionHeight()){
-			velocity.y *= -0.5;
+			velocity.y *= -0.3;
 		}
 		
 		position.x = Math.max(0,
@@ -95,14 +95,14 @@ public class Player {
 				.max(0, Math.min(maxPosition.y - texture.getRegionHeight(),position.y));
 	}
 
-	public void render(SpriteBatch spriteBatch) {
-		this.move();
+	public void render(SpriteBatch spriteBatch, float delta) {
+		this.move(delta);
 
 		spriteBatch.draw(texture, position.x, position.y, texture.getRegionWidth()*0.5f, texture.getRegionHeight()*0.5f, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, direction.angle()); 
 	}
 	
-	public Vector3 getDesiredCameraPosition(){
-		Vector2 offset = velocity.cpy().mul(10);
+	public Vector3 getDesiredCameraPosition(float delta){
+		Vector2 offset = velocity.cpy().mul(600*delta);
 
 		// Clamp cam position to always show our player
 		offset.x = Math.max(-1*Gdx.graphics.getWidth()*0.5f + texture.getRegionWidth(), Math.min(Gdx.graphics.getWidth()*0.5f, offset.x));

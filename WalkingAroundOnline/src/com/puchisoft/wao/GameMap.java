@@ -26,7 +26,7 @@ public class GameMap {
 	
 	private TextureRegion texturePlayer;
 	private Texture textureBg;
-	private int tilesCount = 2;
+	private int tilesCount = 3;
 	
 	private Vector2 maxPosition;
 	
@@ -49,11 +49,11 @@ public class GameMap {
 		
 	}
 	
-	public void render(){
+	public void render(float delta){
 		if(client == null){
 			return;
 		}
-		this.cam.position.lerp(playerLocal.getDesiredCameraPosition(),0.2f);
+		this.cam.position.lerp(playerLocal.getDesiredCameraPosition(delta),Math.min(Math.max(delta*8,0.2f),0.8f));
 		cam.update();
 		
 		spriteBatch.setProjectionMatrix(cam.combined);
@@ -72,7 +72,7 @@ public class GameMap {
 		}
 		
 		for(Map.Entry<Integer, Player> playerEntry: players.entrySet()){
-			playerEntry.getValue().render(spriteBatch);
+			playerEntry.getValue().render(spriteBatch, delta);
 		}
 				
 		spriteBatch.end();

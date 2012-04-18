@@ -2,4 +2,4 @@
 -Add real Menu screen with buttons
 -Added IP entry edit box
 -Camera look ahead
--Use DeltaTime on update
+-Fuel items, running out of fuel decreasing your max speed
