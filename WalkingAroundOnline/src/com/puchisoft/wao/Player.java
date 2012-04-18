@@ -28,9 +28,9 @@ public class Player {
 	private int accelerating = 0; // -1, 0, 1
 	private int acceleratingOld = turning;
 	
-	final private float speedAcc = 30.0f;
+	final private float speedAcc = 20.0f;
 	final private float speedRot = 180.0f; //angle degrees
-	final private float speedMax = 70.0f;
+	final private float speedMax = 50.0f;
 	
 	boolean wasTouched = false;
 	
@@ -69,8 +69,15 @@ public class Player {
 			wasTouched = true;
 		}
 		else if(wasTouched){ // just stopped touching
-			Log.info("drag");
+			if(touchPos.len2() > 0){
+				touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
+				touchPos.x *= -1;
+				Log.info("drag " + touchPos.x+" "+touchPos.y);
+				direction.set(touchPos.tmp()).nor();
+				velocity.add(touchPos.mul(0.2f * speedAcc * Gdx.graphics.getDeltaTime()));
+			}
 			wasTouched = false;
+			touchMove = true;
 		}
 		
 		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
