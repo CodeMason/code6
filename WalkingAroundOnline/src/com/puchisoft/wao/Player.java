@@ -15,7 +15,6 @@ public class Player {
 
 	public Vector2 maxPosition;
 	public Vector2 position;
-	public Vector2 direction = new Vector2();
 	private Vector2 oldDirection = new Vector2();
 	
 	private Vector2 direction = new Vector2(1,0);
@@ -31,7 +30,7 @@ public class Player {
 	final private float speedRot = 180.0f; //angle degrees
 	final private float speedMax = 80.0f;
 	
-	{
+	
 	private boolean isMoving = false;
 	private Dog dog;
 
