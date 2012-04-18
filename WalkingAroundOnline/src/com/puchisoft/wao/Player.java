@@ -49,8 +49,8 @@ public class Player {
 			
 			if(Gdx.input.isTouched()){
 				Log.info(Gdx.input.getX()+" "+Gdx.input.getY());
-//				direction.x = Gdx.input.getX() > Gdx.graphics.getWidth()/2 ? 1 : -1;
-//				direction.y = Gdx.input.getY() > Gdx.graphics.getHeight()/2 ? -1 : 1;
+				turning = Gdx.input.getX() > Gdx.graphics.getWidth()/2 ? 1 : -1;
+				accelerating = Gdx.input.getY() > Gdx.graphics.getHeight()/2 ? -1 : 1;
 			}
 			
 			if (Gdx.input.isKeyPressed(Keys.W)) {
@@ -82,6 +82,13 @@ public class Player {
 		position.add(velocity);
 
 		// Prevent escape
+		if(position.x < 0 || position.x > maxPosition.x - texture.getRegionWidth()){
+			velocity.x *= -0.5;
+		}	
+		else if(position.y < 0 || position.y > maxPosition.y - texture.getRegionHeight()){
+			velocity.y *= -0.5;
+		}
+		
 		position.x = Math.max(0,
 				Math.min(maxPosition.x - texture.getRegionWidth(), position.x));
 		position.y = Math
@@ -95,7 +102,7 @@ public class Player {
 	}
 	
 	public Vector3 getDesiredCameraPosition(){
-		Vector2 offset = velocity.cpy().mul(5);
+		Vector2 offset = velocity.cpy().mul(10);
 
 		// Clamp cam position to always show our player
 		offset.x = Math.max(-1*Gdx.graphics.getWidth()*0.5f + texture.getRegionWidth(), Math.min(Gdx.graphics.getWidth()*0.5f, offset.x));
