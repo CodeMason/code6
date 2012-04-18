@@ -52,14 +52,10 @@ public class GameMap {
 		texturedog = new Texture(Gdx.files.internal("data/dog.png"));
 		textureChasedog = new Texture(Gdx.files.internal("data/dogchase.png"));
 
-		maxPosition = new Vector2(textureBg.getWidth() * tilesCount,
-				textureBg.getHeight() * tilesCount);
 		Dog dogLocal = new Dog(texturedog, new Vector2(50, 50));
-		playerLocal = new Player(texturePlayer, new Vector2(50, 50),
-				maxPosition, dogLocal);
-		
+				
 		maxPosition = new Vector2(textureBg.getWidth()*tilesCount, textureBg.getHeight()*tilesCount);
-		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition,this);
+		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition,this, dogLocal);
 		dogChase = new Dog(textureChasedog, new Vector2(50, 50));
 		
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -159,8 +155,7 @@ public class GameMap {
 	public void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
 		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50),
-				maxPosition,this);
-				maxPosition, new Dog(texturedog, new Vector2(50, 50)));
+				maxPosition, this, new Dog(texturedog, new Vector2(50, 50)));
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
 		

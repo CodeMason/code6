@@ -39,9 +39,7 @@ public class Player {
 	
 	boolean wasTouched = false;
 	long mayFireTime = System.nanoTime()/1000000; //ms
-	
-	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition,GameMap map) {
-	
+		
 	private boolean isMoving = false;
 	private Dog dog;
 
@@ -49,7 +47,7 @@ public class Player {
 		return isMoving;
 	}
 
-	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, Dog dog) {
+	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Dog dog) {
 		this.texture = texture;
 		this.position = position;
 		this.maxPosition = maxPosition;
