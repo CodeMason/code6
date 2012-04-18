@@ -108,7 +108,7 @@ public class Player {
 	public void render(SpriteBatch spriteBatch, float delta) {
 		this.move(delta);
 		
-		dog.position.lerp(this.position, 0.01f);
+		dog.position.lerp(this.position, 0.035f);
 		
 		dog.render(spriteBatch);
 		
