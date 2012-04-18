@@ -19,6 +19,9 @@ public class Player {
 	private Vector2 direction = new Vector2(1,0);
 	private Vector2 velocity = new Vector2();
 	
+	private Vector2 touchPos;
+	
+	
 	// input state
 	private int turning = 0; // -1, 0, 1
 	private int turningOld = turning;
@@ -27,7 +30,9 @@ public class Player {
 	
 	final private float speedAcc = 30.0f;
 	final private float speedRot = 180.0f; //angle degrees
-	final private float speedMax = 80.0f;
+	final private float speedMax = 70.0f;
+	
+	boolean wasTouched = false;
 	
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition) {
 		this.texture = texture;
@@ -43,30 +48,49 @@ public class Player {
 		
 		turning = 0;
 		accelerating = 0;
-		if (Gdx.input.isTouched() || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
+		
+		boolean touchMove = false;
+		
+		
+		if(Gdx.input.isTouched()){
+			if(!wasTouched){ //touchPos == null // just started touching
+				touchPos = new Vector2(Gdx.input.getX(),Gdx.input.getY());
+			}
+			
+//			if(Gdx.input.getDeltaX() != 0){
+//				velocity.x += Gdx.input.getDeltaX() * speedAcc * Gdx.graphics.getDeltaTime();
+//			}
+//			if(Gdx.input.getDeltaY() != 0){
+//				velocity.y -= Gdx.input.getDeltaY() * speedAcc * Gdx.graphics.getDeltaTime();
+//			}
+//			Log.info(Gdx.input.getX()+" "+Gdx.input.getY());
+//			turning = Gdx.input.getX() > Gdx.graphics.getWidth()/2 ? 1 : -1;
+//			accelerating = Gdx.input.getY() > Gdx.graphics.getHeight()/2 ? -1 : 1;
+			wasTouched = true;
+		}
+		else if(wasTouched){ // just stopped touching
+			Log.info("drag");
+			wasTouched = false;
+		}
+		
+		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
 				|| Gdx.input.isKeyPressed(Keys.S)
 				|| Gdx.input.isKeyPressed(Keys.D)) {
-			
-			if(Gdx.input.isTouched()){
-				Log.info(Gdx.input.getX()+" "+Gdx.input.getY());
-				turning = Gdx.input.getX() > Gdx.graphics.getWidth()/2 ? 1 : -1;
-				accelerating = Gdx.input.getY() > Gdx.graphics.getHeight()/2 ? -1 : 1;
-			}
 			
 			if (Gdx.input.isKeyPressed(Keys.W)) {
 				accelerating = 1;
 			}
-			if (Gdx.input.isKeyPressed(Keys.S)) {
+			else if (Gdx.input.isKeyPressed(Keys.S)) {
 				accelerating = -1;
 			}
 			if (Gdx.input.isKeyPressed(Keys.A)) {
 				turning = 1;
 			}
-			if (Gdx.input.isKeyPressed(Keys.D)) {
+			else if (Gdx.input.isKeyPressed(Keys.D)) {
 				turning = -1;
 			}
 		}
-		return turning != turningOld || accelerating != acceleratingOld;
+		return turning != turningOld || accelerating != acceleratingOld || touchMove;
 	}
 
 	private void move(float delta) {

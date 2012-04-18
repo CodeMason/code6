@@ -109,6 +109,7 @@ public class GameMap {
 				maxPosition);
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
+		
 		// tell people where I am again
 		// TODO server should remember this and tell others
 		client.sendMessage(playerLocal.getMovementState());
