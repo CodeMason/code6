@@ -70,7 +70,7 @@ public class ScreenGame extends ScreenCore {
 //			e.printStackTrace();
 //		}
 		
-		Log.info(Float.toString(delta)+" "+Float.toString(1/delta)+" "+30f* delta);
+//		Log.info(Float.toString(delta)+" "+Float.toString(1/delta)+" "+30f* delta);
 //		fps.log();
 	}
 	
