@@ -83,14 +83,16 @@ public class GameMap {
 		}
 		
 		// Render Bullets
-		for(Bullet bullet: bullets){
-			bullet.render(spriteBatch, delta);
+		for (int i = 0; i < bullets.size(); i++) {
+			bullets.get(i).render(spriteBatch, delta);
+			if (bullets.get(i).destroyed)
+				bullets.remove(i);
 		}
-				
+
 		spriteBatch.end();
-		
+
 	}
-	
+
 	public void dispose(){
 		texturePlayer.getTexture().dispose();
 		textureBg.dispose();

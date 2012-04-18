@@ -75,6 +75,7 @@ public class Player {
 				velocity.add(touchPos.mul(speedAccTouch * Gdx.graphics.getDeltaTime()));
 			}
 			else{
+				shoot();
 				Log.info("touch");
 			}
 			wasTouched = false;
@@ -102,8 +103,7 @@ public class Player {
 		}
 		//Shooting
 		if (Gdx.input.isKeyPressed(Keys.SPACE) && mayFireTime < System.nanoTime()/1000000){
-			map.addBullet(this, position.cpy(), velocity.cpy(), direction.cpy());
-			mayFireTime = (System.nanoTime()/1000000) + FIRE_DELAY;
+			shoot();
 		}
 		return turning != turningOld || accelerating != acceleratingOld || touchMove;
 	}
@@ -132,6 +132,11 @@ public class Player {
 				Math.min(maxPosition.x - texture.getRegionWidth(), position.x));
 		position.y = Math
 				.max(0, Math.min(maxPosition.y - texture.getRegionHeight(),position.y));
+	}
+	
+	public void shoot(){
+		map.addBullet(this, position.cpy(), velocity.cpy(), direction.cpy());
+		mayFireTime = (System.nanoTime()/1000000) + FIRE_DELAY;
 	}
 
 	public void render(SpriteBatch spriteBatch, float delta) {
