@@ -1,3 +1,5 @@
--Create Map class to house current game logic
--Use Screens (Game Screen, Menu Screen, Connecting Screen?) to toggle between
--Use DeltaTime on update
+
+-Add real Menu screen with buttons
+-Added IP entry edit box
+-Camera look ahead
+-Fuel items, running out of fuel decreasing your max speed

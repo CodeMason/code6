@@ -1,4 +1,3 @@
-// TEST
 package com.puchisoft.wao;
 
 import java.util.HashMap;
@@ -9,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.wao.net.Network.MovementChange;
@@ -23,9 +23,9 @@ public class GameMap {
 
 	private Player playerLocal;
 
-	private Texture texturePlayer;
+	private TextureRegion texturePlayer;
 	private Texture textureBg;
-	private int tilesCount = 5;
+	private int tilesCount = 3;
 
 	private Texture texturedog;
 	private Texture textureChasedog;
@@ -42,7 +42,7 @@ public class GameMap {
 		Gdx.files.internal("data/background.png");
 		textureBg = new Texture(Gdx.files.internal("data/background.png"));
 
-		texturePlayer = new Texture(Gdx.files.internal("data/player.png"));
+		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
 		texturedog = new Texture(Gdx.files.internal("data/dog.png"));
 		textureChasedog = new Texture(Gdx.files.internal("data/dogchase.png"));
 
@@ -54,6 +54,7 @@ public class GameMap {
 		
 		dogChase = new Dog(textureChasedog, new Vector2(50, 50));
 		
+		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		sizedog = new Vector2(texturedog.getWidth(), texturedog.getHeight());
 		
 		//sizedog.x = texturedog.getWidth();
@@ -67,13 +68,12 @@ public class GameMap {
 		spriteBatch = new SpriteBatch(); //
 
 	}
-
-	public void render() {
-		if (client == null) {
+	
+	public void render(float delta){
+		if(client == null){
 			return;
 		}
-		this.cam.position
-				.set(playerLocal.position.x, playerLocal.position.y, 0);
+		this.cam.position.set(playerLocal.getDesiredCameraPosition(this.cam.position, delta));
 		cam.update();
 
 		spriteBatch.setProjectionMatrix(cam.combined);
@@ -94,7 +94,7 @@ public class GameMap {
 		}
 
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
-			playerEntry.getValue().render(spriteBatch);
+			playerEntry.getValue().render(spriteBatch, delta);
 		}
 
 		Player closestPlayer = playerLocal;
@@ -117,13 +117,12 @@ public class GameMap {
 	}
 
 	public void dispose() {
-		texturePlayer.dispose();
+		texturePlayer.getTexture().dispose();
 		textureBg.dispose();
 		spriteBatch.dispose();
 	}
 
-	// OnConnect
-	public void setNetworkClient(WaoClient client) {
+	public void onConnect(WaoClient client) {
 
 		if (this.client == null) {
 			this.client = client;

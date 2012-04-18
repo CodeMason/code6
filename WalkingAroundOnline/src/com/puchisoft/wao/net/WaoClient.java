@@ -57,7 +57,7 @@ public class WaoClient {
 		Login registerName = new Login("USER"+Math.random(), Network.version);
 		client.sendTCP(registerName);
 		client.updateReturnTripTime();
-		map.setNetworkClient(this);
+		map.onConnect(this);
 	}
 
 
