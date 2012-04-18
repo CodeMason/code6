@@ -29,6 +29,7 @@ public class Player {
 	private int acceleratingOld = turning;
 	
 	final private float speedAcc = 20.0f;
+	final private float speedAccTouch = 1.0f;
 	final private float speedRot = 180.0f; //angle degrees
 	final private float speedMax = 50.0f;
 	
@@ -56,25 +57,18 @@ public class Player {
 			if(!wasTouched){ //touchPos == null // just started touching
 				touchPos = new Vector2(Gdx.input.getX(),Gdx.input.getY());
 			}
-			
-//			if(Gdx.input.getDeltaX() != 0){
-//				velocity.x += Gdx.input.getDeltaX() * speedAcc * Gdx.graphics.getDeltaTime();
-//			}
-//			if(Gdx.input.getDeltaY() != 0){
-//				velocity.y -= Gdx.input.getDeltaY() * speedAcc * Gdx.graphics.getDeltaTime();
-//			}
-//			Log.info(Gdx.input.getX()+" "+Gdx.input.getY());
-//			turning = Gdx.input.getX() > Gdx.graphics.getWidth()/2 ? 1 : -1;
-//			accelerating = Gdx.input.getY() > Gdx.graphics.getHeight()/2 ? -1 : 1;
 			wasTouched = true;
 		}
 		else if(wasTouched){ // just stopped touching
-			if(touchPos.len2() > 0){
-				touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
+			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
+			if(touchPos.len2() > 50){ // deadzone ... to short to be counted as a drag
 				touchPos.x *= -1;
-				Log.info("drag " + touchPos.x+" "+touchPos.y);
+				Log.info("drag " + touchPos.x+" "+touchPos.y+" "+touchPos.len2());
 				direction.set(touchPos.tmp()).nor();
-				velocity.add(touchPos.mul(0.2f * speedAcc * Gdx.graphics.getDeltaTime()));
+				velocity.add(touchPos.mul(speedAccTouch * Gdx.graphics.getDeltaTime()));
+			}
+			else{
+				Log.info("touch");
 			}
 			wasTouched = false;
 			touchMove = true;
