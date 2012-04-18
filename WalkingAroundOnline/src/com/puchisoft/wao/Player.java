@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.wao.net.Network.MovementChange;
 
@@ -24,8 +25,9 @@ public class Player {
 	private int accelerating = 0; // -1, 0, 1
 	private int acceleratingOld = turning;
 	
-	private float speedAcc = 0.5f;
-	private float speedRot = 5f; //angle degrees
+	final private float speedAcc = 0.5f;
+	final private float speedRot = 5f; //angle degrees
+	final private float speedMax = 80f;
 	
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition) {
 		this.texture = texture;
@@ -73,6 +75,10 @@ public class Player {
 		
 		velocity.add(direction.cpy().mul(speedAcc * accelerating));
 		
+		if(velocity.len() > speedMax) {
+			velocity.nor().mul(speedMax);
+		}
+		
 		position.add(velocity);
 
 		// Prevent escape
@@ -85,15 +91,18 @@ public class Player {
 	public void render(SpriteBatch spriteBatch) {
 		this.move();
 
-		spriteBatch.draw(texture, position.x, position.y, texture.getRegionWidth()/2, texture.getRegionHeight()/2, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, direction.angle()); 
+		spriteBatch.draw(texture, position.x, position.y, texture.getRegionWidth()*0.5f, texture.getRegionHeight()*0.5f, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, direction.angle()); 
 	}
+	
+	public Vector3 getDesiredCameraPosition(){
+		Vector2 offset = velocity.cpy().mul(5);
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
+		// Clamp cam position to always show our player
+		offset.x = Math.max(-1*Gdx.graphics.getWidth()*0.5f + texture.getRegionWidth(), Math.min(Gdx.graphics.getWidth()*0.5f, offset.x));
+		offset.y = Math.max(-1*Gdx.graphics.getHeight()*0.5f +texture.getRegionHeight(),Math.min(Gdx.graphics.getHeight()*0.5f, offset.y));
+		
+		Vector2 dest = position.cpy().add(offset);
+		return new Vector3(dest.x,dest.y,0);
 	}
 	
 	public MovementChange getMovementState(){
@@ -106,5 +115,13 @@ public class Player {
 		this.position = msg.position;
 		this.direction = msg.direction;
 		this.velocity = msg.velocity;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 }

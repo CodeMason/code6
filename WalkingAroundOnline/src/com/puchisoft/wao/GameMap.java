@@ -44,7 +44,6 @@ public class GameMap {
 		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition);
 		
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		this.cam.position.set(playerLocal.position.x, playerLocal.position.y, 0);
 		
 		spriteBatch = new SpriteBatch(); //
 		
@@ -54,7 +53,7 @@ public class GameMap {
 		if(client == null){
 			return;
 		}
-		this.cam.position.set(playerLocal.position.x, playerLocal.position.y, 0);
+		this.cam.position.set(playerLocal.getDesiredCameraPosition());
 		cam.update();
 		
 		spriteBatch.setProjectionMatrix(cam.combined);
