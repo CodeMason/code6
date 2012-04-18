@@ -26,7 +26,7 @@ public class GameMap {
 	
 	private TextureRegion texturePlayer;
 	private Texture textureBg;
-	private int tilesCount = 3;
+	private int tilesCount = 2;
 	
 	private Vector2 maxPosition;
 	
@@ -38,7 +38,7 @@ public class GameMap {
 		Gdx.files.internal("data/background.png");
 		textureBg = new Texture(Gdx.files.internal("data/background.png"));
 		
-		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/ship.png")), 0, 0, 42, 32);
+		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
 		
 		maxPosition = new Vector2(textureBg.getWidth()*tilesCount, textureBg.getHeight()*tilesCount);
 		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition);

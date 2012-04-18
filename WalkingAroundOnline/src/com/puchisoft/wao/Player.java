@@ -14,10 +14,11 @@ public class Player {
 
 	public Vector2 maxPosition;
 	public Vector2 position;
-	private Vector2 direction = new Vector2();
+	private Vector2 direction = new Vector2(1,0);
 	private Vector2 oldDirection = new Vector2();
 	
 	private float speed = 5;
+	private float speedMax = 15;
 	
 	private boolean isMoving = false;
 
@@ -37,7 +38,6 @@ public class Player {
 				|| Gdx.input.isKeyPressed(Keys.S)
 				|| Gdx.input.isKeyPressed(Keys.D)) {
 			
-			direction.set(0,0);
 			if(Gdx.input.isTouched()){
 				Log.info(Gdx.input.getX()+" "+Gdx.input.getY());
 				direction.x = Gdx.input.getX() > Gdx.graphics.getWidth()/2 ? 1 : -1;
@@ -45,16 +45,16 @@ public class Player {
 			}
 			
 			if (Gdx.input.isKeyPressed(Keys.W)) {
-				direction.y = 1;
+				speed = Math.min(speed + 0.5f, speedMax);
 			}
 			if (Gdx.input.isKeyPressed(Keys.S)) {
-				direction.y = -1;
+				speed = Math.max(speed - 0.5f, 0.1f);
 			}
 			if (Gdx.input.isKeyPressed(Keys.A)) {
-				direction.x = -1;
+				direction.rotate(5);
 			}
 			if (Gdx.input.isKeyPressed(Keys.D)) {
-				direction.x = 1;
+				direction.rotate(-5);
 			}
 //			
 			direction.nor().mul(speed);
@@ -66,17 +66,15 @@ public class Player {
 		}
 		return wasMoving != isMoving || !oldDirection.equals(direction);
 	}
-		
-	private void move(){
-		if(isMoving){
-			position.add(direction);
-			
-			// Prevent escape
-			position.x = Math.max(0, Math.min(
-					maxPosition.x - texture.getRegionWidth(), position.x));
-			position.y = Math.max(0, Math.min(
-					maxPosition.y - texture.getRegionHeight(), position.y));
-		}
+
+	private void move() {
+		position.add(direction);
+
+		// Prevent escape
+		position.x = Math.max(0,
+				Math.min(maxPosition.x - texture.getRegionWidth(), position.x));
+		position.y = Math
+				.max(0, Math.min(maxPosition.y - texture.getRegionHeight(),position.y));
 	}
 
 	public void render(SpriteBatch spriteBatch) {
