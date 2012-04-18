@@ -10,8 +10,15 @@ import com.esotericsoftware.minlog.Log;
 import com.puchisoft.wao.net.Network.MovementChange;
 
 public class Player {
+	private static final int   FIRE_DELAY = 500;
+	private static final float speedAcc = 20.0f;
+	private static final float speedAccTouch = 1.0f;
+	private static final float speedRot = 180.0f; //angle degrees
+	private static final float speedMax = 50.0f;
+	
 	private TextureRegion texture;
 	private int id;
+	private GameMap map;
 
 	public Vector2 maxPosition;
 	public Vector2 position;
@@ -20,16 +27,20 @@ public class Player {
 	private Vector2 direction = new Vector2(1,0);
 	private Vector2 velocity = new Vector2();
 	
+	private Vector2 touchPos;
+	
+	
 	// input state
 	private int turning = 0; // -1, 0, 1
 	private int turningOld = turning;
 	private int accelerating = 0; // -1, 0, 1
 	private int acceleratingOld = turning;
 	
-	final private float speedAcc = 30.0f;
-	final private float speedRot = 180.0f; //angle degrees
-	final private float speedMax = 80.0f;
 	
+	boolean wasTouched = false;
+	long mayFireTime = System.nanoTime()/1000000; //ms
+	
+	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition,GameMap map) {
 	
 	private boolean isMoving = false;
 	private Dog dog;
@@ -42,6 +53,7 @@ public class Player {
 		this.texture = texture;
 		this.position = position;
 		this.maxPosition = maxPosition;
+		this.map = map;
 		this.dog = dog;
 	}
 	
@@ -53,30 +65,58 @@ public class Player {
 		
 		turning = 0;
 		accelerating = 0;
-		if (Gdx.input.isTouched() || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
+		
+		boolean touchMove = false;
+		
+		
+		//Android
+		// Movement
+		if(Gdx.input.isTouched()){
+			if(!wasTouched){ //touchPos == null // just started touching
+				touchPos = new Vector2(Gdx.input.getX(),Gdx.input.getY());
+			}
+			wasTouched = true;
+		}
+		else if(wasTouched){ // just stopped touching
+			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
+			if(touchPos.len2() > 50){ // deadzone ... to short to be counted as a drag
+				touchPos.x *= -1;
+				Log.info("drag " + touchPos.x+" "+touchPos.y+" "+touchPos.len2());
+				direction.set(touchPos.tmp()).nor();
+				velocity.add(touchPos.mul(speedAccTouch * Gdx.graphics.getDeltaTime()));
+			}
+			else{
+				Log.info("touch");
+			}
+			wasTouched = false;
+			touchMove = true;
+		}
+		
+		//Desktop
+		// Movement
+		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
 				|| Gdx.input.isKeyPressed(Keys.S)
 				|| Gdx.input.isKeyPressed(Keys.D)) {
-			
-			if(Gdx.input.isTouched()){
-				Log.info(Gdx.input.getX()+" "+Gdx.input.getY());
-				turning = Gdx.input.getX() > Gdx.graphics.getWidth()/2 ? 1 : -1;
-				accelerating = Gdx.input.getY() > Gdx.graphics.getHeight()/2 ? -1 : 1;
-			}
 			
 			if (Gdx.input.isKeyPressed(Keys.W)) {
 				accelerating = 1;
 			}
-			if (Gdx.input.isKeyPressed(Keys.S)) {
+			else if (Gdx.input.isKeyPressed(Keys.S)) {
 				accelerating = -1;
 			}
 			if (Gdx.input.isKeyPressed(Keys.A)) {
 				turning = 1;
 			}
-			if (Gdx.input.isKeyPressed(Keys.D)) {
+			else if (Gdx.input.isKeyPressed(Keys.D)) {
 				turning = -1;
 			}
 		}
-		return turning != turningOld || accelerating != acceleratingOld;
+		//Shooting
+		if (Gdx.input.isKeyPressed(Keys.SPACE) && mayFireTime < System.nanoTime()/1000000){
+			map.addBullet(this, position.cpy(), velocity.cpy(), direction.cpy());
+			mayFireTime = (System.nanoTime()/1000000) + FIRE_DELAY;
+		}
+		return turning != turningOld || accelerating != acceleratingOld || touchMove;
 	}
 
 	private void move(float delta) {

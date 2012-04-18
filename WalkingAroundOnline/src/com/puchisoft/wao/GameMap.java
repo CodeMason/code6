@@ -1,6 +1,8 @@
 package com.puchisoft.wao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
@@ -18,12 +20,15 @@ import com.puchisoft.wao.net.WaoClient;
 public class GameMap {
 	public OrthographicCamera cam;
 	private SpriteBatch spriteBatch;
-
-	private Map<Integer, Player> players = new HashMap<Integer, Player>();
-
+	
+	
+	private Map<Integer,Player> players = new HashMap<Integer,Player>();
+	private List<Bullet> bullets = new ArrayList<Bullet>();
+	
 	private Player playerLocal;
 
 	private TextureRegion texturePlayer;
+	private TextureRegion textureBullet;
 	private Texture textureBg;
 	private int tilesCount = 3;
 
@@ -43,6 +48,7 @@ public class GameMap {
 		textureBg = new Texture(Gdx.files.internal("data/background.png"));
 
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
+		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
 		texturedog = new Texture(Gdx.files.internal("data/dog.png"));
 		textureChasedog = new Texture(Gdx.files.internal("data/dogchase.png"));
 
@@ -52,6 +58,8 @@ public class GameMap {
 		playerLocal = new Player(texturePlayer, new Vector2(50, 50),
 				maxPosition, dogLocal);
 		
+		maxPosition = new Vector2(textureBg.getWidth()*tilesCount, textureBg.getHeight()*tilesCount);
+		playerLocal = new Player(texturePlayer, new Vector2(50, 50),maxPosition,this);
 		dogChase = new Dog(textureChasedog, new Vector2(50, 50));
 		
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -88,14 +96,22 @@ public class GameMap {
 			}
 		}
 
-		if (playerLocal.handleInput()) {
+		// Handle local input and sent over network if changed
+		if(playerLocal.handleInput()){
 			Log.info("changed input");
 			client.sendMessage(playerLocal.getMovementState());
 		}
-
-		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+		
+		// Render Players
+		for(Map.Entry<Integer, Player> playerEntry: players.entrySet()){
 			playerEntry.getValue().render(spriteBatch, delta);
 		}
+		
+		// Render Bullets
+		for(Bullet bullet: bullets){
+			bullet.render(spriteBatch, delta);
+		}
+				
 
 		Player closestPlayer = playerLocal;
 		float dogChaseDist = 999999999;
@@ -143,9 +159,14 @@ public class GameMap {
 	public void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
 		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50),
+				maxPosition,this);
 				maxPosition, new Dog(texturedog, new Vector2(50, 50)));
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
+		
+		// tell people where I am again
+		// TODO server should remember this and tell others
+		client.sendMessage(playerLocal.getMovementState());
 	}
 
 	public void removePlayer(PlayerJoinLeave msg) {
@@ -161,6 +182,14 @@ public class GameMap {
 
 	public void setStatus(String status) {
 		hud.setStatus(status);
+	}
+
+	public void addBullet(Player player, Vector2 position, Vector2 velocity,
+			Vector2 direction) {
+		bullets.add(new Bullet(textureBullet, position, velocity, direction, maxPosition));
+		if(player == playerLocal ){
+			// network code here
+		}
 	}
 
 }
