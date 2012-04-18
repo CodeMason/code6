@@ -113,6 +113,7 @@ public class Player {
 		if (Gdx.input.isKeyPressed(Keys.SPACE) && mayFireTime < System.nanoTime()/1000000){
 			map.addBullet(this, position.cpy(), velocity.cpy(), direction.cpy());
 			mayFireTime = (System.nanoTime()/1000000) + FIRE_DELAY;
+			velocity.sub(direction.nor().mul(0.5f));
 		}
 		return turning != turningOld || accelerating != acceleratingOld || touchMove;
 	}
