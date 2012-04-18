@@ -55,17 +55,23 @@ public class Network {
 	
 	static public class MovementChange {
 		public int playerId;
-		public boolean isMoving;
+		public int turning;
+		public int accelerating; 
 		public Vector2 position;
 		public Vector2 direction;
+		public Vector2 velocity;
 		
 		public MovementChange(){}
-		public MovementChange(int playerId, boolean isMoving, Vector2 position, Vector2 direction) {
+
+		public MovementChange(int playerId, int turning, int accelerating, Vector2 position, Vector2 direction, Vector2 velocity) {
 			this.playerId = playerId;
-			this.direction = direction;
-			this.isMoving = isMoving;
+			this.turning = turning;
+			this.accelerating = accelerating;
 			this.position = position;
+			this.direction = direction;
+			this.velocity = velocity;
 		}
+		
 		
 	}
 }

@@ -6,7 +6,6 @@ import java.io.IOException;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.wao.GameMap;
@@ -23,7 +22,7 @@ public class ScreenGame extends ScreenCore {
 	private WaoServer server;
 	private WaoClient client;
 	
-	private FPSLogger fps = new FPSLogger();
+//	private FPSLogger fps = new FPSLogger();
 	
 	public ScreenGame(Game game) {
 		super(game);
@@ -64,7 +63,7 @@ public class ScreenGame extends ScreenCore {
 		map.render();
 		hud.render();
 		
-		fps.log();
+//		fps.log();
 	}
 	
 	@Override

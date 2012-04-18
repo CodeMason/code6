@@ -14,14 +14,19 @@ public class Player {
 
 	public Vector2 maxPosition;
 	public Vector2 position;
+	
 	private Vector2 direction = new Vector2(1,0);
-	private Vector2 oldDirection = new Vector2();
+	private Vector2 velocity = new Vector2();
 	
-	private float speed = 5;
-	private float speedMax = 15;
+	// input state
+	private int turning = 0; // -1, 0, 1
+	private int turningOld = turning;
+	private int accelerating = 0; // -1, 0, 1
+	private int acceleratingOld = turning;
 	
-	private boolean isMoving = false;
-
+	private float speedAcc = 0.5f;
+	private float speedRot = 5f; //angle degrees
+	
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition) {
 		this.texture = texture;
 		this.position = position;
@@ -31,44 +36,44 @@ public class Player {
 	// Returns whether there was a change
 	public boolean handleInput() {
 		
-		boolean wasMoving = isMoving; 
-		oldDirection.set(direction);
+		turningOld = turning;
+		acceleratingOld = accelerating;
 		
+		turning = 0;
+		accelerating = 0;
 		if (Gdx.input.isTouched() || Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A)
 				|| Gdx.input.isKeyPressed(Keys.S)
 				|| Gdx.input.isKeyPressed(Keys.D)) {
 			
 			if(Gdx.input.isTouched()){
 				Log.info(Gdx.input.getX()+" "+Gdx.input.getY());
-				direction.x = Gdx.input.getX() > Gdx.graphics.getWidth()/2 ? 1 : -1;
-				direction.y = Gdx.input.getY() > Gdx.graphics.getHeight()/2 ? -1 : 1;
+//				direction.x = Gdx.input.getX() > Gdx.graphics.getWidth()/2 ? 1 : -1;
+//				direction.y = Gdx.input.getY() > Gdx.graphics.getHeight()/2 ? -1 : 1;
 			}
 			
 			if (Gdx.input.isKeyPressed(Keys.W)) {
-				speed = Math.min(speed + 0.5f, speedMax);
+				accelerating = 1;
 			}
 			if (Gdx.input.isKeyPressed(Keys.S)) {
-				speed = Math.max(speed - 0.5f, 0.1f);
+				accelerating = -1;
 			}
 			if (Gdx.input.isKeyPressed(Keys.A)) {
-				direction.rotate(5);
+				turning = 1;
 			}
 			if (Gdx.input.isKeyPressed(Keys.D)) {
-				direction.rotate(-5);
+				turning = -1;
 			}
-//			
-			direction.nor().mul(speed);
-			isMoving = true;
-			
 		}
-		else{
-			isMoving = false;
-		}
-		return wasMoving != isMoving || !oldDirection.equals(direction);
+		return turning != turningOld || accelerating != acceleratingOld;
 	}
 
 	private void move() {
-		position.add(direction);
+		
+		direction.rotate(turning * speedRot);
+		
+		velocity.add(direction.cpy().mul(speedAcc * accelerating));
+		
+		position.add(velocity);
 
 		// Prevent escape
 		position.x = Math.max(0,
@@ -92,12 +97,14 @@ public class Player {
 	}
 	
 	public MovementChange getMovementState(){
-		return new MovementChange(id,isMoving,position,direction);
+		return new MovementChange(id,turning, accelerating, position, direction, velocity);
 	}
 
 	public void setMovementState(MovementChange msg) {
-		this.direction = msg.direction;
-		this.isMoving = msg.isMoving;
+		this.turning = msg.turning;
+		this.accelerating = msg.accelerating;
 		this.position = msg.position;
+		this.direction = msg.direction;
+		this.velocity = msg.velocity;
 	}
 }

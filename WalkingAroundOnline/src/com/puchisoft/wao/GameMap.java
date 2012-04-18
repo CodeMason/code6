@@ -86,8 +86,7 @@ public class GameMap {
 		spriteBatch.dispose();
 	}
 
-	// OnConnect
-	public void setNetworkClient(WaoClient client) {
+	public void onConnect(WaoClient client) {
 		
 		if (this.client == null) {
 			this.client = client;
