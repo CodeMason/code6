@@ -58,40 +58,60 @@ public class GameMap {
 		if (client == null) {
 			return;
 		}
+		
+		
+		update(delta);
+		render();
+		
+		
+	}
+	
+	private void update(float delta){
 		this.cam.position.set(playerLocal.getDesiredCameraPosition(this.cam.position, delta));
 		cam.update();
 
+		// Handle local input and sent over network if changed
+		if (playerLocal.handleInput(delta)) {
+			Log.info("changed input");
+			client.sendMessage(playerLocal.getMovementState());
+		}
+
+		// Update Players
+		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+			playerEntry.getValue().update(delta);
+		}
+
+		// Update Bullets
+		for (int i = 0; i < bullets.size(); i++) {
+			bullets.get(i).update(delta);
+			if (bullets.get(i).destroyed)
+				bullets.remove(i);
+		}
+	}
+	
+	private void render(){
 		spriteBatch.setProjectionMatrix(cam.combined);
 		spriteBatch.begin();
 		spriteBatch.setColor(Color.WHITE);
-
+		
+		// Background
 		for (int i = 0; i < tilesCount; i++) {
 			for (int j = 0; j < tilesCount; j++) {
 				spriteBatch.draw(textureBg, textureBg.getWidth() * i, textureBg.getHeight() * j, 0, 0, textureBg.getWidth(),
 						textureBg.getHeight());
 			}
 		}
-
-		// Handle local input and sent over network if changed
-		if (playerLocal.handleInput()) {
-			Log.info("changed input");
-			client.sendMessage(playerLocal.getMovementState());
-		}
-
+		
 		// Render Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
-			playerEntry.getValue().render(spriteBatch, delta);
+			playerEntry.getValue().render(spriteBatch);
 		}
-
 		// Render Bullets
 		for (int i = 0; i < bullets.size(); i++) {
-			bullets.get(i).render(spriteBatch, delta);
-			if (bullets.get(i).destroyed)
-				bullets.remove(i);
+			bullets.get(i).render(spriteBatch);
 		}
-
+		
 		spriteBatch.end();
-
 	}
 
 	public void dispose() {
@@ -125,7 +145,7 @@ public class GameMap {
 		players.put(msg.playerId, newPlayer);
 
 		// tell people where I am again
-		// TODO server should remember this and tell others
+		// TODO server should remember this and tell others based on emulating players movements locally
 		client.sendMessage(playerLocal.getMovementState());
 	}
 

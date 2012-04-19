@@ -27,7 +27,7 @@ public class Bullet {
 		this.playerID = playerID;
 		this.position = position;
 		this.angle = direction.angle();
-		this.velocity = baseVelocity.add(direction.nor().mul(speed)); //todo direction //  * Gdx.graphics.getDeltaTime()
+		this.velocity = baseVelocity.add(direction.nor().mul(speed));
 		this.maxPosition = maxPosition;
 		
 	}
@@ -53,10 +53,12 @@ public class Bullet {
 		return true;
 	}
 	
-	public void render(SpriteBatch spriteBatch, float delta) {
+	public void update(float delta){
 		this.move(delta);
 		collision();
-		
+	}
+	
+	public void render(SpriteBatch spriteBatch) {
 		spriteBatch.draw(texture, position.x, position.y, texture.getRegionWidth()*0.5f, texture.getRegionHeight()*0.5f, texture.getRegionWidth(), texture.getRegionHeight(), 1f, 1f, angle);
 	}
 

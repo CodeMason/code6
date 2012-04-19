@@ -12,7 +12,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
 public class Player {
 	private static final int FIRE_DELAY = 500 * 1000000;
-	private static final float speedAcc = 20.0f;
+	private static final float speedAcc = 10.0f;
 	private static final float speedAccTouch = 1.0f;
 	private static final float speedRot = 180.0f; // angle degrees
 	private static final float speedMax = 50.0f;
@@ -47,7 +47,7 @@ public class Player {
 
 	// Returns whether there was a change
 	// TODO move into GameMap?
-	public boolean handleInput() {
+	public boolean handleInput(float delta) {
 
 		turningOld = turning;
 		acceleratingOld = accelerating;
@@ -71,7 +71,7 @@ public class Player {
 				touchPos.x *= -1;
 				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
 				direction.set(touchPos.tmp()).nor();
-				velocity.add(touchPos.mul(speedAccTouch * Gdx.graphics.getDeltaTime()));
+				velocity.add(touchPos.mul(speedAccTouch * delta));
 			} else {
 				shoot();
 				Log.info("touch");
@@ -134,10 +134,13 @@ public class Player {
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
 	}
-
-	public void render(SpriteBatch spriteBatch, float delta) {
+	
+	public void update(float delta){
 		this.move(delta);
+	}
 
+	public void render(SpriteBatch spriteBatch) {
+		
 		spriteBatch.draw(texture, position.x, position.y, texture.getRegionWidth() * 0.5f, texture.getRegionHeight() * 0.5f,
 				texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, direction.angle());
 	}
