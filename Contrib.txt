@@ -1,0 +1,12 @@
+Thanks to the following:
+
+>Graphics:
+
+Ship
+http://opengameart.org/content/space-starter-kit CruzR
+
+Bullet, Astroid
+http://hackcraft.de http://opengameart.org/content/particle-effects hc
+
+Background
+http://opengameart.org/content/sparkly-space-background scorcher24
