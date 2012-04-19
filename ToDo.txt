@@ -6,3 +6,4 @@
 -Wrapping bounding box instead of bouncing? Infinite?
 -Afterburner graphic for local player only
 -Shift to accellerate in PC? Android can just drag faster
+-TexturePacker
