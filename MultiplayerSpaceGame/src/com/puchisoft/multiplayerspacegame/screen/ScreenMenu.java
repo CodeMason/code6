@@ -1,4 +1,3 @@
-
 package com.puchisoft.multiplayerspacegame.screen;
 
 import com.badlogic.gdx.Game;
@@ -12,23 +11,23 @@ public class ScreenMenu extends ScreenCore {
 	SpriteBatch batch;
 	float time = 0;
 
-	public ScreenMenu (Game game) {
+	public ScreenMenu(Game game) {
 		super(game);
 	}
 
 	@Override
-	public void show () {
+	public void show() {
 		title = new Texture(Gdx.files.internal("data/load.png"));
 		batch = new SpriteBatch();
 	}
 
 	@Override
-	public void render (float delta) {
+	public void render(float delta) {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		batch.begin();
 		batch.draw(title, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.end();
-		
+
 		if (time > 0) {
 			game.setScreen(new ScreenGame(game));
 			return;
@@ -37,7 +36,7 @@ public class ScreenMenu extends ScreenCore {
 	}
 
 	@Override
-	public void hide () {
+	public void hide() {
 		batch.dispose();
 		title.dispose();
 	}

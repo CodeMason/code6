@@ -3,7 +3,6 @@ package com.puchisoft.multiplayerspacegame;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.esotericsoftware.minlog.Log;
 
 public class Bullet {
 	private TextureRegion texture;
@@ -13,18 +12,18 @@ public class Bullet {
 	
 	public Vector2 maxPosition;
 	
-	final private float speed = 10.0f;
+	final private float speed = 15.0f;
 
 	private float angle;
 	
 	public boolean destroyed = false;
 	
-	public Bullet(TextureRegion texture, Vector2 position, Vector2 velocity, Vector2 direction, Vector2 maxPosition) {
+	public Bullet(TextureRegion texture, Vector2 position, Vector2 baseVelocity, Vector2 direction, Vector2 maxPosition) {
 		
 		this.texture = texture;
 		this.position = position;
 		this.angle = direction.angle();
-		this.velocity = velocity.add(direction.nor().mul(speed)); //todo direction //  * Gdx.graphics.getDeltaTime()
+		this.velocity = baseVelocity.add(direction.nor().mul(speed)); //todo direction //  * Gdx.graphics.getDeltaTime()
 		this.maxPosition = maxPosition;
 		
 	}

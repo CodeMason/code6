@@ -13,7 +13,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 
 public class WaoClient {
-	
+
 	private Client client;
 	private GameMap map;
 	public int id;
@@ -21,7 +21,7 @@ public class WaoClient {
 
 	public WaoClient(final GameMap game) { //
 		this.map = game;
-		
+
 		client = new Client();
 		client.start();
 
@@ -30,48 +30,45 @@ public class WaoClient {
 		Network.register(client);
 
 		client.addListener(new Listener() {
-			public void connected (Connection connection) {
+			public void connected(Connection connection) {
 				handleConnect(connection);
 			}
 
-			public void received (Connection connection, Object object) {
+			public void received(Connection connection, Object object) {
 				handleMessage(connection.getID(), object);
 			}
 
-			public void disconnected (Connection connection) {
+			public void disconnected(Connection connection) {
 				handleDisonnect(connection);
 			}
 		});
 
 	}
-		
 
 	protected void handleDisonnect(Connection connection) {
 		map.onDisconnect();
 	}
 
-
 	protected void handleConnect(Connection connection) {
 		id = connection.getID();
 		remoteIP = connection.getRemoteAddressTCP().toString();
-		Login registerName = new Login("USER"+Math.random(), Network.version);
+		Login registerName = new Login("USER" + Math.random(), Network.version);
 		client.sendTCP(registerName);
 		client.updateReturnTripTime();
 		map.onConnect(this);
 	}
 
-
 	public void connectLocal() {
 		connect("localhost", Network.port);
 	}
-	
+
 	public void connect(String host, int port) {
 		try {
 			client.connect(5000, host, port);
 		} catch (IOException e) {
-//			e.printStackTrace();
-			map.setStatus("Can't connect to "+host);
-			Log.error("Can't connect to "+host);
+			// e.printStackTrace();
+			map.setStatus("Can't connect to " + host);
+			Log.error("Can't connect to " + host);
 		}
 	}
 
@@ -90,19 +87,16 @@ public class WaoClient {
 		if (message instanceof LogMessage) {
 			LogMessage msg = (LogMessage) message;
 			map.setStatus(msg.message);
-		}
-		else if(message instanceof PlayerJoinLeave){
+		} else if (message instanceof PlayerJoinLeave) {
 			PlayerJoinLeave msg = (PlayerJoinLeave) message;
-			if(msg.hasJoined){
+			if (msg.hasJoined) {
 				map.setStatus(msg.name + " joined");
 				map.addPlayer(msg);
-			}
-			else{
+			} else {
 				map.setStatus(msg.name + " left");
 				map.removePlayer(msg);
 			}
-		}
-		else if(message instanceof MovementChange){
+		} else if (message instanceof MovementChange) {
 			MovementChange msg = (MovementChange) message;
 			map.playerMoved(msg);
 		}
@@ -111,7 +105,7 @@ public class WaoClient {
 
 	public void ping() {
 		if (client.isConnected()) {
-			this.client.updateReturnTripTime();		
+			this.client.updateReturnTripTime();
 		}
 	}
 
