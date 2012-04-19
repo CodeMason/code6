@@ -2,6 +2,6 @@
 <resources>
 
     <string name="hello">Hello World, WalkingAroundOnlineActivity!</string>
-    <string name="app_name">WalkingAroundOnline-Android</string>
+    <string name="app_name">Multiplayer Space Game</string>
 
 </resources>
