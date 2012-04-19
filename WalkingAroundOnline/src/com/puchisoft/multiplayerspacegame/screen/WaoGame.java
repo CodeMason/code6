@@ -1,4 +1,4 @@
-package com.puchisoft.wao.screen;
+package com.puchisoft.multiplayerspacegame.screen;
 
 import com.badlogic.gdx.Game;
 

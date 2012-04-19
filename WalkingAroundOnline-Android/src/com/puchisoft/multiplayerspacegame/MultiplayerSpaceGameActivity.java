@@ -1,11 +1,11 @@
-package com.puchisoft.walkingaroundonline;
+package com.puchisoft.multiplayerspacegame;
 
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
-import com.puchisoft.wao.screen.WaoGame;
+import com.puchisoft.multiplayerspacegame.screen.WaoGame;
 
-public class WalkingAroundOnlineActivity extends AndroidApplication {
+public class MultiplayerSpaceGameActivity extends AndroidApplication {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {

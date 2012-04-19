@@ -1,4 +1,4 @@
-package com.puchisoft.wao;
+package com.puchisoft.multiplayerspacegame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.wao.net.Network.MovementChange;
+import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 
 public class Player {
 	private static final int   FIRE_DELAY = 500;

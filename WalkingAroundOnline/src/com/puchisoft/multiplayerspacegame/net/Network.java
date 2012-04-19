@@ -1,4 +1,4 @@
-package com.puchisoft.wao.net;
+package com.puchisoft.multiplayerspacegame.net;
 
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;

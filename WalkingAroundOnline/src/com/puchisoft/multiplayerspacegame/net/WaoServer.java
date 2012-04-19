@@ -1,4 +1,4 @@
-package com.puchisoft.wao.net;
+package com.puchisoft.multiplayerspacegame.net;
 
 import java.io.IOException;
 
@@ -7,9 +7,9 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.wao.net.Network.Login;
-import com.puchisoft.wao.net.Network.MovementChange;
-import com.puchisoft.wao.net.Network.PlayerJoinLeave;
+import com.puchisoft.multiplayerspacegame.net.Network.Login;
+import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 
 public class WaoServer {
 	Server server;

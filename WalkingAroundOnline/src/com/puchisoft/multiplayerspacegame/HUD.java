@@ -1,4 +1,4 @@
-package com.puchisoft.wao;
+package com.puchisoft.multiplayerspacegame;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;

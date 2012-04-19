@@ -1,5 +1,5 @@
 
-package com.puchisoft.wao.screen;
+package com.puchisoft.multiplayerspacegame.screen;
 
 import java.io.IOException;
 
@@ -8,11 +8,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.wao.GameMap;
-import com.puchisoft.wao.HUD;
-import com.puchisoft.wao.net.Network;
-import com.puchisoft.wao.net.WaoClient;
-import com.puchisoft.wao.net.WaoServer;
+import com.puchisoft.multiplayerspacegame.GameMap;
+import com.puchisoft.multiplayerspacegame.HUD;
+import com.puchisoft.multiplayerspacegame.net.Network;
+import com.puchisoft.multiplayerspacegame.net.WaoClient;
+import com.puchisoft.multiplayerspacegame.net.WaoServer;
 
 public class ScreenGame extends ScreenCore {
 

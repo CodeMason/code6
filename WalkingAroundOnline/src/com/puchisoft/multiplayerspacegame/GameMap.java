@@ -1,4 +1,4 @@
-package com.puchisoft.wao;
+package com.puchisoft.multiplayerspacegame;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +13,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.wao.net.Network.MovementChange;
-import com.puchisoft.wao.net.Network.PlayerJoinLeave;
-import com.puchisoft.wao.net.WaoClient;
+import com.puchisoft.multiplayerspacegame.net.WaoClient;
+import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 
 public class GameMap {
 	public OrthographicCamera cam;
