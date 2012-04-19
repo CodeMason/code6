@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -83,7 +84,21 @@ public class GameMap {
 
 		// Update Bullets
 		for (int i = 0; i < bullets.size(); i++) {
+			Bullet bulletCur = bullets.get(i);
 			bullets.get(i).update(delta);
+			// Collision with Players
+			for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+				Player playerCur = playerEntry.getValue();
+				if(playerCur.getID() != bulletCur.getPlayerID() && playerCur.getBoundingRectangle().overlaps(bulletCur.getBoundingRectangle())){
+					bulletCur.destroy();
+					playerCur.hit();
+					if(playerCur == playerLocal){
+						client.sendMessage(playerLocal.getMovementState());
+					}
+				}
+			}
+			
+			// Remove impacted bullets
 			if (bullets.get(i).destroyed)
 				bullets.remove(i);
 		}
@@ -165,7 +180,7 @@ public class GameMap {
 	}
 
 	public void addBullet(PlayerShoots playerShoots) {
-		if (playerShoots.playerID == playerLocal.getId()) {
+		if (playerShoots.playerID == playerLocal.getID()) {
 			// tell others I shot
 			client.sendMessage(playerShoots);
 		}

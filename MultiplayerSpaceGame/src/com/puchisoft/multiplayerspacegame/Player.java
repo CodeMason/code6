@@ -1,10 +1,13 @@
 package com.puchisoft.multiplayerspacegame;
 
+import java.util.Random;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.esotericsoftware.minlog.Log;
@@ -38,6 +41,8 @@ public class Player {
 
 	boolean wasTouched = false;
 	long mayFireTime = System.nanoTime(); // ms
+	
+	private Random random = new Random();
 
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map) {
 		this.sprite = new Sprite(texture);
@@ -140,6 +145,12 @@ public class Player {
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
 	}
 	
+	public void hit(){
+		velocity.set(0,0);
+		direction.rotate(random.nextInt(360));
+		position.set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
+	}
+	
 	public void update(float delta){
 		this.move(delta);
 	}
@@ -173,11 +184,15 @@ public class Player {
 		this.velocity = msg.velocity;
 	}
 
-	public int getId() {
+	public int getID() {
 		return id;
 	}
 
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public Rectangle getBoundingRectangle(){
+		return sprite.getBoundingRectangle();
 	}
 }

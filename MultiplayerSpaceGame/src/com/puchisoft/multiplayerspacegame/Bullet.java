@@ -3,6 +3,7 @@ package com.puchisoft.multiplayerspacegame;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class Bullet {
@@ -62,5 +63,9 @@ public class Bullet {
 
 	public int getPlayerID() {
 		return playerID;
+	}
+	
+	public Rectangle getBoundingRectangle(){
+		return sprite.getBoundingRectangle();
 	}
 }
