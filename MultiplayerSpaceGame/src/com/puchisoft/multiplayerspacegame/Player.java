@@ -2,6 +2,7 @@ package com.puchisoft.multiplayerspacegame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -17,8 +18,8 @@ public class Player {
 	private static final float speedRot = 180.0f; // angle degrees
 	private static final float speedMax = 50.0f;
 
-	private TextureRegion texture;
 	private int id;
+	private Sprite sprite;
 	private GameMap map;
 
 	public Vector2 maxPosition;
@@ -39,7 +40,7 @@ public class Player {
 	long mayFireTime = System.nanoTime(); // ms
 
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map) {
-		this.texture = texture;
+		this.sprite = new Sprite(texture);
 		this.position = position;
 		this.maxPosition = maxPosition;
 		this.map = map;
@@ -106,6 +107,7 @@ public class Player {
 	private void move(float delta) {
 
 		direction.rotate(turning * delta * speedRot);
+		sprite.setRotation(direction.angle()); // update sprite
 
 		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
 
@@ -115,15 +117,18 @@ public class Player {
 
 		position.add(velocity.tmp().mul(delta * 60));
 
-		// Prevent escape
-		if (position.x < 0 || position.x > maxPosition.x - texture.getRegionWidth()) {
+		// Bounce
+		if (position.x < 0 || position.x > maxPosition.x - sprite.getWidth()) {
 			velocity.x *= -0.3;
-		} else if (position.y < 0 || position.y > maxPosition.y - texture.getRegionHeight()) {
+		} else if (position.y < 0 || position.y > maxPosition.y - sprite.getHeight()) {
 			velocity.y *= -0.3;
 		}
-
-		position.x = Math.max(0, Math.min(maxPosition.x - texture.getRegionWidth(), position.x));
-		position.y = Math.max(0, Math.min(maxPosition.y - texture.getRegionHeight(), position.y));
+		// Prevent escape
+		position.x = Math.max(0, Math.min(maxPosition.x - sprite.getWidth(), position.x));
+		position.y = Math.max(0, Math.min(maxPosition.y - sprite.getHeight(), position.y));
+		
+		sprite.setPosition(position.x, position.y); // update sprite
+		
 	}
 
 	public void shoot() {
@@ -140,9 +145,7 @@ public class Player {
 	}
 
 	public void render(SpriteBatch spriteBatch) {
-		
-		spriteBatch.draw(texture, position.x, position.y, texture.getRegionWidth() * 0.5f, texture.getRegionHeight() * 0.5f,
-				texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, direction.angle());
+		sprite.draw(spriteBatch);
 	}
 
 	public Vector3 getDesiredCameraPosition(Vector3 camPos, float delta) {
