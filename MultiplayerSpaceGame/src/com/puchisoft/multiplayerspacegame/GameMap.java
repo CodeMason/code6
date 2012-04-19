@@ -13,9 +13,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.multiplayerspacegame.net.WaoClient;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
+import com.puchisoft.multiplayerspacegame.net.WaoClient;
 
 public class GameMap {
 	public OrthographicCamera cam;
@@ -143,11 +144,12 @@ public class GameMap {
 		hud.setStatus(status);
 	}
 
-	public void addBullet(Player player, Vector2 position, Vector2 velocity, Vector2 direction) {
-		bullets.add(new Bullet(textureBullet, position, velocity, direction, maxPosition));
-		if (player == playerLocal) {
-			// network code here
+	public void addBullet(PlayerShoots playerShoots) {
+		if (playerShoots.playerID == playerLocal.getId()) {
+			// tell others I shot
+			client.sendMessage(playerShoots);
 		}
+		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
 	}
 
 }

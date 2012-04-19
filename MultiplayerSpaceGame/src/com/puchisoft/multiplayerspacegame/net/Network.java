@@ -8,17 +8,18 @@ import com.esotericsoftware.kryonet.FrameworkMessage.Ping;
 public class Network {
 
 	static public final int port = 6464;
-	static public final int version = 3;
+	static public final int version = 4;
 
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
 		Kryo kryo = endPoint.getKryo();
 		kryo.register(Ping.class);
 		kryo.register(Login.class);
-		kryo.register(LogMessage.class);
+//		kryo.register(LogMessage.class);
+		kryo.register(Vector2.class);
 		kryo.register(PlayerJoinLeave.class);
 		kryo.register(MovementChange.class);
-		kryo.register(Vector2.class);
+		kryo.register(PlayerShoots.class);
 	}
 
 	static public class Login {
@@ -34,16 +35,16 @@ public class Network {
 		}
 	}
 
-	static public class LogMessage {
-		public String message;
-
-		public LogMessage() {
-		}
-
-		public LogMessage(String message) {
-			this.message = message;
-		}
-	}
+//	static public class LogMessage {
+//		public String message;
+//
+//		public LogMessage() {
+//		}
+//
+//		public LogMessage(String message) {
+//			this.message = message;
+//		}
+//	}
 
 	static public class PlayerJoinLeave {
 		public int playerId;
@@ -79,6 +80,20 @@ public class Network {
 			this.direction = direction;
 			this.velocity = velocity;
 		}
+	}
 
+	static public class PlayerShoots {
+		public int playerID;
+		public Vector2 position;
+		public Vector2 direction;
+		public Vector2 baseVelocity;
+		public PlayerShoots() {
+		}
+		public PlayerShoots(int playerId, Vector2 position, Vector2 baseVelocity, Vector2 direction) {
+			this.playerID = playerId;
+			this.position = position;
+			this.direction = direction;
+			this.baseVelocity = baseVelocity;
+		}
 	}
 }

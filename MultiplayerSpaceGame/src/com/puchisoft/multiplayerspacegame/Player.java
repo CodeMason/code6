@@ -8,9 +8,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
 public class Player {
-	private static final int FIRE_DELAY = 500;
+	private static final int FIRE_DELAY = 500 * 1000000;
 	private static final float speedAcc = 20.0f;
 	private static final float speedAccTouch = 1.0f;
 	private static final float speedRot = 180.0f; // angle degrees
@@ -35,7 +36,7 @@ public class Player {
 	private int acceleratingOld = turning;
 
 	boolean wasTouched = false;
-	long mayFireTime = System.nanoTime() / 1000000; // ms
+	long mayFireTime = System.nanoTime(); // ms
 
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map) {
 		this.texture = texture;
@@ -45,6 +46,7 @@ public class Player {
 	}
 
 	// Returns whether there was a change
+	// TODO move into GameMap?
 	public boolean handleInput() {
 
 		turningOld = turning;
@@ -95,7 +97,7 @@ public class Player {
 			}
 		}
 		// Shooting
-		if (Gdx.input.isKeyPressed(Keys.SPACE) && mayFireTime < System.nanoTime() / 1000000) {
+		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
 			shoot();
 		}
 		return turning != turningOld || accelerating != acceleratingOld || touchMove;
@@ -125,8 +127,12 @@ public class Player {
 	}
 
 	public void shoot() {
-		map.addBullet(this, position.cpy(), velocity.cpy(), direction.cpy());
-		mayFireTime = (System.nanoTime() / 1000000) + FIRE_DELAY;
+		if(mayFireTime > System.nanoTime()){
+			return;
+		}
+		PlayerShoots msgPlayerShoots = new PlayerShoots(id,position.cpy(),velocity.cpy(),direction.cpy());
+		map.addBullet(msgPlayerShoots);
+		mayFireTime = System.nanoTime() + FIRE_DELAY;
 	}
 
 	public void render(SpriteBatch spriteBatch, float delta) {

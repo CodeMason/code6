@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 public class Bullet {
 	private TextureRegion texture;
 
+	private int playerID;
+	
 	private Vector2 position;	
 	private Vector2 velocity;
 	
@@ -17,10 +19,12 @@ public class Bullet {
 	private float angle;
 	
 	public boolean destroyed = false;
+
 	
-	public Bullet(TextureRegion texture, Vector2 position, Vector2 baseVelocity, Vector2 direction, Vector2 maxPosition) {
+	public Bullet(TextureRegion texture, int playerID, Vector2 position, Vector2 baseVelocity, Vector2 direction, Vector2 maxPosition) {
 		
 		this.texture = texture;
+		this.playerID = playerID;
 		this.position = position;
 		this.angle = direction.angle();
 		this.velocity = baseVelocity.add(direction.nor().mul(speed)); //todo direction //  * Gdx.graphics.getDeltaTime()
@@ -54,5 +58,9 @@ public class Bullet {
 		collision();
 		
 		spriteBatch.draw(texture, position.x, position.y, texture.getRegionWidth()*0.5f, texture.getRegionHeight()*0.5f, texture.getRegionWidth(), texture.getRegionHeight(), 1f, 1f, angle);
+	}
+
+	public int getPlayerID() {
+		return playerID;
 	}
 }

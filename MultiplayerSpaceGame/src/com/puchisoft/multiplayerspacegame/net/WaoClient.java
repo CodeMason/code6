@@ -7,10 +7,10 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
-import com.puchisoft.multiplayerspacegame.net.Network.LogMessage;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
 public class WaoClient {
 
@@ -84,10 +84,11 @@ public class WaoClient {
 
 	public void handleMessage(int playerId, Object message) {
 
-		if (message instanceof LogMessage) {
-			LogMessage msg = (LogMessage) message;
-			map.setStatus(msg.message);
-		} else if (message instanceof PlayerJoinLeave) {
+//		if (message instanceof LogMessage) {
+//			LogMessage msg = (LogMessage) message;
+//			map.setStatus(msg.message);
+//		} else 
+		if (message instanceof PlayerJoinLeave) {
 			PlayerJoinLeave msg = (PlayerJoinLeave) message;
 			if (msg.hasJoined) {
 				map.setStatus(msg.name + " joined");
@@ -99,6 +100,9 @@ public class WaoClient {
 		} else if (message instanceof MovementChange) {
 			MovementChange msg = (MovementChange) message;
 			map.playerMoved(msg);
+		} else if (message instanceof PlayerShoots) {
+			PlayerShoots msg = (PlayerShoots) message;
+			map.addBullet(msg);
 		}
 
 	}

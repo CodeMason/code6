@@ -10,6 +10,7 @@ import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
 public class WaoServer {
 	Server server;
@@ -72,7 +73,14 @@ public class WaoServer {
 				else if(message instanceof MovementChange) {
 					MovementChange msg = (MovementChange)message;
 					msg.playerId = connection.getID();
+					// TODO Remember more about player movement state, compute changes
 					connection.position = msg.position;
+					server.sendToAllExceptTCP(connection.getID(), msg);
+				}
+				else if(message instanceof PlayerShoots) {
+					PlayerShoots msg = (PlayerShoots)message;
+					msg.playerID = connection.getID();
+					// TODO some sort of validation: remember last shot time or such 
 					server.sendToAllExceptTCP(connection.getID(), msg);
 				}
 				
