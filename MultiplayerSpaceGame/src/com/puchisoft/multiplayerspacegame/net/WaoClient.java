@@ -1,7 +1,9 @@
 package com.puchisoft.multiplayerspacegame.net;
 
 import java.io.IOException;
+import java.util.Random;
 
+import com.badlogic.gdx.graphics.Color;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -18,6 +20,8 @@ public class WaoClient {
 	private GameMap map;
 	public int id;
 	public String remoteIP;
+	
+	public Random random = new Random();
 
 	public WaoClient(final GameMap game) { //
 		this.map = game;
@@ -52,10 +56,11 @@ public class WaoClient {
 	protected void handleConnect(Connection connection) {
 		id = connection.getID();
 		remoteIP = connection.getRemoteAddressTCP().toString();
-		Login registerName = new Login("USER" + Math.random(), Network.version);
+		Color color = new Color(random.nextFloat(),random.nextFloat(),random.nextFloat(),1);
+		Login registerName = new Login("Guest" + random.nextInt(10000), Network.version, color);
 		client.sendTCP(registerName);
 		client.updateReturnTripTime();
-		map.onConnect(this);
+		map.onConnect(this,color);
 	}
 
 	public void connectLocal() {

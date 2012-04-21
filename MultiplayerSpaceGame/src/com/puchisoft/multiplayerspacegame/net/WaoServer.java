@@ -2,6 +2,7 @@ package com.puchisoft.multiplayerspacegame.net;
 
 import java.io.IOException;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -49,22 +50,22 @@ public class WaoServer {
 					if (name.length() == 0) return;
 					// Store the name on the connection.
 					connection.name = name;
+					connection.color = msg.color;
 					if(msg.version != Network.version){
 						Log.error("wrong version");
 						connection.close();
 					}
 					
-					server.sendToAllExceptTCP(connection.getID(), msg);
 					
 					// Tell old people about new person
-					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true);
+					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, connection.color);
 					server.sendToAllExceptTCP(connection.getID(), reply);
 					
 					// Tell new person about old people
 					for(Connection con: server.getConnections()){
 						WaoConnection conn = (WaoConnection)con;
 						if(conn.getID() != connection.getID() && conn.name != null){ // Not self, Have logged in
-							PlayerJoinLeave hereMsg  = new PlayerJoinLeave(conn.getID(), conn.name, true);
+							PlayerJoinLeave hereMsg  = new PlayerJoinLeave(conn.getID(), conn.name, true, conn.color);
 							connection.sendTCP(hereMsg);
 						}
 					}
@@ -90,7 +91,7 @@ public class WaoServer {
 				WaoConnection connection = (WaoConnection)c;
 				if (connection.name != null) {
 					// Announce to everyone that someone has left.
-					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, false);
+					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, false, connection.color);
 					server.sendToAllExceptTCP(connection.getID(), reply);
 				}
 			}
@@ -108,6 +109,7 @@ public class WaoServer {
 	static class WaoConnection extends Connection {
 		public String name;
 		public Vector2 position;
+		protected Color color;
 	}
 
 	public void shutdown() {

@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -44,8 +45,9 @@ public class Player {
 	
 	private Random random = new Random();
 
-	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map) {
+	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color) {
 		this.sprite = new Sprite(texture);
+		this.sprite.setColor(color);
 		this.position = position;
 		this.maxPosition = maxPosition;
 		this.map = map;
@@ -72,7 +74,7 @@ public class Player {
 			wasTouched = true;
 		} else if (wasTouched) { // just stopped touching
 			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
-			if (touchPos.len2() > 50) { // deadzone ... to short to be counted
+			if (touchPos.len() > 10) { // deadzone ... to short to be counted
 										// as a drag
 				touchPos.x *= -1;
 				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());

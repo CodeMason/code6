@@ -47,7 +47,6 @@ public class GameMap {
 		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
 
 		maxPosition = new Vector2(textureBg.getWidth() * tilesCount, textureBg.getHeight() * tilesCount);
-		playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this);
 
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -56,10 +55,9 @@ public class GameMap {
 	}
 
 	public void render(float delta) {
-		if (client == null) {
+		if (client == null || playerLocal == null) {
 			return;
 		}
-		
 		
 		update(delta);
 		render();
@@ -146,10 +144,11 @@ public class GameMap {
 		spriteBatch.dispose();
 	}
 
-	public void onConnect(WaoClient client) {
+	public void onConnect(WaoClient client, Color color) {
 
 		if (this.client == null) {
 			this.client = client;
+			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color);
 			this.playerLocal.setId(client.id);
 			players.put(client.id, playerLocal);
 			setStatus("Connected to " + client.remoteIP);
@@ -166,7 +165,7 @@ public class GameMap {
 
 	public void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this);
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color);
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
 

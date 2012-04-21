@@ -1,5 +1,6 @@
 package com.puchisoft.multiplayerspacegame.net;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
@@ -8,7 +9,7 @@ import com.esotericsoftware.kryonet.FrameworkMessage.Ping;
 public class Network {
 
 	static public final int port = 6464;
-	static public final int version = 4;
+	static public final int version = 5;
 
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
@@ -17,6 +18,7 @@ public class Network {
 		kryo.register(Login.class);
 //		kryo.register(LogMessage.class);
 		kryo.register(Vector2.class);
+		kryo.register(Color.class);
 		kryo.register(PlayerJoinLeave.class);
 		kryo.register(MovementChange.class);
 		kryo.register(PlayerShoots.class);
@@ -25,13 +27,15 @@ public class Network {
 	static public class Login {
 		public String name;
 		public int version;
+		public Color color;
 
 		public Login() {
 		}
 
-		public Login(String name, int version) {
+		public Login(String name, int version, Color color) {
 			this.name = name;
 			this.version = version;
+			this.color = color;
 		}
 	}
 
@@ -50,14 +54,16 @@ public class Network {
 		public int playerId;
 		public String name;
 		public boolean hasJoined;
+		public Color color; // only for joined
 
 		public PlayerJoinLeave() {
 		}
 
-		public PlayerJoinLeave(int playerId, String name, boolean hasJoined) {
+		public PlayerJoinLeave(int playerId, String name, boolean hasJoined, Color color) {
 			this.playerId = playerId;
 			this.name = name;
 			this.hasJoined = hasJoined;
+			this.color = color;
 		}
 	}
 
