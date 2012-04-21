@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -68,6 +68,16 @@ public class GameMap {
 	}
 	
 	private void update(float delta){
+		// Zooming
+		if (Gdx.input.isKeyPressed(Keys.Q)){
+			this.cam.zoom = Math.max(this.cam.zoom - 1.0f * delta , 0.3f);
+		}else if (Gdx.input.isKeyPressed(Keys.E)){
+			this.cam.zoom = Math.min(this.cam.zoom + 1.0f * delta, 10.0f);
+		}
+		else if (Gdx.input.isTouched(1)){
+			this.cam.zoom = Math.min(Math.max(this.cam.zoom + (Gdx.input.getDeltaX(1) * 0.5f * delta), 0.3f), 10.0f);
+		}
+		
 		this.cam.position.set(playerLocal.getDesiredCameraPosition(this.cam.position, delta));
 		cam.update();
 
@@ -93,6 +103,7 @@ public class GameMap {
 					bulletCur.destroy();
 					playerCur.hit();
 					if(playerCur == playerLocal){
+						Gdx.input.vibrate(300);
 						client.sendMessage(playerLocal.getMovementState());
 					}
 				}

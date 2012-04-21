@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.minlog.Log;
@@ -39,6 +40,7 @@ public class ScreenGame extends ScreenCore {
 
 	@Override
 	public void render(float delta) {
+		// if (Gdx.app.getType() != ApplicationType.Android)
 		if (Gdx.input.isKeyPressed(Keys.G) || Gdx.input.isKeyPressed(Keys.MENU) || Gdx.input.isTouched(2)) {
 			if (server == null) {
 				// Start server
