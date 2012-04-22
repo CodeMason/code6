@@ -42,15 +42,17 @@ public class Player {
 
 	boolean wasTouched = false;
 	long mayFireTime = System.nanoTime(); // ms
+	private Moon moon;
 	
 	private Random random = new Random();
 
-	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color) {
+	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, Moon moon) {
 		this.sprite = new Sprite(texture);
 		this.sprite.setColor(color);
 		this.position = position;
 		this.maxPosition = maxPosition;
 		this.map = map;
+		this.moon = moon;
 	}
 
 	// Returns whether there was a change
@@ -158,6 +160,10 @@ public class Player {
 	}
 
 	public void render(SpriteBatch spriteBatch) {
+		moon.position.lerp(this.position, 0.035f);
+		
+		moon.render(spriteBatch);		
+		
 		sprite.draw(spriteBatch);
 	}
 

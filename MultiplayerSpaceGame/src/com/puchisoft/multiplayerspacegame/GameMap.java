@@ -32,12 +32,18 @@ public class GameMap {
 	private TextureRegion textureBullet;
 	private Texture textureBg;
 	private int tilesCount = 3;
+	
+	private Texture texturemoon;
+	private Texture textureChasemoon;
+	private Vector2 sizemoon;
 
 	private Vector2 maxPosition;
 
 	private WaoClient client;
 	private HUD hud;
 
+	private Moon moonChase;	
+	
 	public GameMap(HUD hud) {
 		this.hud = hud;
 		Gdx.files.internal("data/background.png");
@@ -45,11 +51,16 @@ public class GameMap {
 
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
 		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
-
+		texturemoon = new Texture(Gdx.files.internal("data/moon.png"));
+		textureChasemoon = new Texture(Gdx.files.internal("data/moonchase.png"));
+			
 		maxPosition = new Vector2(textureBg.getWidth() * tilesCount, textureBg.getHeight() * tilesCount);
 
+		moonChase = new Moon(textureChasemoon, new Vector2(50, 50));
+		
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
+		sizemoon = new Vector2(texturemoon.getWidth(), texturemoon.getHeight());
+		
 		spriteBatch = new SpriteBatch(); //
 
 	}
@@ -61,7 +72,7 @@ public class GameMap {
 		
 		update(delta);
 		render();
-		
+				
 		
 	}
 	
@@ -111,13 +122,28 @@ public class GameMap {
 			if (bullets.get(i).destroyed)
 				bullets.remove(i);
 		}
+		
+		Player closestPlayer = playerLocal;
+		float moonChaseDist = 999999999;
+		
+		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+			float currentdist = playerEntry.getValue().position.dst2(moonChase.position);
+			if (currentdist < moonChaseDist) {
+				moonChaseDist = currentdist;
+				closestPlayer = playerEntry.getValue();
+			}
+		}
+		
+		moonChase.position.lerp(closestPlayer.position, 0.01f);
+		
+		
 	}
 	
 	private void render(){
 		spriteBatch.setProjectionMatrix(cam.combined);
 		spriteBatch.begin();
 		spriteBatch.setColor(Color.WHITE);
-		
+				
 		// Background
 		for (int i = 0; i < tilesCount; i++) {
 			for (int j = 0; j < tilesCount; j++) {
@@ -135,6 +161,8 @@ public class GameMap {
 			bullets.get(i).render(spriteBatch);
 		}
 		
+		moonChase.render(spriteBatch);
+		
 		spriteBatch.end();
 	}
 
@@ -145,10 +173,11 @@ public class GameMap {
 	}
 
 	public void onConnect(WaoClient client, Color color) {
-
+				
 		if (this.client == null) {
 			this.client = client;
-			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color);
+			Moon moonLocal = new Moon(texturemoon, new Vector2(50, 50));
+			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, moonLocal);
 			this.playerLocal.setId(client.id);
 			players.put(client.id, playerLocal);
 			setStatus("Connected to " + client.remoteIP);
@@ -165,7 +194,7 @@ public class GameMap {
 
 	public void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color);
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, new Moon(texturemoon, new Vector2(50, 50)));
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
 
