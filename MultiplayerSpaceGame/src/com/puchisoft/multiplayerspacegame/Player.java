@@ -28,9 +28,10 @@ public class Player {
 
 	public Vector2 maxPosition;
 	public Vector2 position;
+	public Vector2 gravity;
 
 	private Vector2 direction = new Vector2(1, 0);
-	private Vector2 velocity = new Vector2();
+	public Vector2 velocity = new Vector2();
 
 	private Vector2 touchPos;
 
@@ -42,17 +43,18 @@ public class Player {
 
 	boolean wasTouched = false;
 	long mayFireTime = System.nanoTime(); // ms
-	private Moon moon;
+	public Moon moon;
 	
 	private Random random = new Random();
 
-	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, Moon moon) {
+	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, Moon moon, Vector2 gravity) {
 		this.sprite = new Sprite(texture);
 		this.sprite.setColor(color);
 		this.position = position;
 		this.maxPosition = maxPosition;
 		this.map = map;
 		this.moon = moon;
+		this.gravity = gravity;
 	}
 
 	// Returns whether there was a change

@@ -43,6 +43,8 @@ public class GameMap {
 	private HUD hud;
 
 	private Moon moonChase;	
+	private Vector2 currentPlayerPosition;
+	private Vector2 gravityLocal = new Vector2();
 	
 	public GameMap(HUD hud) {
 		this.hud = hud;
@@ -95,7 +97,58 @@ public class GameMap {
 			Log.info("changed input");
 			client.sendMessage(playerLocal.getMovementState());
 		}
+		
+		Player closestPlayer = playerLocal;
+		float moonChaseDist = 999999999;
+		
+		Vector2 gravitySum;
+		float gravityForce;
+		float gravityShip = (0.0000000000667384f * 7360000000000f * 3040f);
 
+		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+			
+			//Chase Moon
+			float currentdist = playerEntry.getValue().position.dst2(moonChase.position);
+			if (currentdist < moonChaseDist) {
+				moonChaseDist = currentdist;
+				closestPlayer = playerEntry.getValue();
+			}
+			
+			//Gravity
+//			currentPlayerPosition = playerEntry.getValue().position;
+//			Player currentPlayer = playerEntry.getValue();
+			
+			gravityForce = 0;
+			//float currentdist = playerEntry.getValue().position.dst2(moonChase.position);
+			if (playerLocal != playerEntry.getValue()) {			
+				if (!playerLocal.position.equals(playerEntry.getValue().moon.position)){
+					gravityForce =(gravityShip / playerLocal.position.dst2(playerEntry.getValue().moon.position));
+					if (gravityForce > 10){
+						gravityForce = 10;
+					}
+					Vector2 gravityVector = playerEntry.getValue().moon.position.cpy().sub(playerLocal.position).nor().mul(gravityForce);
+					playerLocal.velocity.add(gravityVector.mul(delta));
+					Log.info(String.valueOf(gravityForce));
+				}
+			}
+			/*gravitySum.x = 0;
+			gravitySum.y = 0;
+			for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+				gravityForce = 0;
+				//float currentdist = playerEntry.getValue().position.dst2(moonChase.position);
+				if (currentPlayer != playerEntry.getValue()) {
+					//gravitySum =
+					gravityForce = (0.0000000000667384 * 1000 * 2) / currentPlayer.position.dst2(playerEntry.getValue.position);
+					currentPlayer.position.add(playerEntry.getValue.position.mul(gravityForce));
+				}
+			}
+			//playerEntry.getValue().gravity = gravitySum;*/
+		}
+		
+		
+		moonChase.position.lerp(closestPlayer.position, 0.01f);
+		
+		
 		// Update Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 			playerEntry.getValue().update(delta);
@@ -122,19 +175,6 @@ public class GameMap {
 			if (bullets.get(i).destroyed)
 				bullets.remove(i);
 		}
-		
-		Player closestPlayer = playerLocal;
-		float moonChaseDist = 999999999;
-		
-		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
-			float currentdist = playerEntry.getValue().position.dst2(moonChase.position);
-			if (currentdist < moonChaseDist) {
-				moonChaseDist = currentdist;
-				closestPlayer = playerEntry.getValue();
-			}
-		}
-		
-		moonChase.position.lerp(closestPlayer.position, 0.01f);
 		
 		
 	}
@@ -177,7 +217,8 @@ public class GameMap {
 		if (this.client == null) {
 			this.client = client;
 			Moon moonLocal = new Moon(texturemoon, new Vector2(50, 50));
-			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, moonLocal);
+			
+			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, moonLocal , gravityLocal);
 			this.playerLocal.setId(client.id);
 			players.put(client.id, playerLocal);
 			setStatus("Connected to " + client.remoteIP);
@@ -194,7 +235,7 @@ public class GameMap {
 
 	public void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, new Moon(texturemoon, new Vector2(50, 50)));
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, new Moon(texturemoon, new Vector2(50, 50)), new Vector2());
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
 
