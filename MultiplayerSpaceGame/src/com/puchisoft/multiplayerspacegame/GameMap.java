@@ -131,18 +131,22 @@ public class GameMap {
 					Log.info(String.valueOf(gravityForce));
 				}
 			}
-			/*gravitySum.x = 0;
-			gravitySum.y = 0;
-			for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+
+			for (Map.Entry<Integer, Player> playerEntryMoon : players.entrySet()) {
 				gravityForce = 0;
-				//float currentdist = playerEntry.getValue().position.dst2(moonChase.position);
-				if (currentPlayer != playerEntry.getValue()) {
-					//gravitySum =
-					gravityForce = (0.0000000000667384 * 1000 * 2) / currentPlayer.position.dst2(playerEntry.getValue.position);
-					currentPlayer.position.add(playerEntry.getValue.position.mul(gravityForce));
+				if (playerEntry.getValue() != playerEntryMoon.getValue()) {
+					if (!playerEntry.getValue().position.equals(playerEntryMoon.getValue().moon.position)){
+						gravityForce =(gravityShip / playerEntry.getValue().position.dst2(playerEntryMoon.getValue().moon.position));
+						if (gravityForce > 10){
+							gravityForce = 10;
+						}
+						Vector2 gravityVector = playerEntryMoon.getValue().moon.position.cpy().sub(playerEntry.getValue().position).nor().mul(gravityForce);
+						playerEntry.getValue().velocity.add(gravityVector.mul(delta));
+						Log.info(String.valueOf(gravityForce));
+					}
 				}
 			}
-			//playerEntry.getValue().gravity = gravitySum;*/
+			//playerEntry.getValue().gravity = gravitySum;
 		}
 		
 		
