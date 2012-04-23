@@ -26,22 +26,22 @@ public class Bullet {
 		this.sprite.setRotation(direction.angle());
 		
 		this.playerID = playerID;
-		this.position = position;
-		this.velocity = baseVelocity.add(direction.nor().mul(speed));
+		this.setPosition(position);
+		this.setVelocity(baseVelocity.add(direction.nor().mul(speed)));
 		this.maxPosition = maxPosition;
 		
 	}
 	
 	private void move(float delta) {
-		position.add(velocity.tmp().mul(delta*60));
-		this.sprite.setPosition(position.x, position.y);
+		getPosition().add(getVelocity().tmp().mul(delta*60));
+		this.sprite.setPosition(getPosition().x, getPosition().y);
 	}
 	
 	private boolean collision(){
-		if(position.x < 0 || position.x > maxPosition.x - sprite.getWidth()){
+		if(getPosition().x < 0 || getPosition().x > maxPosition.x - sprite.getWidth()){
 			return destroy();
 		}	
-		else if(position.y < 0 || position.y > maxPosition.y - sprite.getHeight()){
+		else if(getPosition().y < 0 || getPosition().y > maxPosition.y - sprite.getHeight()){
 			return destroy();
 		}
 		return false;
@@ -67,5 +67,21 @@ public class Bullet {
 	
 	public Rectangle getBoundingRectangle(){
 		return sprite.getBoundingRectangle();
+	}
+
+	public Vector2 getPosition() {
+		return position;
+	}
+
+	public void setPosition(Vector2 position) {
+		this.position = position;
+	}
+
+	public Vector2 getVelocity() {
+		return velocity;
+	}
+
+	public void setVelocity(Vector2 velocity) {
+		this.velocity = velocity;
 	}
 }

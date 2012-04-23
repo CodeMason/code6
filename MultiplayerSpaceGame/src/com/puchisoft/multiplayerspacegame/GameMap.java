@@ -44,7 +44,6 @@ public class GameMap {
 
 	private Moon moonChase;	
 	private Vector2 currentPlayerPosition;
-	private Vector2 gravityLocal = new Vector2();
 	
 	public GameMap(HUD hud) {
 		this.hud = hud;
@@ -104,6 +103,7 @@ public class GameMap {
 		Vector2 gravitySum;
 		float gravityForce;
 		float gravityShip = (0.0000000000667384f * 7360000000000f * 3040f);
+		float gravityBullet = (0.0000000000667384f * 7360000000000f * 340f);
 
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 			
@@ -115,11 +115,8 @@ public class GameMap {
 			}
 			
 			//Gravity
-//			currentPlayerPosition = playerEntry.getValue().position;
-//			Player currentPlayer = playerEntry.getValue();
 			
 			gravityForce = 0;
-			//float currentdist = playerEntry.getValue().position.dst2(moonChase.position);
 			if (playerLocal != playerEntry.getValue()) {			
 				if (!playerLocal.position.equals(playerEntry.getValue().moon.position)){
 					gravityForce =(gravityShip / playerLocal.position.dst2(playerEntry.getValue().moon.position));
@@ -146,7 +143,21 @@ public class GameMap {
 					}
 				}
 			}
-			//playerEntry.getValue().gravity = gravitySum;
+			
+			for (int i = 0; i < bullets.size(); i++) {
+				Bullet bulletCur = bullets.get(i);
+				gravityForce = 0;
+				if (!bulletCur.getPosition().equals(playerEntry.getValue().moon.position)){
+					gravityForce =(gravityBullet / bulletCur.getPosition().dst2(playerEntry.getValue().moon.position));
+					if (gravityForce > 10){
+						gravityForce = 10;
+					}
+					Vector2 gravityVector = playerEntry.getValue().moon.position.cpy().sub(bulletCur.getPosition()).nor().mul(gravityForce);
+					bulletCur.setVelocity(bulletCur.getVelocity().add(gravityVector.mul(delta)));
+					Log.info(String.valueOf(gravityForce));
+				}
+				
+				}
 		}
 		
 		
@@ -222,7 +233,7 @@ public class GameMap {
 			this.client = client;
 			Moon moonLocal = new Moon(texturemoon, new Vector2(50, 50));
 			
-			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, moonLocal , gravityLocal);
+			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, moonLocal);
 			this.playerLocal.setId(client.id);
 			players.put(client.id, playerLocal);
 			setStatus("Connected to " + client.remoteIP);
@@ -239,7 +250,7 @@ public class GameMap {
 
 	public void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, new Moon(texturemoon, new Vector2(50, 50)), new Vector2());
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, new Moon(texturemoon, new Vector2(50, 50)));
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
 
