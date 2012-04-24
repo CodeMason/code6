@@ -33,6 +33,8 @@ public class ScreenGame extends ScreenCore {
 
 	@Override
 	public void show() {
+		
+		Gdx.input.setCatchBackKey(true);
 
 		hud = new HUD();
 		map = new GameMap(hud);
@@ -56,7 +58,7 @@ public class ScreenGame extends ScreenCore {
 
 	@Override
 	public void render(float delta) {
-		if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+		if (Gdx.input.isKeyPressed(Keys.ESCAPE) || Gdx.input.isKeyPressed(Keys.BACK)) {
 			game.setScreen(new ScreenMenu(game));
 		}
 
@@ -85,6 +87,7 @@ public class ScreenGame extends ScreenCore {
 
 	@Override
 	public void hide() {
+		Gdx.input.setCatchBackKey(false);
 		client.shutdown();
 		if (server != null)
 			server.shutdown();

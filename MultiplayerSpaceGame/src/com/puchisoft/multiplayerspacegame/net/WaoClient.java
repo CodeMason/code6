@@ -56,7 +56,7 @@ public class WaoClient {
 	protected void handleConnect(Connection connection) {
 		id = connection.getID();
 		remoteIP = connection.getRemoteAddressTCP().toString();
-		Color color = new Color(random.nextFloat(),random.nextFloat(),random.nextFloat(),1);
+		Color color = new Color(random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,1);
 		Login registerName = new Login("Guest" + random.nextInt(10000), Network.version, color);
 		client.sendTCP(registerName);
 		client.updateReturnTripTime();
