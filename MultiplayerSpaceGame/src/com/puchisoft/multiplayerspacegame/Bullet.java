@@ -37,12 +37,21 @@ public class Bullet {
 		this.sprite.setPosition(getPosition().x, getPosition().y);
 	}
 	
+	int bulletCollision =0;
 	private boolean collision(){
 		if(getPosition().x < 0 || getPosition().x > maxPosition.x - sprite.getWidth()){
-			return destroy();
+			if(bulletCollision < 4){
+				velocity.x = velocity.x * -1;
+				bulletCollision = bulletCollision + 1;
+				}
+				else return destroy();
 		}	
 		else if(getPosition().y < 0 || getPosition().y > maxPosition.y - sprite.getHeight()){
-			return destroy();
+			if(bulletCollision < 5){
+			velocity.y = velocity.y * -1;
+			bulletCollision = bulletCollision + 1;
+			}
+			else return destroy();
 		}
 		return false;
 	}
