@@ -10,3 +10,10 @@
 -Trails
 -Ships get random colors
 -Input circle (tap to shoot, drag to insta-turn and move (magnitude of drag matters?))
+
+James
+-ricochet bullets off moon
+-moon moves and pulls player behind with gravity
+-gravity effects from bullets
+-planet obstacles with gravity wells, trap players in orbit
+
