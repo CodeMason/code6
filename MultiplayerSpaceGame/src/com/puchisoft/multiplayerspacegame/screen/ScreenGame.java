@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.minlog.Log;
@@ -21,11 +20,15 @@ public class ScreenGame extends ScreenCore {
 
 	private WaoServer server;
 	private WaoClient client;
+	private final boolean isHost;
+	private final String ip;
 
 	// private FPSLogger fps = new FPSLogger();
 
-	public ScreenGame(Game game) {
+	public ScreenGame(Game game, boolean isHost, String ip) {
 		super(game);
+		this.isHost = isHost;
+		this.ip = ip;
 	}
 
 	@Override
@@ -33,27 +36,27 @@ public class ScreenGame extends ScreenCore {
 
 		hud = new HUD();
 		map = new GameMap(hud);
-
+		
 		client = new WaoClient(map);
-		client.connect("puchisoft.servegame.com", Network.port);
+		
+		if(isHost){
+			// Start server
+			Log.info("Starting server...");
+			try {
+				server = new WaoServer();
+				client.connectLocal();
+			} catch (IOException e) {
+				e.printStackTrace();
+				Log.error("Can't start server. Already running?");
+			}
+		}else{
+			client.connect(ip, Network.port);
+		}
 	}
 
 	@Override
 	public void render(float delta) {
-		// if (Gdx.app.getType() != ApplicationType.Android)
-		if (Gdx.input.isKeyPressed(Keys.G) || Gdx.input.isKeyPressed(Keys.MENU) || Gdx.input.isTouched(2)) {
-			if (server == null) {
-				// Start server
-				Log.info("Starting server...");
-				try {
-					server = new WaoServer();
-				} catch (IOException e) {
-					e.printStackTrace();
-					Log.error("Can't start server. Already running?");
-				}
-				client.connectLocal();
-			}
-		} else if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+		if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
 			game.setScreen(new ScreenMenu(game));
 		}
 
