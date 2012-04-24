@@ -16,11 +16,11 @@ import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
 public class Player {
-	private static final int FIRE_DELAY = 500 * 1000000;
+	private static final int FIRE_DELAY = 500 * 500000;
 	private static final float speedAcc = 10.0f;
 	private static final float speedAccTouch = 1.0f;
 	private static final float speedRot = 180.0f; // angle degrees
-	private static final float speedMax = 50.0f;
+	private static final float speedMax = 60.0f;
 
 	private int id;
 	private Sprite sprite;
@@ -147,6 +147,7 @@ public class Player {
 		PlayerShoots msgPlayerShoots = new PlayerShoots(id,position.cpy(),velocity.cpy(),direction.cpy());
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
+		velocity.sub(direction.nor().mul(0.5f));
 	}
 	
 	public void hit(){
