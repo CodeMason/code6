@@ -120,6 +120,7 @@ public class ScreenMenu extends ScreenCore {
 
 	@Override
 	public void hide() {
+		Gdx.input.setInputProcessor(null);
 		stage.dispose();
 		skin.dispose();
 		batch.dispose();
