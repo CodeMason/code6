@@ -1,5 +1,7 @@
 package com.puchisoft.multiplayerspacegame.screen;
 
+import java.net.InetAddress;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -18,6 +20,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
+import com.esotericsoftware.kryonet.Client;
+import com.puchisoft.multiplayerspacegame.net.Network;
 
 public class ScreenMenu extends ScreenCore {
 	Texture title;
@@ -47,19 +51,25 @@ public class ScreenMenu extends ScreenCore {
 		labelTitle.x = Gdx.graphics.getWidth()/2 - labelTitle.width/2;
 		
 		textfieldIP = new TextField("puchisoft.servegame.com", "Enter IP", skin.getStyle(TextFieldStyle.class), "textfield_ip");
-		textfieldIP.width = 200;
+		textfieldIP.width = 400;
 		textfieldIP.height = 30;
 		textfieldIP.y = Gdx.graphics.getHeight() - textfieldIP.height - 65 -200;
 		textfieldIP.x = Gdx.graphics.getWidth()/2 - textfieldIP.width/2;
 		
+		final Button buttonFind = new TextButton("Find", skin.getStyle(TextButtonStyle.class), "button_join");
+		buttonFind.width = 60;
+		buttonFind.height = textfieldIP.height;
+		buttonFind.y = textfieldIP.y;
+		buttonFind.x = textfieldIP.x+textfieldIP.width+5;
+		
 		final Button buttonJoin = new TextButton("Join Game", skin.getStyle(TextButtonStyle.class), "button_join");
-		buttonJoin.width = 200;
+		buttonJoin.width = 400;
 		buttonJoin.height = 100;
 		buttonJoin.y = Gdx.graphics.getHeight() - buttonJoin.height - 100 -200;
 		buttonJoin.x = Gdx.graphics.getWidth()/2-buttonJoin.width/2;
 		
 		final Button buttonHost = new TextButton("Host Game", skin.getStyle(TextButtonStyle.class), "button_join");
-		buttonHost.width = 200;
+		buttonHost.width = 400;
 		buttonHost.height = 100;
 		buttonHost.y = Gdx.graphics.getHeight() - buttonHost.height - 220 -200;
 		buttonHost.x = Gdx.graphics.getWidth()/2-buttonHost.width/2;
@@ -67,6 +77,7 @@ public class ScreenMenu extends ScreenCore {
 		
 		stage.addActor(labelTitle);
 		stage.addActor(textfieldIP);
+		stage.addActor(buttonFind);
 		stage.addActor(buttonJoin);
 		stage.addActor(buttonHost);
 		
@@ -74,6 +85,13 @@ public class ScreenMenu extends ScreenCore {
 		textfieldIP.setTextFieldListener(new TextFieldListener() {
 			public void keyTyped (TextField textField, char key) {
 				if (key == '\n') textField.getOnscreenKeyboard().show(false);
+			}
+		});
+		buttonFind.setClickListener(new ClickListener() {
+			@Override
+			public void click(Actor actor, float x, float y) {
+				goFind();
+				
 			}
 		});
 		buttonJoin.setClickListener(new ClickListener() {
@@ -95,6 +113,18 @@ public class ScreenMenu extends ScreenCore {
 		Gdx.input.setInputProcessor(stage);
 	}
 	
+	private void goFind() {
+		Client client = new Client();
+		client.start();
+		InetAddress found = client.discoverHost(Network.portUdp, 5000);
+		if(found != null){
+			textfieldIP.setText(found.getHostAddress().toString());
+		}
+		client.stop();
+		client.close();
+		
+	}
+
 	private void goJoin(){
 		game.setScreen(new ScreenGame(game, false, textfieldIP.getText()));
 	}

@@ -1,6 +1,7 @@
 package com.puchisoft.multiplayerspacegame.net;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
@@ -28,6 +29,8 @@ public class WaoClient {
 
 		client = new Client();
 		client.start();
+//		InetAddress found = client.discoverHost(Network.portUdp, 5000);
+//		System.out.println(found.toString());
 
 		// For consistency, the classes to be sent over the network are
 		// registered by the same method for both the client and server.
@@ -64,12 +67,12 @@ public class WaoClient {
 	}
 
 	public void connectLocal() {
-		connect("localhost", Network.port);
+		connect("localhost");
 	}
 
-	public void connect(String host, int port) {
+	public void connect(String host) {
 		try {
-			client.connect(5000, host, port);
+			client.connect(5000, host, Network.port, Network.portUdp);
 		} catch (IOException e) {
 			// e.printStackTrace();
 			map.setStatus("Can't connect to " + host);
@@ -119,6 +122,7 @@ public class WaoClient {
 	}
 
 	public void shutdown() {
+		client.stop();
 		client.close();
 	}
 
