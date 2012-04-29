@@ -16,7 +16,6 @@ public class Moon {
 	
 	private Sprite sprite;
 	
-	private Texture texture;
 	public Vector2 maxPosition;
 	public Vector2 position;
 	
@@ -34,7 +33,7 @@ public class Moon {
 	boolean wasTouched = false;
 	
 	public Moon(Texture texture, Vector2 position, Vector2 maxPosition) {
-		this.texture = texture;
+		this.sprite = new Sprite(texture);
 		this.position = position;
 		this.maxPosition = maxPosition;
 	}
@@ -123,8 +122,9 @@ public class Moon {
 
 	public void render(SpriteBatch spriteBatch) {
 		// TODO Auto-generated method stub
-		spriteBatch.draw(texture, position.x, position.y, 0, 0, 
-				texture.getWidth(), texture.getHeight());
+//		spriteBatch.draw(texture, position.x, position.y, 0, 0, 
+//				texture.getWidth(), texture.getHeight());
+		sprite.draw(spriteBatch);
 	}
 	
 }
