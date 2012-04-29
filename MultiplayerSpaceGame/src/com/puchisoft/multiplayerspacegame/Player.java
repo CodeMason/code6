@@ -113,32 +113,32 @@ public class Player {
 //		return turning != turningOld || accelerating != acceleratingOld || touchMove;
 //	}
 
-	private void move(float delta) {
-
-		direction.rotate(turning * delta * speedRot);
-		sprite.setRotation(direction.angle()); // update sprite
-
-		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
-
-		if (velocity.len() > speedMax) {
-			velocity.nor().mul(speedMax);
-		}
-
-		position.add(velocity.tmp().mul(delta * 60));
-
-		// Bounce
-		if (position.x < 0 || position.x > maxPosition.x - sprite.getWidth()) {
-			velocity.x *= -0.3;
-		} else if (position.y < 0 || position.y > maxPosition.y - sprite.getHeight()) {
-			velocity.y *= -0.3;
-		}
-		// Prevent escape
-		position.x = Math.max(0, Math.min(maxPosition.x - sprite.getWidth(), position.x));
-		position.y = Math.max(0, Math.min(maxPosition.y - sprite.getHeight(), position.y));
-		
-		sprite.setPosition(position.x, position.y); // update sprite
-		
-	}
+//	private void move(float delta) {
+//
+//		direction.rotate(turning * delta * speedRot);
+//		sprite.setRotation(direction.angle()); // update sprite
+//
+//		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
+//
+//		if (velocity.len() > speedMax) {
+//			velocity.nor().mul(speedMax);
+//		}
+//
+//		position.add(velocity.tmp().mul(delta * 60));
+//
+//		// Bounce
+//		if (position.x < 0 || position.x > maxPosition.x - sprite.getWidth()) {
+//			velocity.x *= -0.3;
+//		} else if (position.y < 0 || position.y > maxPosition.y - sprite.getHeight()) {
+//			velocity.y *= -0.3;
+//		}
+//		// Prevent escape
+//		position.x = Math.max(0, Math.min(maxPosition.x - sprite.getWidth(), position.x));
+//		position.y = Math.max(0, Math.min(maxPosition.y - sprite.getHeight(), position.y));
+//		
+//		sprite.setPosition(position.x, position.y); // update sprite
+//		
+//	}
 
 	public void shoot() {
 		if(mayFireTime > System.nanoTime()){
@@ -158,10 +158,12 @@ public class Player {
 	
 	public void update(float delta){
 		moon.move(delta);
+		
+		this.position.lerp(moon.position, 0.035f);
 	}
 
 	public void render(SpriteBatch spriteBatch) {
-		this.position.lerp(moon.position, 0.035f);
+		
 		
 		moon.render(spriteBatch);		
 		
