@@ -116,18 +116,18 @@ public class GameMap {
 			
 			//Gravity
 			
-			gravityForce = 0;
-			if (playerLocal != playerEntry.getValue()) {			
-				if (!playerLocal.moon.position.equals(playerEntry.getValue().moon.position)){
-					gravityForce =(gravityShip / playerLocal.moon.position.dst2(playerEntry.getValue().position));
-					if (gravityForce > 10){
-						gravityForce = 10;
-					}
-					Vector2 gravityVector = playerEntry.getValue().position.cpy().sub(playerLocal.moon.position).nor().mul(gravityForce);
-					playerLocal.moon.velocity.add(gravityVector.mul(delta));
-					Log.info(String.valueOf(gravityForce));
-				}
-			}
+//			gravityForce = 0;
+//			if (playerLocal != playerEntry.getValue()) {			
+//				if (!playerLocal.moon.position.equals(playerEntry.getValue().moon.position)){
+//					gravityForce =(gravityShip / playerLocal.moon.position.dst2(playerEntry.getValue().position));
+//					if (gravityForce > 10){
+//						gravityForce = 10;
+//					}
+//					Vector2 gravityVector = playerEntry.getValue().position.cpy().sub(playerLocal.moon.position).nor().mul(gravityForce);
+//					playerLocal.moon.velocity.add(gravityVector.mul(delta));
+//					Log.info(String.valueOf(gravityForce));
+//				}
+//			}
 
 			for (Map.Entry<Integer, Player> playerEntryMoon : players.entrySet()) {
 				gravityForce = 0;
