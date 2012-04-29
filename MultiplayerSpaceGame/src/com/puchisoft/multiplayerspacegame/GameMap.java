@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
+import com.puchisoft.multiplayerspacegame.net.Network.AstroidLocations;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
@@ -22,6 +24,8 @@ import com.puchisoft.multiplayerspacegame.net.WaoClient;
 public class GameMap {
 	public OrthographicCamera cam;
 	private SpriteBatch spriteBatch;
+	
+	private Random random = new Random();
 
 	private Map<Integer, Player> players = new HashMap<Integer, Player>();
 	private List<Bullet> bullets = new ArrayList<Bullet>();
@@ -40,9 +44,9 @@ public class GameMap {
 	private HUD hud;
 	private TextureRegion textureAstroid;
 	
-	boolean isClient = true;
+	boolean isClient;
 
-	public GameMap(boolean isClientd) {
+	public GameMap(boolean isClient) {
 		this.isClient = isClient;
 		if(isClient) this.hud = new HUD();
 		Gdx.files.internal("data/background.png");
@@ -51,11 +55,9 @@ public class GameMap {
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
 		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
 		textureAstroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
-		
-		asteroids.add(new Asteroid(textureAstroid, new Vector2(150, 50)));
 
 		maxPosition = new Vector2(textureBg.getWidth() * tilesCount, textureBg.getHeight() * tilesCount);
-
+		
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		spriteBatch = new SpriteBatch(); //
@@ -217,5 +219,29 @@ public class GameMap {
 		}
 		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
 	}
-
+	
+	private void addAsteroid(Vector2 postion){
+		asteroids.add(new Asteroid(textureAstroid, postion));
+	}
+	
+	public void addAsteroidsRandom(int amount){
+		for(int i = 0; i < amount; i++){
+			addAsteroid(new Vector2(random.nextInt((int) maxPosition.x),random.nextInt((int) maxPosition.y)));
+		}
+	}
+	
+	public AstroidLocations getAstroidLocations(){
+		Vector2[] positions = new Vector2[asteroids.size()];
+		for (int i = 0; i < asteroids.size(); i++) {
+			positions[i] = asteroids.get(i).getPosition();
+		}
+		
+		return new AstroidLocations(positions);
+	}
+	
+	public void addAstroidLocations(AstroidLocations astroidLocations){
+		for(Vector2 positon : astroidLocations.positions){
+			addAsteroid(positon);
+		}
+	}
 }

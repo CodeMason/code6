@@ -9,6 +9,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
+import com.puchisoft.multiplayerspacegame.net.Network.AstroidLocations;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
@@ -21,7 +22,7 @@ public class WaoClient {
 	public int id;
 	public String remoteIP;
 	
-	public Random random = new Random();
+	private Random random = new Random();
 
 	public WaoClient(final GameMap game) { //
 		this.map = game;
@@ -110,6 +111,9 @@ public class WaoClient {
 		} else if (message instanceof PlayerShoots) {
 			PlayerShoots msg = (PlayerShoots) message;
 			map.addBullet(msg);
+		} else if (message instanceof AstroidLocations) {
+			AstroidLocations msg = (AstroidLocations) message;
+			map.addAstroidLocations(msg);
 		}
 
 	}

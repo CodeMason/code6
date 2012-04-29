@@ -19,10 +19,12 @@ public class Network {
 		kryo.register(Login.class);
 //		kryo.register(LogMessage.class);
 		kryo.register(Vector2.class);
+		kryo.register(com.badlogic.gdx.math.Vector2[].class);
 		kryo.register(Color.class);
 		kryo.register(PlayerJoinLeave.class);
 		kryo.register(MovementChange.class);
 		kryo.register(PlayerShoots.class);
+		kryo.register(AstroidLocations.class);
 	}
 
 	static public class Login {
@@ -101,6 +103,15 @@ public class Network {
 			this.position = position;
 			this.direction = direction;
 			this.baseVelocity = baseVelocity;
+		}
+	}
+	
+	static public class AstroidLocations {
+		public Vector2[] positions;
+		public AstroidLocations() {
+		}
+		public AstroidLocations(Vector2[] positions) {
+			this.positions = positions;
 		}
 	}
 }

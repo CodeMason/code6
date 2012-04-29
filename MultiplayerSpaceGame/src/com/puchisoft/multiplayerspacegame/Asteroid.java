@@ -18,4 +18,8 @@ public class Asteroid {
 		sprite.draw(spriteBatch);
 		
 	}
+
+	public Vector2 getPosition() {
+		return new Vector2(this.sprite.getX(),this.sprite.getY());
+	}
 }

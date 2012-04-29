@@ -21,6 +21,8 @@ public class WaoServer {
 	public WaoServer() throws IOException {
 		//Log.set(Log.LEVEL_DEBUG);
 		map = new GameMap(false);
+		map.addAsteroidsRandom(100);
+		
 		server = new Server() {
 			protected Connection newConnection() {
 				// By providing our own connection implementation, we can store
@@ -62,6 +64,9 @@ public class WaoServer {
 					// Tell old people about new person
 					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, connection.color);
 					server.sendToAllExceptTCP(connection.getID(), reply);
+					
+					// Tell new person about asteroids
+					connection.sendTCP(map.getAstroidLocations());
 					
 					// Tell new person about old people
 					for(Connection con: server.getConnections()){
