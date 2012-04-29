@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
+import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 
 public class Moon {
 	private static final float speedAcc = 10.0f;
@@ -14,6 +15,7 @@ public class Moon {
 	private static final float speedRot = 180.0f; // angle degrees
 	private static final float speedMax = 60.0f;
 	
+	private int id;
 	private Sprite sprite;
 	
 	public Vector2 maxPosition;
@@ -125,6 +127,26 @@ public class Moon {
 //		spriteBatch.draw(texture, position.x, position.y, 0, 0, 
 //				texture.getWidth(), texture.getHeight());
 		sprite.draw(spriteBatch);
+	}
+	
+	public MovementChange getMovementState() {
+		return new MovementChange(id, turning, accelerating, position, direction, velocity);
+	}
+
+	public void setMovementState(MovementChange msg) {
+		turning = msg.turning;
+		accelerating = msg.accelerating;
+		position = msg.position;
+		direction = msg.direction;
+		velocity = msg.velocity;
+	}
+	
+	public int getID() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 }

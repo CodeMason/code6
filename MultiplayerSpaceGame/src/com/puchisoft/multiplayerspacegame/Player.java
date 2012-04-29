@@ -110,8 +110,8 @@ public class Player {
 		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
 			shoot();
 		}
-		moon.handleInput(delta);
-		return turning != turningOld || accelerating != acceleratingOld || touchMove;
+
+		return turning != turningOld || accelerating != acceleratingOld || touchMove || moon.handleInput(delta);
 	}
 
 	private void move(float delta) {
@@ -191,11 +191,11 @@ public class Player {
 	}
 
 	public void setMovementState(MovementChange msg) {
-		this.turning = msg.turning;
-		this.accelerating = msg.accelerating;
-		this.position = msg.position;
-		this.direction = msg.direction;
-		this.velocity = msg.velocity;
+		turning = msg.turning;
+		accelerating = msg.accelerating;
+		position = msg.position;
+		direction = msg.direction;
+		velocity = msg.velocity;
 	}
 
 	public int getID() {
@@ -204,6 +204,7 @@ public class Player {
 
 	public void setId(int id) {
 		this.id = id;
+		moon.setId(id);
 	}
 	
 	public Rectangle getBoundingRectangle(){
