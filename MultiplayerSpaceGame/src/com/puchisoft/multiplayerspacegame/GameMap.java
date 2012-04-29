@@ -57,7 +57,7 @@ public class GameMap {
 			
 		maxPosition = new Vector2(textureBg.getWidth() * tilesCount, textureBg.getHeight() * tilesCount);
 
-		moonChase = new Moon(textureChasemoon, new Vector2(50, 50));
+		moonChase = new Moon(textureChasemoon, new Vector2(50, 50), maxPosition);
 		
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		sizemoon = new Vector2(texturemoon.getWidth(), texturemoon.getHeight());
@@ -92,7 +92,7 @@ public class GameMap {
 		cam.update();
 
 		// Handle local input and sent over network if changed
-		if (playerLocal.handleInput(delta)) {
+		if (playerLocal.moon.handleInput(delta)) {
 			Log.info("changed input");
 			client.sendMessage(playerLocal.getMovementState());
 		}
@@ -248,7 +248,7 @@ public class GameMap {
 				
 		if (this.client == null) {
 			this.client = client;
-			Moon moonLocal = new Moon(texturemoon, new Vector2(50, 50));
+			Moon moonLocal = new Moon(texturemoon, new Vector2(50, 50), maxPosition);
 			
 			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, moonLocal);
 			this.playerLocal.setId(client.id);
@@ -267,7 +267,7 @@ public class GameMap {
 
 	public void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, new Moon(texturemoon, new Vector2(50, 50)));
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, new Moon(texturemoon, new Vector2(50, 50), maxPosition));
 		newPlayer.setId(msg.playerId);
 		players.put(msg.playerId, newPlayer);
 
