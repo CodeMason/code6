@@ -1,6 +1,7 @@
 package com.puchisoft.multiplayerspacegame.screen;
 
 import java.io.IOException;
+import java.util.Random;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -19,6 +20,8 @@ public class ScreenGame extends ScreenCore {
 	private WaoClient client;
 	private final boolean isHost;
 	private final String ip;
+	private String name;
+	private Random random = new Random();
 
 	// private FPSLogger fps = new FPSLogger();
 
@@ -26,6 +29,8 @@ public class ScreenGame extends ScreenCore {
 		super(game);
 		this.isHost = isHost;
 		this.ip = ip;
+		
+		this.name = "Guest" + random.nextInt(10000);
 	}
 
 	@Override
@@ -35,7 +40,7 @@ public class ScreenGame extends ScreenCore {
 
 		map = new GameMap(true);
 		
-		client = new WaoClient(map);
+		client = new WaoClient(map,name);
 		
 		if(isHost){
 			// Start server

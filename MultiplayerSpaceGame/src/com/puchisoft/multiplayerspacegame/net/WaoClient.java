@@ -20,12 +20,14 @@ public class WaoClient {
 	private Client client;
 	private GameMap map;
 	public int id;
+	private String name;
 	public String remoteIP;
 	
 	private Random random = new Random();
 
-	public WaoClient(final GameMap game) { //
+	public WaoClient(final GameMap game, String name) { //
 		this.map = game;
+		this.name = name;
 
 		client = new Client();
 		client.start();
@@ -60,10 +62,10 @@ public class WaoClient {
 		id = connection.getID();
 		remoteIP = connection.getRemoteAddressTCP().toString();
 		Color color = new Color(random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,1);
-		Login registerName = new Login("Guest" + random.nextInt(10000), Network.version, color);
+		Login registerName = new Login(name, Network.version, color);
 		client.sendTCP(registerName);
 		client.updateReturnTripTime();
-		map.onConnect(this,color);
+		map.onConnect(this,name,color);
 	}
 
 	public void connectLocal() {
