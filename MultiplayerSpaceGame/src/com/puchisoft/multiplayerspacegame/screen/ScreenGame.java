@@ -50,9 +50,10 @@ public class ScreenGame extends ScreenCore {
 			} catch (IOException e) {
 				e.printStackTrace();
 				Log.error("Can't start server. Already running?");
+				game.setScreen(new ScreenMenu(game));
 			}
 		}else{
-			client.connect(ip, Network.port);
+			client.connect(ip);
 		}
 	}
 
