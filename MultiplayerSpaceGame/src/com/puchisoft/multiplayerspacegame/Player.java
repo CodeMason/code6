@@ -16,7 +16,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
 public class Player {
-	private static final int FIRE_DELAY = 500 * 500000;
+	private static final int FIRE_DELAY = 500 * 1000000;
 	private static final float speedAcc = 10.0f;
 	private static final float speedAccTouch = 1.0f;
 	private static final float speedRot = 180.0f; // angle degrees
@@ -57,61 +57,61 @@ public class Player {
 
 	// Returns whether there was a change
 	// TODO move into GameMap?
-	public boolean handleInput(float delta) {
-
-		turningOld = turning;
-		acceleratingOld = accelerating;
-
-		turning = 0;
-		accelerating = 0;
-
-		boolean touchMove = false;
-
-		// Android
-		// Movement
-		if (Gdx.input.isTouched()) {
-			if (!wasTouched) { // touchPos == null // just started touching
-				touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-			}
-			wasTouched = true;
-		} else if (wasTouched) { // just stopped touching
-			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
-			if (touchPos.len() > 10) { // deadzone ... to short to be counted
-										// as a drag
-				touchPos.x *= -1;
-				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
-				direction.set(touchPos.tmp()).nor();
-				velocity.add(touchPos.mul(speedAccTouch * delta));
-			} else {
-				shoot();
-				Log.info("touch");
-			}
-			wasTouched = false;
-			touchMove = true;
-		}
-
-		// Desktop
-		// Movement
-		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.S)
-				|| Gdx.input.isKeyPressed(Keys.D)) {
-
-			if (Gdx.input.isKeyPressed(Keys.W)) {
-				accelerating = 1;
-			} else if (Gdx.input.isKeyPressed(Keys.S)) {
-				accelerating = -1;
-			}
-			if (Gdx.input.isKeyPressed(Keys.A)) {
-				turning = 1;
-			} else if (Gdx.input.isKeyPressed(Keys.D)) {
-				turning = -1;
-			}
-		}
-		// Shooting
-		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
-			shoot();
-		}
-		return turning != turningOld || accelerating != acceleratingOld || touchMove;
-	}
+//	public boolean handleInput(float delta) {
+//
+//		turningOld = turning;
+//		acceleratingOld = accelerating;
+//
+//		turning = 0;
+//		accelerating = 0;
+//
+//		boolean touchMove = false;
+//
+//		// Android
+//		// Movement
+//		if (Gdx.input.isTouched()) {
+//			if (!wasTouched) { // touchPos == null // just started touching
+//				touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+//			}
+//			wasTouched = true;
+//		} else if (wasTouched) { // just stopped touching
+//			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
+//			if (touchPos.len() > 10) { // deadzone ... to short to be counted
+//										// as a drag
+//				touchPos.x *= -1;
+//				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
+//				direction.set(touchPos.tmp()).nor();
+//				velocity.add(touchPos.mul(speedAccTouch * delta));
+//			} else {
+//				shoot();
+//				Log.info("touch");
+//			}
+//			wasTouched = false;
+//			touchMove = true;
+//		}
+//
+//		// Desktop
+//		// Movement
+//		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.S)
+//				|| Gdx.input.isKeyPressed(Keys.D)) {
+//
+//			if (Gdx.input.isKeyPressed(Keys.W)) {
+//				accelerating = 1;
+//			} else if (Gdx.input.isKeyPressed(Keys.S)) {
+//				accelerating = -1;
+//			}
+//			if (Gdx.input.isKeyPressed(Keys.A)) {
+//				turning = 1;
+//			} else if (Gdx.input.isKeyPressed(Keys.D)) {
+//				turning = -1;
+//			}
+//		}
+//		// Shooting
+//		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
+//			shoot();
+//		}
+//		return turning != turningOld || accelerating != acceleratingOld || touchMove;
+//	}
 
 	private void move(float delta) {
 
@@ -157,11 +157,11 @@ public class Player {
 	}
 	
 	public void update(float delta){
-		this.move(delta);
+		moon.move(delta);
 	}
 
 	public void render(SpriteBatch spriteBatch) {
-		moon.position.lerp(this.position, 0.035f);
+		this.position.lerp(moon.position, 0.035f);
 		
 		moon.render(spriteBatch);		
 		
