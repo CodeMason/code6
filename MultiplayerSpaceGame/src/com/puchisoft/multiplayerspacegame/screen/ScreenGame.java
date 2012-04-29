@@ -65,7 +65,8 @@ public class ScreenGame extends ScreenCore {
 		Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-		map.render(delta);
+		map.update(delta);
+		map.render();
 		hud.render(delta);
 
 		// emulate terrible fps

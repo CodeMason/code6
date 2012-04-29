@@ -25,6 +25,7 @@ public class GameMap {
 
 	private Map<Integer, Player> players = new HashMap<Integer, Player>();
 	private List<Bullet> bullets = new ArrayList<Bullet>();
+	private List<Astroid> astroids = new ArrayList<Astroid>();
 
 	private Player playerLocal;
 
@@ -37,6 +38,7 @@ public class GameMap {
 
 	private WaoClient client;
 	private HUD hud;
+	private TextureRegion textureAstroid;
 
 	public GameMap(HUD hud) {
 		this.hud = hud;
@@ -45,6 +47,9 @@ public class GameMap {
 
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
 		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
+		textureAstroid = new TextureRegion(new Texture(Gdx.files.internal("data/astroid.png")), 0, 0, 48, 48);
+		
+		astroids.add(new Astroid(textureAstroid, new Vector2(150, 50)));
 
 		maxPosition = new Vector2(textureBg.getWidth() * tilesCount, textureBg.getHeight() * tilesCount);
 
@@ -53,19 +58,12 @@ public class GameMap {
 		spriteBatch = new SpriteBatch(); //
 
 	}
-
-	public void render(float delta) {
+	
+	private void handleInput(float delta){
 		if (client == null || playerLocal == null) {
 			return;
 		}
 		
-		update(delta);
-		render();
-		
-		
-	}
-	
-	private void update(float delta){
 		// Zooming
 		if (Gdx.input.isKeyPressed(Keys.Q)){
 			this.cam.zoom = Math.max(this.cam.zoom - 1.0f * delta , 0.3f);
@@ -75,15 +73,25 @@ public class GameMap {
 		else if (Gdx.input.isTouched(1)){
 			this.cam.zoom = Math.min(Math.max(this.cam.zoom + (Gdx.input.getDeltaX(1) * 0.5f * delta), 0.3f), 10.0f);
 		}
-		
-		this.cam.position.set(playerLocal.getDesiredCameraPosition(this.cam.position, delta));
-		cam.update();
+	}
 
-		// Handle local input and sent over network if changed
-		if (playerLocal.handleInput(delta)) {
-			Log.info("changed input");
-			client.sendMessage(playerLocal.getMovementState());
+	public void update(float delta){
+		
+		// Client ready and player is spawned 
+		if (client != null && playerLocal != null) {
+			handleInput(delta);
+			
+			this.cam.position.set(playerLocal.getDesiredCameraPosition(this.cam.position, delta));
+			cam.update();
+			
+			// Handle local input and sent over network if changed
+			if (playerLocal.handleInput(delta)) {
+				Log.info("changed input");
+				client.sendMessage(playerLocal.getMovementState());
+			}
 		}
+
+		
 
 		// Update Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
@@ -113,7 +121,11 @@ public class GameMap {
 		}
 	}
 	
-	private void render(){
+	public void render(){
+		if (client == null || playerLocal == null) {
+			return;
+		}
+		
 		spriteBatch.setProjectionMatrix(cam.combined);
 		spriteBatch.begin();
 		spriteBatch.setColor(Color.WHITE);
@@ -124,6 +136,11 @@ public class GameMap {
 				spriteBatch.draw(textureBg, textureBg.getWidth() * i, textureBg.getHeight() * j, 0, 0, textureBg.getWidth(),
 						textureBg.getHeight());
 			}
+		}
+		
+		// Render Astroids
+		for (int i = 0; i < astroids.size(); i++) {
+			astroids.get(i).render(spriteBatch);
 		}
 		
 		// Render Players
