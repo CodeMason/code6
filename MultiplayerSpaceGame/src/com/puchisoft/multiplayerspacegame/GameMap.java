@@ -92,7 +92,7 @@ public class GameMap {
 		cam.update();
 
 		// Handle local input and sent over network if changed
-		if (playerLocal.moon.handleInput(delta)) {
+		if (playerLocal.handleInput(delta)) {
 			Log.info("changed input");
 			client.sendMessage(playerLocal.getMovementState());
 		}
@@ -116,67 +116,67 @@ public class GameMap {
 			
 			//Gravity
 			
-			gravityForce = 0;
-			if (playerLocal != playerEntry.getValue()) {			
-				if (!playerLocal.position.equals(playerEntry.getValue().moon.position)){
-					gravityForce =(gravityShip / playerLocal.position.dst2(playerEntry.getValue().moon.position));
-					if (gravityForce > 10){
-						gravityForce = 10;
-					}
-					Vector2 gravityVector = playerEntry.getValue().moon.position.cpy().sub(playerLocal.position).nor().mul(gravityForce);
-					playerLocal.velocity.add(gravityVector.mul(delta));
-					Log.info(String.valueOf(gravityForce));
-				}
-			}
+//			gravityForce = 0;
+//			if (playerLocal != playerEntry.getValue()) {			
+//				if (!playerLocal.moon.position.equals(playerEntry.getValue().moon.position)){
+//					gravityForce =(gravityShip / playerLocal.moon.position.dst2(playerEntry.getValue().position));
+//					if (gravityForce > 10){
+//						gravityForce = 10;
+//					}
+//					Vector2 gravityVector = playerEntry.getValue().position.cpy().sub(playerLocal.moon.position).nor().mul(gravityForce);
+//					playerLocal.moon.velocity.add(gravityVector.mul(delta));
+//					Log.info(String.valueOf(gravityForce));
+//				}
+//			}
 
-			for (Map.Entry<Integer, Player> playerEntryMoon : players.entrySet()) {
-				gravityForce = 0;
-				if (playerEntry.getValue() != playerEntryMoon.getValue()) {
-					if (!playerEntry.getValue().position.equals(playerEntryMoon.getValue().moon.position)){
-						gravityForce =(gravityShip / playerEntry.getValue().position.dst2(playerEntryMoon.getValue().moon.position));
-						if (gravityForce > 10){
-							gravityForce = 10;
-						}
-						Vector2 gravityVector = playerEntryMoon.getValue().moon.position.cpy().sub(playerEntry.getValue().position).nor().mul(gravityForce);
-						playerEntry.getValue().velocity.add(gravityVector.mul(delta));
-						Log.info(String.valueOf(gravityForce));
-					}
-				}
-			}
+//			for (Map.Entry<Integer, Player> playerEntryMoon : players.entrySet()) {
+//				gravityForce = 0;
+//				if (playerEntryMoon.getValue() != playerEntry.getValue()) {
+//					if (!playerEntryMoon.getValue().moon.position.equals(playerEntry.getValue().moon.position)){
+//						gravityForce =(gravityShip / playerEntryMoon.getValue().moon.position.dst2(playerEntry.getValue().position));
+//						if (gravityForce > 10){
+//							gravityForce = 10;
+//						}
+//						Vector2 gravityVector = playerEntry.getValue().position.cpy().sub(playerEntryMoon.getValue().moon.position).nor().mul(gravityForce);
+//						playerEntryMoon.getValue().moon.velocity.add(gravityVector.mul(delta));
+//						Log.info(String.valueOf(gravityForce));
+//					}
+//				}
+//			}
 			
-			for (int i = 0; i < bullets.size(); i++) {
-				Bullet bulletCur = bullets.get(i);
-				gravityForce = 0;
-				if (!bulletCur.getPosition().equals(playerEntry.getValue().moon.position)){
-					gravityForce =(gravityBullet / bulletCur.getPosition().dst2(playerEntry.getValue().moon.position));
-					if (gravityForce > 10){
-						gravityForce = 10;
-					}
-					Vector2 gravityVector = playerEntry.getValue().moon.position.cpy().sub(bulletCur.getPosition()).nor().mul(gravityForce);
-					bulletCur.setVelocity(bulletCur.getVelocity().add(gravityVector.mul(delta)));
-					Log.info(String.valueOf(gravityForce));
-				}
-				
-			}
+//			for (int i = 0; i < bullets.size(); i++) {
+//				Bullet bulletCur = bullets.get(i);
+//				gravityForce = 0;
+//				if (!bulletCur.getPosition().equals(playerEntry.getValue().moon.position)){
+//					gravityForce =(gravityBullet / bulletCur.getPosition().dst2(playerEntry.getValue().moon.position));
+//					if (gravityForce > 10){
+//						gravityForce = 10;
+//					}
+//					Vector2 gravityVector = playerEntry.getValue().moon.position.cpy().sub(bulletCur.getPosition()).nor().mul(gravityForce);
+//					bulletCur.setVelocity(bulletCur.getVelocity().add(gravityVector.mul(delta)));
+//					Log.info(String.valueOf(gravityForce));
+//				}
+//				
+//			}
 		}
-		for (int i = 0; i < bullets.size(); i++) {
-			Bullet bulletCurI = bullets.get(i);
-			gravityForce = 0;
-			for (int j = 0; j < bullets.size(); j++) {
-				Bullet bulletCurJ = bullets.get(j);
-				gravityForce = 0;
-				if (!bulletCurI.getPosition().equals(bulletCurJ.getPosition())){
-					gravityForce =(gravityShip / bulletCurI.getPosition().dst2(bulletCurJ.getPosition()));
-					if (gravityForce > 15){
-						gravityForce = 15;
-					}
-					Vector2 gravityVector = bulletCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
-					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
-					Log.info(String.valueOf(gravityForce));
-				}
-				
-			}
-		}
+//		for (int i = 0; i < bullets.size(); i++) {
+//			Bullet bulletCurI = bullets.get(i);
+//			gravityForce = 0;
+//			for (int j = 0; j < bullets.size(); j++) {
+//				Bullet bulletCurJ = bullets.get(j);
+//				gravityForce = 0;
+//				if (!bulletCurI.getPosition().equals(bulletCurJ.getPosition())){
+//					gravityForce =(gravityShip / bulletCurI.getPosition().dst2(bulletCurJ.getPosition()));
+//					if (gravityForce > 15){
+//						gravityForce = 15;
+//					}
+//					Vector2 gravityVector = bulletCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
+//					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
+//					Log.info(String.valueOf(gravityForce));
+//				}
+//				
+//			}
+//		}
 		
 		moonChase.position.lerp(closestPlayer.position, 0.01f);
 		
