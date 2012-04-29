@@ -25,7 +25,7 @@ public class GameMap {
 
 	private Map<Integer, Player> players = new HashMap<Integer, Player>();
 	private List<Bullet> bullets = new ArrayList<Bullet>();
-	private List<Astroid> astroids = new ArrayList<Astroid>();
+	private List<Asteroid> asteroids = new ArrayList<Asteroid>();
 
 	private Player playerLocal;
 
@@ -39,17 +39,20 @@ public class GameMap {
 	private WaoClient client;
 	private HUD hud;
 	private TextureRegion textureAstroid;
+	
+	boolean isClient = true;
 
-	public GameMap(HUD hud) {
-		this.hud = hud;
+	public GameMap(boolean isClientd) {
+		this.isClient = isClient;
+		if(isClient) this.hud = new HUD();
 		Gdx.files.internal("data/background.png");
 		textureBg = new Texture(Gdx.files.internal("data/background.png"));
 
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
 		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
-		textureAstroid = new TextureRegion(new Texture(Gdx.files.internal("data/astroid.png")), 0, 0, 48, 48);
+		textureAstroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
 		
-		astroids.add(new Astroid(textureAstroid, new Vector2(150, 50)));
+		asteroids.add(new Asteroid(textureAstroid, new Vector2(150, 50)));
 
 		maxPosition = new Vector2(textureBg.getWidth() * tilesCount, textureBg.getHeight() * tilesCount);
 
@@ -90,8 +93,6 @@ public class GameMap {
 				client.sendMessage(playerLocal.getMovementState());
 			}
 		}
-
-		
 
 		// Update Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
@@ -138,9 +139,9 @@ public class GameMap {
 			}
 		}
 		
-		// Render Astroids
-		for (int i = 0; i < astroids.size(); i++) {
-			astroids.get(i).render(spriteBatch);
+		// Render Asteroids
+		for (int i = 0; i < asteroids.size(); i++) {
+			asteroids.get(i).render(spriteBatch);
 		}
 		
 		// Render Players
@@ -153,12 +154,15 @@ public class GameMap {
 		}
 		
 		spriteBatch.end();
+		
+		if(hud != null) hud.render();
 	}
 
 	public void dispose() {
 		texturePlayer.getTexture().dispose();
 		textureBg.dispose();
 		spriteBatch.dispose();
+		hud.dispose();
 	}
 
 	public void onConnect(WaoClient client, Color color) {
@@ -203,7 +207,7 @@ public class GameMap {
 	}
 
 	public void setStatus(String status) {
-		hud.setStatus(status);
+		if(hud != null) hud.setStatus(status);
 	}
 
 	public void addBullet(PlayerShoots playerShoots) {

@@ -8,13 +8,11 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
-import com.puchisoft.multiplayerspacegame.HUD;
 import com.puchisoft.multiplayerspacegame.net.WaoClient;
 import com.puchisoft.multiplayerspacegame.net.WaoServer;
 
 public class ScreenGame extends ScreenCore {
 
-	private HUD hud;
 	private GameMap map;
 
 	private WaoServer server;
@@ -35,8 +33,7 @@ public class ScreenGame extends ScreenCore {
 		
 		Gdx.input.setCatchBackKey(true);
 
-		hud = new HUD();
-		map = new GameMap(hud);
+		map = new GameMap(true);
 		
 		client = new WaoClient(map);
 		
@@ -67,7 +64,6 @@ public class ScreenGame extends ScreenCore {
 
 		map.update(delta);
 		map.render();
-		hud.render(delta);
 
 		// emulate terrible fps
 		// try {
@@ -93,7 +89,6 @@ public class ScreenGame extends ScreenCore {
 		if (server != null)
 			server.shutdown();
 		map.dispose();
-		hud.dispose();
 	}
 
 	@Override
