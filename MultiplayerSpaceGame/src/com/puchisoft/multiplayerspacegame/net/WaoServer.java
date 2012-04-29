@@ -97,7 +97,7 @@ public class WaoServer {
 			}
 		});
 		
-		server.bind(Network.port,Network.portUdp);
+		server.bind(Network.port); //,Network.portUdp);
 		server.start();
 	}
 	

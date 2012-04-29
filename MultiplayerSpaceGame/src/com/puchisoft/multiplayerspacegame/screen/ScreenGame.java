@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
 import com.puchisoft.multiplayerspacegame.HUD;
-import com.puchisoft.multiplayerspacegame.net.Network;
 import com.puchisoft.multiplayerspacegame.net.WaoClient;
 import com.puchisoft.multiplayerspacegame.net.WaoServer;
 

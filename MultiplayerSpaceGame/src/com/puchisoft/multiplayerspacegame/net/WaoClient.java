@@ -1,7 +1,6 @@
 package com.puchisoft.multiplayerspacegame.net;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
@@ -72,7 +71,7 @@ public class WaoClient {
 
 	public void connect(String host) {
 		try {
-			client.connect(5000, host, Network.port, Network.portUdp);
+			client.connect(5000, host, Network.port);//, Network.portUdp);
 		} catch (IOException e) {
 			// e.printStackTrace();
 			map.setStatus("Can't connect to " + host);
