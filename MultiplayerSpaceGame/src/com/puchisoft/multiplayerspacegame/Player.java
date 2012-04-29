@@ -197,4 +197,8 @@ public class Player {
 	public Rectangle getBoundingRectangle(){
 		return sprite.getBoundingRectangle();
 	}
+
+	public void bounce(float delta) {
+		velocity.mul(-1);
+	}
 }

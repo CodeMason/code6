@@ -98,7 +98,14 @@ public class GameMap {
 
 		// Update Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
-			playerEntry.getValue().update(delta);
+			Player playerCur = playerEntry.getValue();
+			playerCur.update(delta);
+			// Collision with asteroids
+			for(Asteroid asteroid : asteroids){
+				if(playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
+					playerCur.bounce(delta);
+				}
+			}
 		}
 
 		// Update Bullets
