@@ -29,7 +29,7 @@ public class Player {
 	private GameMap map;
 	
 	public Vector2 maxPosition;
-	public Vector2 position;
+	private Vector2 position;
 
 	private Vector2 direction = new Vector2(1, 0);
 	private Vector2 velocity = new Vector2();
@@ -50,7 +50,8 @@ public class Player {
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color) {
 		this.sprite = new Sprite(texture);
 		this.sprite.setColor(color);
-		this.position = position;
+//		this.sprite.setScale(1.5f);
+		this.setPosition(position);
 		this.maxPosition = maxPosition;
 		this.map = map;
 	}
@@ -76,7 +77,7 @@ public class Player {
 			wasTouched = true;
 		} else if (wasTouched) { // just stopped touching
 			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
-			if (touchPos.len() > 10) { // deadzone ... to short to be counted
+			if (touchPos.len() > 10) { // deadzone ... too short to be counted
 										// as a drag
 				touchPos.x *= -1;
 				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
@@ -124,19 +125,20 @@ public class Player {
 			velocity.nor().mul(speedMax);
 		}
 
-		position.add(velocity.tmp().mul(delta * 60));
+		getPosition().add(velocity.tmp().mul(delta * 60));
 
+		//TODO move into central collision detection logic
 		// Bounce
-		if (position.x < 0 || position.x > maxPosition.x - sprite.getWidth()) {
+		if (position.x < 0 || position.x > maxPosition.x - sprite.getBoundingRectangle().getWidth()) {
 			velocity.x *= -0.3;
-		} else if (position.y < 0 || position.y > maxPosition.y - sprite.getHeight()) {
+		} else if (position.y < 0 || position.y > maxPosition.y - sprite.getBoundingRectangle().getHeight()) {
 			velocity.y *= -0.3;
 		}
 		// Prevent escape
-		position.x = Math.max(0, Math.min(maxPosition.x - sprite.getWidth(), position.x));
-		position.y = Math.max(0, Math.min(maxPosition.y - sprite.getHeight(), position.y));
+		getPosition().x = Math.max(0, Math.min(maxPosition.x - sprite.getBoundingRectangle().getWidth(), getPosition().x));
+		getPosition().y = Math.max(0, Math.min(maxPosition.y - sprite.getBoundingRectangle().getHeight(), getPosition().y));
 		
-		sprite.setPosition(position.x, position.y); // update sprite
+		sprite.setPosition(getPosition().x, getPosition().y); // update sprite
 		
 	}
 
@@ -144,7 +146,7 @@ public class Player {
 		if(mayFireTime > System.nanoTime()){
 			return;
 		}
-		PlayerShoots msgPlayerShoots = new PlayerShoots(id,position.cpy(),velocity.cpy(),direction.cpy());
+		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),velocity.cpy(),direction.cpy());
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
 	}
@@ -152,11 +154,14 @@ public class Player {
 	public void hit(){
 		velocity.set(0,0);
 		direction.rotate(random.nextInt(360));
-		position.set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
+		getPosition().set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
 	}
 	
 	public void update(float delta){
 		this.move(delta);
+//		Log.info(sprite.getX()+" "+sprite.getY());
+//		Log.info("x"+getBoundingRectangle().x+" y"+getBoundingRectangle().y+" a"+ getBoundingRectangle().x+getBoundingRectangle().width+ " b"+ getBoundingRectangle().y+getBoundingRectangle().height);
+//		Log.info("x"+getBoundingRectangle().x+" y"+getBoundingRectangle().y+" w"+ getBoundingRectangle().width+ " h"+ getBoundingRectangle().height);
 	}
 
 	public void render(SpriteBatch spriteBatch) {
@@ -164,7 +169,7 @@ public class Player {
 	}
 	public void renderNameTag(SpriteBatch spriteBatch, BitmapFont fontNameTag) {
 		fontNameTag.setColor(sprite.getColor());
-		fontNameTag.draw(spriteBatch, name, position.x-16, position.y + fontNameTag.getLineHeight()+48);
+		fontNameTag.draw(spriteBatch, name, getPosition().x-16, getPosition().y + fontNameTag.getLineHeight()+48);
 	}
 
 	public Vector3 getDesiredCameraPosition(Vector3 camPos, float delta) {
@@ -174,14 +179,14 @@ public class Player {
 		offset.x = Math.max(-1 * Gdx.graphics.getWidth() * 0.3f, Math.min(Gdx.graphics.getWidth() * 0.3f, offset.x));
 		offset.y = Math.max(-1 * Gdx.graphics.getHeight() * 0.3f, Math.min(Gdx.graphics.getHeight() * 0.3f, offset.y));
 
-		Vector2 dest = position.cpy().add(offset);
+		Vector2 dest = getPosition().cpy().add(offset);
 		camPos.lerp(new Vector3(dest.x, dest.y, 0), 30f * delta);
 
 		return camPos;
 	}
 
 	public MovementChange getMovementState() {
-		return new MovementChange(id, turning, accelerating, position, direction, velocity);
+		return new MovementChange(id, turning, accelerating, getPosition(), direction, velocity);
 	}
 
 	public void setMovementState(MovementChange msg) {
@@ -204,8 +209,48 @@ public class Player {
 		return sprite.getBoundingRectangle();
 	}
 
-	public void bounce(float delta) {
-		velocity.mul(-1);
+	public void preventOverlap(Rectangle otherColRectangle, float delta) {
+//		Log.info("revert...");
+//		Log.info("P x"+position.x+" y"+position.y);
+//		Log.info("PBB x" + getBoundingRectangle().x + " y" + getBoundingRectangle().y + " w" + getBoundingRectangle().width + " h" + getBoundingRectangle().height);
+//		Log.info("OBB x" + otherColRectangle.x + " y" + otherColRectangle.y + " w" + otherColRectangle.width + " h" + otherColRectangle.height);
+		
+		float distY = Math.abs((getBoundingRectangle().y + getBoundingRectangle().height / 2) - (otherColRectangle.y + otherColRectangle.height / 2));
+		float totalHeight = (getBoundingRectangle().height / 2 + otherColRectangle.height / 2);
+		float overlapY = totalHeight - distY;
+//		Log.info("O y" + overlapY);
+
+		float distX = Math.abs((getBoundingRectangle().x + getBoundingRectangle().width / 2) - (otherColRectangle.x + otherColRectangle.width / 2));
+		float totalWidth = (getBoundingRectangle().width / 2 + otherColRectangle.width / 2);
+		float overlapX = totalWidth - distX;
+//		Log.info("O x" + overlapX);
+		if (overlapX < overlapY) {
+			// Only do X
+			if (getBoundingRectangle().x + getBoundingRectangle().width / 2 < otherColRectangle.x) {
+				position.x -= overlapX+1;
+				setPosition(position);
+				velocity.mul(0f);
+				Log.info("x left");
+			} else {
+				position.x += overlapX+1;
+				setPosition(position);
+				velocity.mul(0f);
+				Log.info("x right");
+			}
+		} else {
+			// Only do Y 
+			if (getBoundingRectangle().y + getBoundingRectangle().height / 2 < otherColRectangle.y + otherColRectangle.height / 2) {
+				Log.info("y below");
+				position.y -= overlapY+1;
+				setPosition(position);
+				velocity.mul(0f);
+			} else {
+				Log.info("y above");
+				position.y += overlapY+1;
+				setPosition(position);
+				velocity.mul(0f);
+			}
+		}
 	}
 
 	public String getName() {
@@ -214,5 +259,14 @@ public class Player {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Vector2 getPosition() {
+		return position;
+	}
+
+	public void setPosition(Vector2 position) {
+		this.position = position;
+		sprite.setPosition(getPosition().x, getPosition().y); // update sprite
 	}
 }

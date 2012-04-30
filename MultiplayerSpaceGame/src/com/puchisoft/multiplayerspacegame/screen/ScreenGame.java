@@ -6,6 +6,7 @@ import java.util.Random;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
@@ -23,13 +24,13 @@ public class ScreenGame extends ScreenCore {
 	private String name;
 	private Random random = new Random();
 
-	// private FPSLogger fps = new FPSLogger();
+	private FPSLogger fps = new FPSLogger();
 
 	public ScreenGame(Game game, boolean isHost, String ip) {
 		super(game);
 		this.isHost = isHost;
 		this.ip = ip;
-		
+
 		this.name = "Guest" + random.nextInt(10000);
 	}
 
@@ -79,7 +80,7 @@ public class ScreenGame extends ScreenCore {
 
 		// Log.info(Float.toString(delta)+" "+Float.toString(1/delta)+" "+30f*
 		// delta);
-		// fps.log();
+		 fps.log();
 	}
 
 	@Override

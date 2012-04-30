@@ -110,7 +110,7 @@ public class GameMap {
 			// Collision with asteroids
 			for(Asteroid asteroid : asteroids){
 				if(playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
-					playerCur.bounce(delta);
+					playerCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
 				}
 			}
 		}
