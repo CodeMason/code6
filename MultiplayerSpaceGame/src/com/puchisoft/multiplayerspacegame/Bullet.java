@@ -37,6 +37,7 @@ public class Bullet {
 		this.sprite.setPosition(getPosition().x, getPosition().y);
 	}
 	
+	//Bounces bullets off sides five times then destroys
 	int bulletCollision =0;
 	private boolean collision(){
 		if(getPosition().x < 0 || getPosition().x > maxPosition.x - sprite.getWidth()){

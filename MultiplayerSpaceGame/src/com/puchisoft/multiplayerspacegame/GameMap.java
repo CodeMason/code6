@@ -65,15 +65,12 @@ public class GameMap {
 		Gdx.files.internal("data/background.png");
 		textureBg = new Texture(Gdx.files.internal("data/background.png"));
 
-		texturePlayer = new TextureRegion(new Texture(
-				Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
-		textureBullet = new TextureRegion(new Texture(
-				Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
+		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
+		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
 		texturemoon = new Texture(Gdx.files.internal("data/moon.png"));
 		textureChasemoon = new Texture(Gdx.files.internal("data/moonchase.png"));
 
-		textureAstroid = new TextureRegion(new Texture(
-				Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
+		textureAstroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
 
 		fontNameTag = new BitmapFont();
 		fontNameTag.setColor(Color.YELLOW);
@@ -84,8 +81,7 @@ public class GameMap {
 
 		moonChase = new Moon(textureChasemoon, new Vector2(50, 50), maxPosition);
 
-		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(),
-				Gdx.graphics.getHeight());
+		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 		sizemoon = new Vector2(texturemoon.getWidth(), texturemoon.getHeight());
 
 		spriteBatch = new SpriteBatch(); //
@@ -133,8 +129,11 @@ public class GameMap {
 
 		Vector2 gravitySum;
 		float gravityForce;
+		
+		//Gravity Constants
 		float gravityShip = (0.0000000000667384f * 7360000000000f * 3040f);
 		float gravityBullet = (0.0000000000667384f * 7360000000000f * 340f);
+		float gravityAsteroid = (0.0000000000667384f * 7360000000f * 340f);
 
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 
@@ -162,7 +161,8 @@ public class GameMap {
 			// Log.info(String.valueOf(gravityForce));
 			// }
 			// }
-
+			
+			//Gravity on Players from Moons
 			for (Map.Entry<Integer, Player> playerEntryMoon : players
 					.entrySet()) {
 				gravityForce = 0;
@@ -178,7 +178,7 @@ public class GameMap {
 					}
 				}
 			}
-
+			//Gravity on Bullets from Moons
 			for (int i = 0; i < bullets.size(); i++) {
 				Bullet bulletCur = bullets.get(i);
 				gravityForce = 0;
@@ -199,6 +199,7 @@ public class GameMap {
 
 			}
 		}
+		//Gravity on Bullets from Bullets - Overkilled
 		for (int i = 0; i < bullets.size(); i++) {
 			Bullet bulletCurI = bullets.get(i);
 			gravityForce = 0;
@@ -211,17 +212,30 @@ public class GameMap {
 					if (gravityForce > 15) {
 						gravityForce = 15;
 					}
-					Vector2 gravityVector = bulletCurJ.getPosition().cpy()
-							.sub(bulletCurI.getPosition()).nor()
-							.mul(gravityForce);
-					bulletCurI.setVelocity(bulletCurI.getVelocity().add(
-							gravityVector.mul(delta)));
+					Vector2 gravityVector = bulletCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
+					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
+					Log.info(String.valueOf(gravityForce));
+				}
+
+			}
+			//Gravity on Bullets from Asteroids
+			for (int j = 0; j < asteroids.size(); j++) {
+				Asteroid asteroidCurJ = asteroids.get(j);
+				gravityForce = 0;
+				if (!bulletCurI.getPosition().equals(asteroidCurJ.getPosition())) {
+					gravityForce = (gravityAsteroid / bulletCurI.getPosition()
+							.dst2(asteroidCurJ.getPosition()));
+					if (gravityForce > 15) {
+						gravityForce = 15;
+					}
+					Vector2 gravityVector = asteroidCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
+					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
 					Log.info(String.valueOf(gravityForce));
 				}
 
 			}
 		}
-
+		//Moves Chase Moon towards closest Player
 		moonChase.getPosition().lerp(closestPlayer.getPosition(), 0.01f);
 
 		// Update Players
@@ -384,11 +398,13 @@ public class GameMap {
 	}
 
 	public void addAsteroidsRandom(int amount) {
-
+		//Randomly generates Asteroid locations
 		int randomX = 0;
 		int randomY = 0;
 		int loopExit = 0;
 		Log.error("initial" + loopExit);
+		
+		//Prevents Asteroids from overlapping
 		while (asteroids.size() < amount && loopExit < 1000) {
 			loopExit++;
 			Log.info("current" + loopExit);
