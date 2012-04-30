@@ -117,7 +117,7 @@ public class GameMap {
 		if (client != null && playerLocal != null) {
 			handleInput(delta);
 
-			this.cam.position.set(playerLocal.getDesiredCameraPosition(
+			this.cam.position.set(playerLocal.moon.getDesiredCameraPosition(
 					this.cam.position, delta));
 			cam.update();
 
@@ -139,8 +139,7 @@ public class GameMap {
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 
 			// Chase Moon
-			float currentdist = playerEntry.getValue().getPosition()
-					.dst2(moonChase.position);
+			float currentdist = playerEntry.getValue().getPosition().dst2(moonChase.getPosition());
 			if (currentdist < moonChaseDist) {
 				moonChaseDist = currentdist;
 				closestPlayer = playerEntry.getValue();
@@ -168,20 +167,13 @@ public class GameMap {
 					.entrySet()) {
 				gravityForce = 0;
 				if (playerEntryMoon.getValue() != playerEntry.getValue()) {
-					if (!playerEntryMoon.getValue().moon.position
-							.equals(playerEntry.getValue().moon.position)) {
-						gravityForce = (gravityShip / playerEntryMoon
-								.getValue().moon.position.dst2(playerEntry
-								.getValue().getPosition()));
+					if (!playerEntryMoon.getValue().moon.getPosition().equals(playerEntry.getValue().moon.getPosition())) {
+						gravityForce = (gravityShip / playerEntryMoon.getValue().moon.getPosition().dst2(playerEntry.getValue().getPosition()));
 						if (gravityForce > 10) {
 							gravityForce = 10;
 						}
-						Vector2 gravityVector = playerEntry.getValue().getPosition()
-								.cpy()
-								.sub(playerEntryMoon.getValue().moon.position)
-								.nor().mul(gravityForce);
-						playerEntryMoon.getValue().moon.velocity
-								.add(gravityVector.mul(delta));
+						Vector2 gravityVector = playerEntry.getValue().getPosition().cpy().sub(playerEntryMoon.getValue().moon.getPosition()).nor().mul(gravityForce);
+						playerEntryMoon.getValue().moon.velocity.add(gravityVector.mul(delta));
 						Log.info(String.valueOf(gravityForce));
 					}
 				}
@@ -191,13 +183,13 @@ public class GameMap {
 				Bullet bulletCur = bullets.get(i);
 				gravityForce = 0;
 				if (!bulletCur.getPosition().equals(
-						playerEntry.getValue().moon.position)) {
+						playerEntry.getValue().moon.getPosition())) {
 					gravityForce = (gravityBullet / bulletCur.getPosition()
-							.dst2(playerEntry.getValue().moon.position));
+							.dst2(playerEntry.getValue().moon.getPosition()));
 					if (gravityForce > 10) {
 						gravityForce = 10;
 					}
-					Vector2 gravityVector = playerEntry.getValue().moon.position
+					Vector2 gravityVector = playerEntry.getValue().moon.getPosition()
 							.cpy().sub(bulletCur.getPosition()).nor()
 							.mul(gravityForce);
 					bulletCur.setVelocity(bulletCur.getVelocity().add(
@@ -230,7 +222,7 @@ public class GameMap {
 			}
 		}
 
-		moonChase.position.lerp(closestPlayer.getPosition(), 0.01f);
+		moonChase.getPosition().lerp(closestPlayer.getPosition(), 0.01f);
 
 		// Update Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
@@ -238,10 +230,11 @@ public class GameMap {
 			playerCur.update(delta);
 			// Collision with asteroids
 			for (Asteroid asteroid : asteroids) {
-				if (playerCur.getBoundingRectangle().overlaps(
-						asteroid.getBoundingRectangle())) {
-					playerCur.preventOverlap(asteroid.getBoundingRectangle(),
-							delta);
+				if (playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())) {
+					playerCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
+				}
+				if (playerCur.moon.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())) {
+					playerCur.moon.preventOverlap(asteroid.getBoundingRectangle(),delta);
 				}
 			}
 		}

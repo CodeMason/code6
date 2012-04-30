@@ -167,7 +167,7 @@ public class Player {
 		this.move(delta);
 		moon.move(delta);
 		
-		this.position.lerp(moon.position, 0.035f);
+		this.position.lerp(moon.getPosition(), 0.035f);
 		sprite.setPosition(position.x, position.y); // update sprite
 //		Log.info(sprite.getX()+" "+sprite.getY());
 //		Log.info("x"+getBoundingRectangle().x+" y"+getBoundingRectangle().y+" a"+ getBoundingRectangle().x+getBoundingRectangle().width+ " b"+ getBoundingRectangle().y+getBoundingRectangle().height);
