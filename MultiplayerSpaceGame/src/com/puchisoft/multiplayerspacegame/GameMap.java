@@ -62,7 +62,7 @@ public class GameMap {
 		
 		fontNameTag = new BitmapFont();
 		fontNameTag.setColor(Color.YELLOW);
-		fontNameTag.setScale(0.9f);
+//		fontNameTag.setScale(0.9f);
 
 		maxPosition = new Vector2(textureBg.getWidth() * tilesCount, textureBg.getHeight() * tilesCount);
 		
@@ -141,13 +141,13 @@ public class GameMap {
 					}
 					// I hit someone
 					else if(bulletCur.getPlayerID() == playerLocal.getID()){ 
-						Log.info("I score");
+						setStatus("You hit "+playerCur.getName()+"!");
 						playerLocal.addScore(1);
 						hud.setScore(playerLocal.getScore());
 					}
 				}
 			}
-			// Collision with Astroids
+			// Collision with Asteroids
 			for(Asteroid asteroid : asteroids){
 				if(bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					bulletCur.destroy();

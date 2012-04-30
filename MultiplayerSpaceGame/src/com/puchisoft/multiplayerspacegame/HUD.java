@@ -17,7 +17,7 @@ public class HUD {
 	public HUD() {
 		font = new BitmapFont();
 		font.setColor(Color.GREEN);
-		font.setScale(1.2f);
+//		font.setScale(1.2f);
 
 		spriteBatchStationary = new SpriteBatch();
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -27,7 +27,7 @@ public class HUD {
 		spriteBatchStationary.setProjectionMatrix(cam.combined);
 		spriteBatchStationary.begin();
 		font.draw(spriteBatchStationary, status, 5, font.getLineHeight());
-		font.draw(spriteBatchStationary, "Score: "+score, 5, Gdx.graphics.getHeight() - font.getLineHeight());
+		font.draw(spriteBatchStationary, "Score: "+score, 5, Gdx.graphics.getHeight() - font.getXHeight());
 		spriteBatchStationary.end();
 	}
 
