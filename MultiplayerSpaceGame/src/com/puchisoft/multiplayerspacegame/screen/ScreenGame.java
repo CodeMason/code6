@@ -1,34 +1,37 @@
 package com.puchisoft.multiplayerspacegame.screen;
 
 import java.io.IOException;
+import java.util.Random;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
-import com.puchisoft.multiplayerspacegame.HUD;
-import com.puchisoft.multiplayerspacegame.net.Network;
 import com.puchisoft.multiplayerspacegame.net.WaoClient;
 import com.puchisoft.multiplayerspacegame.net.WaoServer;
 
 public class ScreenGame extends ScreenCore {
 
-	private HUD hud;
 	private GameMap map;
 
 	private WaoServer server;
 	private WaoClient client;
 	private final boolean isHost;
 	private final String ip;
+	private String name;
+	private Random random = new Random();
 
-	// private FPSLogger fps = new FPSLogger();
+	private FPSLogger fps = new FPSLogger();
 
 	public ScreenGame(Game game, boolean isHost, String ip) {
 		super(game);
 		this.isHost = isHost;
 		this.ip = ip;
+
+		this.name = "Guest" + random.nextInt(10000);
 	}
 
 	@Override
@@ -36,10 +39,9 @@ public class ScreenGame extends ScreenCore {
 		
 		Gdx.input.setCatchBackKey(true);
 
-		hud = new HUD();
-		map = new GameMap(hud);
+		map = new GameMap(true);
 		
-		client = new WaoClient(map);
+		client = new WaoClient(map,name);
 		
 		if(isHost){
 			// Start server
@@ -66,8 +68,8 @@ public class ScreenGame extends ScreenCore {
 		Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-		map.render(delta);
-		hud.render(delta);
+		map.update(delta);
+		map.render();
 
 		// emulate terrible fps
 		// try {
@@ -78,7 +80,7 @@ public class ScreenGame extends ScreenCore {
 
 		// Log.info(Float.toString(delta)+" "+Float.toString(1/delta)+" "+30f*
 		// delta);
-		// fps.log();
+		 fps.log();
 	}
 
 	@Override
@@ -93,7 +95,6 @@ public class ScreenGame extends ScreenCore {
 		if (server != null)
 			server.shutdown();
 		map.dispose();
-		hud.dispose();
 	}
 
 	@Override

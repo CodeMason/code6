@@ -1,8 +1,7 @@
 
--Add real Menu screen with buttons
--Added IP entry edit box
--Fuel items, running out of fuel decreasing your max speed
 -Astroids
+-Restructure server to have own copy of map
+-Fuel items, running out of fuel decreasing your max speed
 -Wrapping bounding box instead of bouncing? Infinite?
 -Afterburner graphic for local player only
 -Shift to accellerate in PC? Android can just drag faster

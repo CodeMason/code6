@@ -1,7 +1,6 @@
 package com.puchisoft.multiplayerspacegame.net;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
@@ -10,6 +9,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
+import com.puchisoft.multiplayerspacegame.net.Network.AstroidLocations;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
@@ -20,12 +20,14 @@ public class WaoClient {
 	private Client client;
 	private GameMap map;
 	public int id;
+	private String name;
 	public String remoteIP;
 	
-	public Random random = new Random();
+	private Random random = new Random();
 
-	public WaoClient(final GameMap game) { //
+	public WaoClient(final GameMap game, String name) { //
 		this.map = game;
+		this.name = name;
 
 		client = new Client();
 		client.start();
@@ -60,10 +62,10 @@ public class WaoClient {
 		id = connection.getID();
 		remoteIP = connection.getRemoteAddressTCP().toString();
 		Color color = new Color(random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,1);
-		Login registerName = new Login("Guest" + random.nextInt(10000), Network.version, color);
+		Login registerName = new Login(name, Network.version, color);
 		client.sendTCP(registerName);
 		client.updateReturnTripTime();
-		map.onConnect(this,color);
+		map.onConnect(this,name,color);
 	}
 
 	public void connectLocal() {
@@ -72,7 +74,7 @@ public class WaoClient {
 
 	public void connect(String host) {
 		try {
-			client.connect(5000, host, Network.port, Network.portUdp);
+			client.connect(5000, host, Network.port);//, Network.portUdp);
 		} catch (IOException e) {
 			// e.printStackTrace();
 			map.setStatus("Can't connect to " + host);
@@ -111,6 +113,9 @@ public class WaoClient {
 		} else if (message instanceof PlayerShoots) {
 			PlayerShoots msg = (PlayerShoots) message;
 			map.addBullet(msg);
+		} else if (message instanceof AstroidLocations) {
+			AstroidLocations msg = (AstroidLocations) message;
+			map.addAstroidLocations(msg);
 		}
 
 	}

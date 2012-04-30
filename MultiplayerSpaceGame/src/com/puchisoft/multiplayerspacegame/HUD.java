@@ -17,7 +17,7 @@ public class HUD {
 		spriteBatchStationary = new SpriteBatch();
 	}
 
-	public void render(float delta) {
+	public void render() {
 		spriteBatchStationary.begin();
 		font.draw(spriteBatchStationary, status, 5, font.getLineHeight());
 		spriteBatchStationary.end();
