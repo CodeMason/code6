@@ -172,7 +172,7 @@ public class Player {
 	}
 	public void renderNameTag(SpriteBatch spriteBatch, BitmapFont fontNameTag) {
 		fontNameTag.setColor(sprite.getColor());
-		fontNameTag.draw(spriteBatch, name, getPosition().x-16, getPosition().y + fontNameTag.getLineHeight()+48);
+		fontNameTag.draw(spriteBatch, name+" ["+score+"]", getPosition().x-16, getPosition().y + fontNameTag.getLineHeight()+48);
 	}
 
 	public Vector3 getDesiredCameraPosition(Vector3 camPos, float delta) {

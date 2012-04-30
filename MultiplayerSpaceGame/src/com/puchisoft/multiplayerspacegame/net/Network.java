@@ -10,7 +10,7 @@ public class Network {
 
 	static public final int port = 6464;
 	static public final int portUdp = 6466;
-	static public final int version = 5;
+	static public final int version = 6;
 
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
@@ -25,6 +25,7 @@ public class Network {
 		kryo.register(MovementChange.class);
 		kryo.register(PlayerShoots.class);
 		kryo.register(AstroidLocations.class);
+		kryo.register(PlayerWasHit.class);
 	}
 
 	static public class Login {
@@ -113,5 +114,16 @@ public class Network {
 		public AstroidLocations(Vector2[] positions) {
 			this.positions = positions;
 		}
+	}
+	static public class PlayerWasHit {
+		public int playerIdVictim;
+		public int playerIdHitter;
+		public PlayerWasHit() {}
+		public PlayerWasHit(int playerIdVictim, int playerIdHitter) {
+			this.playerIdVictim = playerIdVictim;
+			this.playerIdHitter = playerIdHitter;
+		}
+		
+		
 	}
 }

@@ -14,6 +14,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
 
 public class WaoClient {
 
@@ -116,6 +117,9 @@ public class WaoClient {
 		} else if (message instanceof AstroidLocations) {
 			AstroidLocations msg = (AstroidLocations) message;
 			map.addAstroidLocations(msg);
+		} else if (message instanceof PlayerWasHit) {
+			PlayerWasHit msg = (PlayerWasHit) message;
+			map.onMsgPlayerWasHit(msg);
 		}
 
 	}

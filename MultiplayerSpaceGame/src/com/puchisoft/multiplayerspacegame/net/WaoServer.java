@@ -13,6 +13,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
 
 public class WaoServer {
 	Server server;
@@ -38,8 +39,7 @@ public class WaoServer {
 
 		server.addListener(new Listener() {
 			public void received(Connection c, Object message) {
-				// We know all connections for this server are actually
-				// SnatchConnections.
+				// We know all connections for this server are actually WaoConnection
 				WaoConnection connection = (WaoConnection) c;
 				
 				if (message instanceof Login) {
@@ -91,6 +91,16 @@ public class WaoServer {
 					// TODO some sort of validation: remember last shot time or such 
 					server.sendToAllExceptTCP(connection.getID(), msg);
 				}
+				else if(message instanceof PlayerWasHit) {
+					PlayerWasHit msg = (PlayerWasHit)message;
+					msg.playerIdVictim = connection.getID();
+					WaoConnection hitter = getConnectionById(msg.playerIdHitter);
+					if(hitter != null){
+						hitter.score++;
+						Log.info(hitter.name+" "+hitter.getID()+" hit someone");
+						server.sendToAllExceptTCP(connection.getID(), msg);
+					}
+				}
 				
 			}
 			
@@ -117,6 +127,15 @@ public class WaoServer {
 		public String name;
 		public Vector2 position;
 		protected Color color;
+		public int score = 0;
+	}
+	
+	private WaoConnection getConnectionById(int id){
+		for(Connection con: server.getConnections()){
+			WaoConnection conn = (WaoConnection)con;
+			if (conn.getID() == id) return conn;
+		}
+		return null;
 	}
 
 	public void shutdown() {

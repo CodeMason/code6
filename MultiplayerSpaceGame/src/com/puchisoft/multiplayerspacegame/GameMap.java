@@ -21,6 +21,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.AstroidLocations;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
 import com.puchisoft.multiplayerspacegame.net.WaoClient;
 
 public class GameMap {
@@ -137,14 +138,10 @@ public class GameMap {
 					// I was hit
 					if(playerCur == playerLocal){
 						Gdx.input.vibrate(300);
+						players.get(bulletCur.getPlayerID()).addScore(1);
 						setStatus("You were hit by "+players.get(bulletCur.getPlayerID()).getName()+"!");
-						client.sendMessage(playerLocal.getMovementState());
-					}
-					// I hit someone
-					else if(bulletCur.getPlayerID() == playerLocal.getID()){ 
-						setStatus("You hit "+playerCur.getName()+"!");
-						playerLocal.addScore(1);
-						hud.setScore(playerLocal.getScore());
+						client.sendMessage(playerLocal.getMovementState()); // TODO Death time out, server decides where I go
+						client.sendMessage(new PlayerWasHit(playerLocal.getID(),bulletCur.getPlayerID()));
 					}
 				}
 			}
@@ -185,9 +182,11 @@ public class GameMap {
 		
 		// Render Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
-			playerEntry.getValue().render(spriteBatch);
-			if(playerEntry.getValue() != playerLocal) playerEntry.getValue().renderNameTag(spriteBatch, fontNameTag);
+			Player curPlayer = playerEntry.getValue();
+			curPlayer.render(spriteBatch);
+			if(curPlayer != playerLocal) curPlayer.renderNameTag(spriteBatch, fontNameTag);
 		}
+		
 		// Render Bullets
 		for (int i = 0; i < bullets.size(); i++) {
 			bullets.get(i).render(spriteBatch);
@@ -308,5 +307,19 @@ public class GameMap {
 	public void resize(int width, int height) {
 		cam.setToOrtho(false, width, height);
 		hud.resize(width, height);
+	}
+
+	public void onMsgPlayerWasHit(PlayerWasHit msg) {
+		Player hitter = players.get(msg.playerIdHitter);
+		if(hitter != null){
+			Player victim = players.get(msg.playerIdVictim);
+			hitter.addScore(1);
+			if(hitter == playerLocal){
+				hud.setScore(playerLocal.getScore());
+				if(victim != null) setStatus("You hit "+victim.getName()+"!");
+			}else if(victim != null){
+				if(victim != null) setStatus(hitter.getName()+" "+msg.playerIdHitter+" hit "+victim.getName()+".");
+			}
+		}
 	}
 }
