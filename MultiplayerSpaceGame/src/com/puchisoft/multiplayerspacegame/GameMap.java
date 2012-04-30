@@ -83,6 +83,8 @@ public class GameMap {
 
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 		sizemoon = new Vector2(texturemoon.getWidth(), texturemoon.getHeight());
+		
+		moonChase.setPosition(maxPosition.cpy().mul(0.5f));
 
 		spriteBatch = new SpriteBatch(); //
 
@@ -168,15 +170,23 @@ public class GameMap {
 				gravityForce = 0;
 				if (playerEntryMoon.getValue() != playerEntry.getValue()) {
 					if (!playerEntryMoon.getValue().moon.getPosition().equals(playerEntry.getValue().moon.getPosition())) {
-						gravityForce = (gravityShip / playerEntryMoon.getValue().moon.getPosition().dst2(playerEntry.getValue().getPosition()));
+						gravityForce = (gravityShip / playerEntryMoon.getValue().moon.getPosition().dst2(moonChase.getPosition()));
 						if (gravityForce > 10) {
 							gravityForce = 10;
 						}
-						Vector2 gravityVector = playerEntry.getValue().getPosition().cpy().sub(playerEntryMoon.getValue().moon.getPosition()).nor().mul(gravityForce);
+						Vector2 gravityVector = moonChase.getPosition().cpy().sub(playerEntryMoon.getValue().moon.getPosition()).nor().mul(gravityForce);
 						playerEntryMoon.getValue().moon.velocity.add(gravityVector.mul(delta));
 						Log.info(String.valueOf(gravityForce));
 					}
 				}
+				//Gravity on Players from Chase Moon (Gravity Well)
+				gravityForce = (gravityAsteroid / playerEntryMoon.getValue().moon.getPosition().dst2(playerEntry.getValue().getPosition()));
+				if (gravityForce > 15) {
+					gravityForce = 15;
+				}
+				Vector2 gravityVector = moonChase.getPosition().cpy().sub(playerEntryMoon.getValue().moon.getPosition()).nor().mul(gravityForce);
+				playerEntryMoon.getValue().moon.velocity.add(gravityVector.mul(delta));
+				Log.info(String.valueOf(gravityForce));
 			}
 			//Gravity on Bullets from Moons
 			for (int i = 0; i < bullets.size(); i++) {
@@ -237,7 +247,7 @@ public class GameMap {
 			}
 		}
 		//Moves Chase Moon towards closest Player
-		moonChase.getPosition().lerp(closestPlayer.getPosition(), 0.01f);
+		//moonChase.getPosition().lerp(closestPlayer.getPosition(), 0.01f);
 
 		// Update Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
