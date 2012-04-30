@@ -59,15 +59,17 @@ public class Network {
 		public String name;
 		public boolean hasJoined;
 		public Color color; // only for joined
+		public int score;
 
 		public PlayerJoinLeave() {
 		}
 
-		public PlayerJoinLeave(int playerId, String name, boolean hasJoined, Color color) {
+		public PlayerJoinLeave(int playerId, String name, boolean hasJoined, Color color, int score) {
 			this.playerId = playerId;
 			this.name = name;
 			this.hasJoined = hasJoined;
 			this.color = color;
+			this.score = score;
 		}
 	}
 

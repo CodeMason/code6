@@ -62,7 +62,7 @@ public class WaoServer {
 					
 					
 					// Tell old people about new person
-					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, connection.color);
+					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, connection.color, connection.score);
 					server.sendToAllExceptTCP(connection.getID(), reply);
 					
 					// Tell new person about asteroids
@@ -72,7 +72,7 @@ public class WaoServer {
 					for(Connection con: server.getConnections()){
 						WaoConnection conn = (WaoConnection)con;
 						if(conn.getID() != connection.getID() && conn.name != null){ // Not self, Have logged in
-							PlayerJoinLeave hereMsg  = new PlayerJoinLeave(conn.getID(), conn.name, true, conn.color);
+							PlayerJoinLeave hereMsg  = new PlayerJoinLeave(conn.getID(), conn.name, true, conn.color, conn.score);
 							connection.sendTCP(hereMsg);
 						}
 					}
@@ -108,7 +108,7 @@ public class WaoServer {
 				WaoConnection connection = (WaoConnection)c;
 				if (connection.name != null) {
 					// Announce to everyone that someone has left.
-					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, false, connection.color);
+					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, false, connection.color, connection.score);
 					server.sendToAllExceptTCP(connection.getID(), reply);
 				}
 			}

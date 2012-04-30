@@ -229,6 +229,7 @@ public class GameMap {
 		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color);
 		newPlayer.setId(msg.playerId);
 		newPlayer.setName(msg.name);
+		newPlayer.addScore(msg.score);
 		players.put(msg.playerId, newPlayer);
 
 		// tell people where I am again
