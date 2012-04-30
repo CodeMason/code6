@@ -114,6 +114,14 @@ public class GameMap {
 					playerCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
 				}
 			}
+			// Collision with Players
+			for (Map.Entry<Integer, Player> otherPlayerEntry : players.entrySet()) {
+				Player playerCurOther = otherPlayerEntry.getValue();
+				if(playerCurOther.getID() != playerCur.getID() && playerCurOther.getBoundingRectangle().overlaps(playerCur.getBoundingRectangle())){
+					playerCur.preventOverlap(playerCurOther.getBoundingRectangle(),delta);
+					playerCurOther.preventOverlap(playerCur.getBoundingRectangle(),delta);
+				}
+			}
 		}
 
 		// Update Bullets

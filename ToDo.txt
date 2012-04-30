@@ -1,4 +1,5 @@
 
+-Boost with shift
 -Restructure server to have own copy of map
 -Fuel items, running out of fuel decreasing your max speed
 -Afterburner graphic for local player only

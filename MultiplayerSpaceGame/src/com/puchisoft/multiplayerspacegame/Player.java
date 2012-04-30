@@ -2,6 +2,7 @@ package com.puchisoft.multiplayerspacegame;
 
 import java.util.Random;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -70,47 +71,48 @@ public class Player {
 
 		// Android
 		// Movement
-		if (Gdx.input.isTouched()) {
-			if (!wasTouched) { // touchPos == null // just started touching
-				touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+		if(Gdx.app.getType() == ApplicationType.Android){
+			if (Gdx.input.isTouched()) {
+				if (!wasTouched) { // touchPos == null // just started touching
+					touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+				}
+				wasTouched = true;
+			} else if (wasTouched) { // just stopped touching
+				touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
+				if (touchPos.len() > 10) { // deadzone ... too short to be counted
+											// as a drag
+					touchPos.x *= -1;
+					Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
+					direction.set(touchPos.tmp()).nor();
+					velocity.add(touchPos.mul(speedAccTouch * delta));
+				} else {
+					shoot();
+					Log.info("touch");
+				}
+				wasTouched = false;
+				touchMove = true;
 			}
-			wasTouched = true;
-		} else if (wasTouched) { // just stopped touching
-			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
-			if (touchPos.len() > 10) { // deadzone ... too short to be counted
-										// as a drag
-				touchPos.x *= -1;
-				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
-				direction.set(touchPos.tmp()).nor();
-				velocity.add(touchPos.mul(speedAccTouch * delta));
-			} else {
-				shoot();
-				Log.info("touch");
-			}
-			wasTouched = false;
-			touchMove = true;
-		}
-
-		// Desktop
-		// Movement
-		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.S)
-				|| Gdx.input.isKeyPressed(Keys.D)) {
-
-			if (Gdx.input.isKeyPressed(Keys.W)) {
+		}else{
+			// Desktop
+			// Movement
+			if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP)) {
 				accelerating = 1;
-			} else if (Gdx.input.isKeyPressed(Keys.S)) {
+			}else if (Gdx.input.isKeyPressed(Keys.S) || Gdx.input.isKeyPressed(Keys.DOWN)) {
 				accelerating = -1;
 			}
-			if (Gdx.input.isKeyPressed(Keys.A)) {
+			
+			if (Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {
 				turning = 1;
-			} else if (Gdx.input.isKeyPressed(Keys.D)) {
+			}else if (Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {
 				turning = -1;
+			}			
+			
+			// Shooting
+			if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
+				shoot();
 			}
 		}
-		// Shooting
-		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
-			shoot();
-		}
+		
 		return turning != turningOld || accelerating != acceleratingOld || touchMove;
 	}
 
