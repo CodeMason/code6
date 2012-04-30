@@ -132,6 +132,12 @@ public class GameMap {
 					}
 				}
 			}
+			// Collision with Astroids
+			for(Asteroid asteroid : asteroids){
+				if(bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
+					bulletCur.destroy();
+				}
+			}
 			
 			// Remove impacted bullets
 			if (bullets.get(i).destroyed)
