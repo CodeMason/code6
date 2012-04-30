@@ -11,6 +11,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -33,6 +34,8 @@ public class GameMap {
 	private List<Asteroid> asteroids = new ArrayList<Asteroid>();
 
 	private Player playerLocal;
+	
+	public BitmapFont fontNameTag;
 
 	private TextureRegion texturePlayer;
 	private TextureRegion textureBullet;
@@ -56,6 +59,10 @@ public class GameMap {
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
 		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
 		textureAstroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
+		
+		fontNameTag = new BitmapFont();
+		fontNameTag.setColor(Color.YELLOW);
+		fontNameTag.setScale(0.9f);
 
 		maxPosition = new Vector2(textureBg.getWidth() * tilesCount, textureBg.getHeight() * tilesCount);
 		
@@ -169,6 +176,7 @@ public class GameMap {
 		// Render Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 			playerEntry.getValue().render(spriteBatch);
+			if(playerEntry.getValue() != playerLocal) playerEntry.getValue().renderNameTag(spriteBatch, fontNameTag);
 		}
 		// Render Bullets
 		for (int i = 0; i < bullets.size(); i++) {
@@ -187,12 +195,13 @@ public class GameMap {
 		hud.dispose();
 	}
 
-	public void onConnect(WaoClient client, Color color) {
+	public void onConnect(WaoClient client, String name, Color color) {
 
 		if (this.client == null) {
 			this.client = client;
 			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color);
 			this.playerLocal.setId(client.id);
+			this.playerLocal.setName(name);
 			players.put(client.id, playerLocal);
 			setStatus("Connected to " + client.remoteIP);
 		} else {
@@ -210,6 +219,7 @@ public class GameMap {
 		Log.info("add player");
 		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color);
 		newPlayer.setId(msg.playerId);
+		newPlayer.setName(msg.name);
 		players.put(msg.playerId, newPlayer);
 
 		// tell people where I am again

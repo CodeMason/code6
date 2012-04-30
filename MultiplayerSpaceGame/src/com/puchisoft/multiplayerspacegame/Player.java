@@ -5,6 +5,7 @@ import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -23,9 +24,10 @@ public class Player {
 	private static final float speedMax = 50.0f;
 
 	private int id;
+	private String name;
 	private Sprite sprite;
 	private GameMap map;
-
+	
 	public Vector2 maxPosition;
 	public Vector2 position;
 
@@ -160,6 +162,10 @@ public class Player {
 	public void render(SpriteBatch spriteBatch) {
 		sprite.draw(spriteBatch);
 	}
+	public void renderNameTag(SpriteBatch spriteBatch, BitmapFont fontNameTag) {
+		fontNameTag.setColor(sprite.getColor());
+		fontNameTag.draw(spriteBatch, name, position.x-16, position.y + fontNameTag.getLineHeight()+48);
+	}
 
 	public Vector3 getDesiredCameraPosition(Vector3 camPos, float delta) {
 		Vector2 offset = velocity.cpy().mul(400 * delta);
@@ -203,5 +209,13 @@ public class Player {
 	}
 	public void bounceY(float delta) {
 		velocity.y *= -.75f;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }
