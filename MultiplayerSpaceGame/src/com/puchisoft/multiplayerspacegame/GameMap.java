@@ -115,13 +115,13 @@ public class GameMap {
 				}
 			}
 			// Collision with Players
-			for (Map.Entry<Integer, Player> otherPlayerEntry : players.entrySet()) {
-				Player playerCurOther = otherPlayerEntry.getValue();
-				if(playerCurOther.getID() != playerCur.getID() && playerCurOther.getBoundingRectangle().overlaps(playerCur.getBoundingRectangle())){
-					playerCur.preventOverlap(playerCurOther.getBoundingRectangle(),delta);
-					playerCurOther.preventOverlap(playerCur.getBoundingRectangle(),delta);
-				}
-			}
+//			for (Map.Entry<Integer, Player> otherPlayerEntry : players.entrySet()) {
+//				Player playerCurOther = otherPlayerEntry.getValue();
+//				if(playerCurOther.getID() != playerCur.getID() && playerCurOther.getBoundingRectangle().overlaps(playerCur.getBoundingRectangle())){
+//					playerCur.preventOverlap(playerCurOther.getBoundingRectangle(),delta);
+//					playerCurOther.preventOverlap(playerCur.getBoundingRectangle(),delta);
+//				}
+//			}
 		}
 
 		// Update Bullets
@@ -137,6 +137,7 @@ public class GameMap {
 					// I was hit
 					if(playerCur == playerLocal){
 						Gdx.input.vibrate(300);
+						setStatus("You were hit by "+players.get(bulletCur.getPlayerID()).getName()+"!");
 						client.sendMessage(playerLocal.getMovementState());
 					}
 					// I hit someone
