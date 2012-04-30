@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 public class Asteroid {
 	
 	private Sprite sprite;
+
 	
 	public Asteroid(TextureRegion texture, Vector2 position) {
 		this.sprite = new Sprite(texture);
@@ -25,7 +26,11 @@ public class Asteroid {
 	}
 
 	public Rectangle getBoundingRectangle() {
-		return sprite.getBoundingRectangle();
+		float scaleX = sprite.getBoundingRectangle().width * 0.1f;
+		float scaleY = sprite.getBoundingRectangle().height * 0.1f;
+		Rectangle boundingRectangle = new Rectangle(sprite.getBoundingRectangle().x+scaleX,sprite.getBoundingRectangle().y+scaleY,sprite.getBoundingRectangle().width-(scaleX * 2), sprite.getBoundingRectangle().height-(scaleY * 2));
+		
+		return boundingRectangle;
 	}
 	
 }
