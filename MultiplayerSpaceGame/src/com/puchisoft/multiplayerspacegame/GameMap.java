@@ -199,25 +199,26 @@ public class GameMap {
 
 			}
 		}
-		//Gravity on Bullets from Bullets - Overkilled
+
 		for (int i = 0; i < bullets.size(); i++) {
 			Bullet bulletCurI = bullets.get(i);
 			gravityForce = 0;
-			for (int j = 0; j < bullets.size(); j++) {
-				Bullet bulletCurJ = bullets.get(j);
-				gravityForce = 0;
-				if (!bulletCurI.getPosition().equals(bulletCurJ.getPosition())) {
-					gravityForce = (gravityShip / bulletCurI.getPosition()
-							.dst2(bulletCurJ.getPosition()));
-					if (gravityForce > 15) {
-						gravityForce = 15;
-					}
-					Vector2 gravityVector = bulletCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
-					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
-					Log.info(String.valueOf(gravityForce));
-				}
-
-			}
+			//Gravity on Bullets from Bullets - Overkilled
+//			for (int j = 0; j < bullets.size(); j++) {
+//				Bullet bulletCurJ = bullets.get(j);
+//				gravityForce = 0;
+//				if (!bulletCurI.getPosition().equals(bulletCurJ.getPosition())) {
+//					gravityForce = (gravityShip / bulletCurI.getPosition()
+//							.dst2(bulletCurJ.getPosition()));
+//					if (gravityForce > 15) {
+//						gravityForce = 15;
+//					}
+//					Vector2 gravityVector = bulletCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
+//					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
+//					Log.info(String.valueOf(gravityForce));
+//				}
+//
+//			}
 			//Gravity on Bullets from Asteroids
 			for (int j = 0; j < asteroids.size(); j++) {
 				Asteroid asteroidCurJ = asteroids.get(j);
@@ -269,6 +270,15 @@ public class GameMap {
 						Gdx.input.vibrate(300);
 						client.sendMessage(playerLocal.getMovementState());
 					}
+				}
+				if (bulletCur.getBoundingRectangle().overlaps(playerCur.moon.getBoundingRectangle())) {
+					bulletCur.preventOverlap(playerCur.moon.getBoundingRectangle(),delta);
+				}
+			}
+			
+			for (Asteroid asteroid : asteroids) {
+				if (bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())) {
+					bulletCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
 				}
 			}
 

@@ -151,7 +151,7 @@ public class Player {
 		if(mayFireTime > System.nanoTime()){
 			return;
 		}
-		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),velocity.cpy(),direction.cpy());
+		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),moon.velocity.cpy(),moon.getDirection().cpy());
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
 		velocity.sub(direction.nor().mul(0.5f));

@@ -24,6 +24,8 @@ public class Moon {
 	private Vector2 position;
 	
 	private Vector2 direction = new Vector2(1, 0);
+
+
 	public Vector2 velocity = new Vector2();
 	
 	private Vector2 touchPos;
@@ -219,6 +221,13 @@ public class Moon {
 	public void setPosition(Vector2 position) {
 		this.position = position;
 		sprite.setPosition(getPosition().x, getPosition().y); // update sprite
+	}
+	public Vector2 getDirection() {
+		return direction;
+	}
+
+	public void setDirection(Vector2 direction) {
+		this.direction = direction;
 	}
 	
 }
