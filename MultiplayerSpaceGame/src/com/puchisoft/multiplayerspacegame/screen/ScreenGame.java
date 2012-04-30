@@ -85,7 +85,7 @@ public class ScreenGame extends ScreenCore {
 
 	@Override
 	public void resize(int width, int height) {
-		map.cam.setToOrtho(false, width, height);
+		map.resize(width,height);
 	}
 
 	@Override

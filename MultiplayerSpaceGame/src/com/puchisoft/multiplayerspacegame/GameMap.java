@@ -134,9 +134,16 @@ public class GameMap {
 				if(playerCur.getID() != bulletCur.getPlayerID() && playerCur.getBoundingRectangle().overlaps(bulletCur.getBoundingRectangle())){
 					bulletCur.destroy();
 					playerCur.hit();
+					// I was hit
 					if(playerCur == playerLocal){
 						Gdx.input.vibrate(300);
 						client.sendMessage(playerLocal.getMovementState());
+					}
+					// I hit someone
+					else if(bulletCur.getPlayerID() == playerLocal.getID()){ 
+						Log.info("I score");
+						playerLocal.addScore(1);
+						hud.setScore(playerLocal.getScore());
 					}
 				}
 			}
@@ -295,5 +302,10 @@ public class GameMap {
 		for(Vector2 positon : astroidLocations.positions){
 			addAsteroid(positon);
 		}
+	}
+
+	public void resize(int width, int height) {
+		cam.setToOrtho(false, width, height);
+		hud.resize(width, height);
 	}
 }

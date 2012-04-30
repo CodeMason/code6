@@ -47,6 +47,7 @@ public class Player {
 	long mayFireTime = System.nanoTime(); // ms
 	
 	private Random random = new Random();
+	private int score = 0;
 
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color) {
 		this.sprite = new Sprite(texture);
@@ -270,5 +271,13 @@ public class Player {
 	public void setPosition(Vector2 position) {
 		this.position = position;
 		sprite.setPosition(getPosition().x, getPosition().y); // update sprite
+	}
+
+	public void addScore(int amount) {
+		score  += amount;
+	}
+
+	public int getScore() {
+		return score;
 	}
 }
