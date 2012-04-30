@@ -229,12 +229,12 @@ public class Player {
 			if (getBoundingRectangle().x + getBoundingRectangle().width / 2 < otherColRectangle.x) {
 				position.x -= overlapX+1;
 				setPosition(position);
-				velocity.mul(0f);
+				velocity.x *= -0.3; //velocity.mul(0f);
 				Log.info("x left");
 			} else {
 				position.x += overlapX+1;
 				setPosition(position);
-				velocity.mul(0f);
+				velocity.x *= -0.3;
 				Log.info("x right");
 			}
 		} else {
@@ -243,12 +243,12 @@ public class Player {
 				Log.info("y below");
 				position.y -= overlapY+1;
 				setPosition(position);
-				velocity.mul(0f);
+				velocity.y *= -0.3;
 			} else {
 				Log.info("y above");
 				position.y += overlapY+1;
 				setPosition(position);
-				velocity.mul(0f);
+				velocity.y *= -0.3;
 			}
 		}
 	}
