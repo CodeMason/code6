@@ -1,4 +1,7 @@
 
+-Randomly seed Asteroids (map generation?), set rotation
+_Goal - score?
+-Death respawn delay - kill cam of killer in mean time
 -Lower collision bounding box
 -Boost with shift
 -Restructure server to have own copy of map

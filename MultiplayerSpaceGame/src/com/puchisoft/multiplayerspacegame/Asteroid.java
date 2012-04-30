@@ -26,8 +26,8 @@ public class Asteroid {
 	}
 
 	public Rectangle getBoundingRectangle() {
-		float scaleX = sprite.getBoundingRectangle().width * 0.1f;
-		float scaleY = sprite.getBoundingRectangle().height * 0.1f;
+		float scaleX = sprite.getBoundingRectangle().width * 0.10f;
+		float scaleY = sprite.getBoundingRectangle().height * 0.10f;
 		Rectangle boundingRectangle = new Rectangle(sprite.getBoundingRectangle().x+scaleX,sprite.getBoundingRectangle().y+scaleY,sprite.getBoundingRectangle().width-(scaleX * 2), sprite.getBoundingRectangle().height-(scaleY * 2));
 		
 		return boundingRectangle;

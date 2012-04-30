@@ -89,7 +89,7 @@ public class GameMap {
 		}
 	}
 
-	public void update(float delta){
+	public synchronized void update(float delta){
 		
 		// Client ready and player is spawned 
 		if (client != null && playerLocal != null) {
@@ -158,7 +158,7 @@ public class GameMap {
 		}
 	}
 	
-	public void render(){
+	public synchronized void render(){
 		if (client == null || playerLocal == null) {
 			return;
 		}
@@ -224,7 +224,7 @@ public class GameMap {
 		setStatus("Disconnected");
 	}
 
-	public void addPlayer(PlayerJoinLeave msg) {
+	public synchronized void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
 		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color);
 		newPlayer.setId(msg.playerId);
@@ -237,7 +237,7 @@ public class GameMap {
 		client.sendMessage(playerLocal.getMovementState());
 	}
 
-	public void removePlayer(PlayerJoinLeave msg) {
+	public synchronized void removePlayer(PlayerJoinLeave msg) { // synchronized
 		Log.info("remove player");
 		players.remove(msg.playerId);
 	}
