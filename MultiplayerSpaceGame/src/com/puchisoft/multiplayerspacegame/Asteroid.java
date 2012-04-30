@@ -27,4 +27,5 @@ public class Asteroid {
 	public Rectangle getBoundingRectangle() {
 		return sprite.getBoundingRectangle();
 	}
+	
 }

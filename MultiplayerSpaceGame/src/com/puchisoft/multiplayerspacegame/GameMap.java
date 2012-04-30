@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.net.Network.AstroidLocations;
@@ -103,7 +104,19 @@ public class GameMap {
 			// Collision with asteroids
 			for(Asteroid asteroid : asteroids){
 				if(playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
-					playerCur.bounce(delta);
+//					playerCur.bounce(delta);
+					if(playerCur.position.x < asteroid.getPosition().x){
+						playerCur.bounceY(delta);
+					}
+					if(playerCur.position.x > asteroid.getPosition().x + asteroid.getBoundingRectangle().width){
+						playerCur.bounceY(delta);
+					}
+					if(playerCur.position.y < asteroid.getPosition().y){
+						playerCur.bounceX(delta);
+					}
+					if(playerCur.position.y > asteroid.getPosition().y + asteroid.getBoundingRectangle().height){
+						playerCur.bounceX(delta);
+					}
 				}
 			}
 		}
@@ -231,9 +244,29 @@ public class GameMap {
 		asteroids.add(new Asteroid(textureAstroid, postion));
 	}
 	
+	
 	public void addAsteroidsRandom(int amount){
-		for(int i = 0; i < amount; i++){
-			addAsteroid(new Vector2(random.nextInt((int) maxPosition.x),random.nextInt((int) maxPosition.y)));
+		
+		int randomX = 0;
+		int randomY = 0;
+		int loopExit = 0;
+		Log.error("initial" + loopExit);
+		while(asteroids.size() < amount && loopExit < 1000){
+			loopExit++;
+			Log.info("current" + loopExit);
+			randomX = random.nextInt((int) maxPosition.x - textureAstroid.getRegionWidth()-100) + 100;
+			randomY = random.nextInt((int) maxPosition.y - textureAstroid.getRegionHeight()-100) + 100;
+			Rectangle box = new Rectangle(randomX , randomY, textureAstroid.getRegionWidth(), textureAstroid.getRegionHeight());
+			boolean canMakeAsteroid = true;
+			for (int j = 0; j < asteroids.size(); j++) {
+				if(asteroids.get(j).getBoundingRectangle().overlaps(box)){
+					canMakeAsteroid = false;
+				}
+			}
+			if(canMakeAsteroid == true){
+			addAsteroid(new Vector2(randomX,randomY));
+			}
+			
 		}
 	}
 	
