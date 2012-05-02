@@ -214,21 +214,21 @@ public class GameMap {
 			Bullet bulletCurI = bullets.get(i);
 			gravityForce = 0;
 			//Gravity on Bullets from Bullets - Overkilled
-//			for (int j = 0; j < bullets.size(); j++) {
-//				Bullet bulletCurJ = bullets.get(j);
-//				gravityForce = 0;
-//				if (!bulletCurI.getPosition().equals(bulletCurJ.getPosition())) {
-//					gravityForce = (gravityShip / bulletCurI.getPosition()
-//							.dst2(bulletCurJ.getPosition()));
-//					if (gravityForce > 15) {
-//						gravityForce = 15;
-//					}
-//					Vector2 gravityVector = bulletCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
-//					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
-//					Log.info(String.valueOf(gravityForce));
-//				}
-//
-//			}
+			for (int j = 0; j < bullets.size(); j++) {
+				Bullet bulletCurJ = bullets.get(j);
+				gravityForce = 0;
+				if (!bulletCurI.getPosition().equals(bulletCurJ.getPosition())) {
+					gravityForce = (gravityShip / bulletCurI.getPosition()
+							.dst2(bulletCurJ.getPosition()));
+					if (gravityForce > 15) {
+						gravityForce = 15;
+					}
+					Vector2 gravityVector = bulletCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
+					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
+					Log.info(String.valueOf(gravityForce));
+				}
+
+			}
 			//Gravity on Bullets from Asteroids
 			for (int j = 0; j < asteroids.size(); j++) {
 				Asteroid asteroidCurJ = asteroids.get(j);
