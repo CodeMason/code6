@@ -56,37 +56,37 @@ public class Moon {
 
 		// Android
 		// Movement
-		if (Gdx.input.isTouched()) {
-			if (!wasTouched) { // touchPos == null // just started touching
-				touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-			}
-			wasTouched = true;
-		} else if (wasTouched) { // just stopped touching
-			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
-			if (touchPos.len() > 10) { // deadzone ... to short to be counted
-										// as a drag
-				touchPos.x *= -1;
-				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
-				direction.set(touchPos.tmp()).nor();
-				velocity.add(touchPos.mul(speedAccTouch * delta));
-			} else {
-				//shoot();
-				Log.info("touch");
-			}
-			wasTouched = false;
-			touchMove = true;
-		}
+//		if (Gdx.input.isTouched()) {
+//			if (!wasTouched) { // touchPos == null // just started touching
+//				touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+//			}
+//			wasTouched = true;
+//		} else if (wasTouched) { // just stopped touching
+//			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
+//			if (touchPos.len() > 10) { // deadzone ... to short to be counted
+//										// as a drag
+//				touchPos.x *= -1;
+//				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
+//				direction.set(touchPos.tmp()).nor();
+//				velocity.add(touchPos.mul(speedAccTouch * delta));
+//			} else {
+//				//shoot();
+//				Log.info("touch");
+//			}
+//			wasTouched = false;
+//			touchMove = true;
+//		}
 
 		// Desktop
 		// Movement
 		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.S)
 				|| Gdx.input.isKeyPressed(Keys.D)) {
 
-			if (Gdx.input.isKeyPressed(Keys.W)) {
-				accelerating = 1;
-			} else if (Gdx.input.isKeyPressed(Keys.S)) {
-				accelerating = -1;
-			}
+//			if (Gdx.input.isKeyPressed(Keys.W)) {
+//				accelerating = 1;
+//			} else if (Gdx.input.isKeyPressed(Keys.S)) {
+//				accelerating = -1;
+//			}
 			if (Gdx.input.isKeyPressed(Keys.A)) {
 				turning = 1;
 			} else if (Gdx.input.isKeyPressed(Keys.D)) {
@@ -103,13 +103,13 @@ public class Moon {
 		direction.rotate(turning * delta * speedRot);
 		sprite.setRotation(direction.angle()); // update sprite
 
-		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
-
-		if (velocity.len() > speedMax) {
-			velocity.nor().mul(speedMax);
-		}
-
-		position.add(velocity.tmp().mul(delta * 60));
+//		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
+//
+//		if (velocity.len() > speedMax) {
+//			velocity.nor().mul(speedMax);
+//		}
+//
+//		position.add(velocity.tmp().mul(delta * 60));
 
 		// Bounce
 		if (position.x < 0 || position.x > maxPosition.x - sprite.getWidth()) {

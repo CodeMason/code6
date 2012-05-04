@@ -115,7 +115,7 @@ public class GameMap {
 		if (client != null && playerLocal != null) {
 			handleInput(delta);
 
-			this.cam.position.set(playerLocal.moon.getDesiredCameraPosition(
+			this.cam.position.set(playerLocal.getDesiredCameraPosition(
 					this.cam.position, delta));
 			cam.update();
 
@@ -189,25 +189,25 @@ public class GameMap {
 				Log.info(String.valueOf(gravityForce));
 			}
 			//Gravity on Bullets from Moons
-			for (int i = 0; i < bullets.size(); i++) {
-				Bullet bulletCur = bullets.get(i);
-				gravityForce = 0;
-				if (!bulletCur.getPosition().equals(
-						playerEntry.getValue().moon.getPosition())) {
-					gravityForce = (gravityBullet / bulletCur.getPosition()
-							.dst2(playerEntry.getValue().moon.getPosition()));
-					if (gravityForce > 10) {
-						gravityForce = 10;
-					}
-					Vector2 gravityVector = playerEntry.getValue().moon.getPosition()
-							.cpy().sub(bulletCur.getPosition()).nor()
-							.mul(gravityForce);
-					bulletCur.setVelocity(bulletCur.getVelocity().add(
-							gravityVector.mul(delta)));
-					Log.info(String.valueOf(gravityForce));
-				}
-
-			}
+//			for (int i = 0; i < bullets.size(); i++) {
+//				Bullet bulletCur = bullets.get(i);
+//				gravityForce = 0;
+//				if (!bulletCur.getPosition().equals(
+//						playerEntry.getValue().moon.getPosition())) {
+//					gravityForce = (gravityBullet / bulletCur.getPosition()
+//							.dst2(playerEntry.getValue().moon.getPosition()));
+//					if (gravityForce > 10) {
+//						gravityForce = 10;
+//					}
+//					Vector2 gravityVector = playerEntry.getValue().moon.getPosition()
+//							.cpy().sub(bulletCur.getPosition()).nor()
+//							.mul(gravityForce);
+//					bulletCur.setVelocity(bulletCur.getVelocity().add(
+//							gravityVector.mul(delta)));
+//					Log.info(String.valueOf(gravityForce));
+//				}
+//
+//			}
 		}
 
 		for (int i = 0; i < bullets.size(); i++) {
@@ -384,7 +384,8 @@ public class GameMap {
 		// tell people where I am again
 		// TODO server should remember this and tell others based on emulating
 		// players movements locally
-		client.sendMessage(playerLocal.moon.getMovementState());
+		client.sendMessage(playerLocal.getMovementState());
+		//client.sendMessage(playerLocal.moon.getMovementState());
 	}
 
 	public void removePlayer(PlayerJoinLeave msg) {
@@ -394,7 +395,8 @@ public class GameMap {
 
 	public void playerMoved(MovementChange msg) {
 		Player player = players.get(msg.playerId);
-		player.moon.setMovementState(msg);
+		player.setMovementState(msg);
+		//player.moon.setMovementState(msg);
 
 	}
 

@@ -70,39 +70,39 @@ public class Player {
 
 		boolean touchMove = false;
 
-//		// Android
-//		// Movement
-//		if (Gdx.input.isTouched()) {
-//			if (!wasTouched) { // touchPos == null // just started touching
-//				touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-//			}
-//			wasTouched = true;
-//		} else if (wasTouched) { // just stopped touching
-//			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
-//			if (touchPos.len() > 10) { // deadzone ... to short to be counted
-//										// as a drag
-//				touchPos.x *= -1;
-//				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
-//				direction.set(touchPos.tmp()).nor();
-//				velocity.add(touchPos.mul(speedAccTouch * delta));
-//			} else {
-//				shoot();
-//				Log.info("touch");
-//			}
-//			wasTouched = false;
-//			touchMove = true;
-//		}
+		// Android
+		// Movement
+		if (Gdx.input.isTouched()) {
+			if (!wasTouched) { // touchPos == null // just started touching
+				touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+			}
+			wasTouched = true;
+		} else if (wasTouched) { // just stopped touching
+			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
+			if (touchPos.len() > 10) { // deadzone ... to short to be counted
+										// as a drag
+				touchPos.x *= -1;
+				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
+				direction.set(touchPos.tmp()).nor();
+				velocity.add(touchPos.mul(speedAccTouch * delta));
+			} else {
+				shoot();
+				Log.info("touch");
+			}
+			wasTouched = false;
+			touchMove = true;
+		}
 
 		// Desktop
 		// Movement
 		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.S)
 				|| Gdx.input.isKeyPressed(Keys.D)) {
 
-//			if (Gdx.input.isKeyPressed(Keys.W)) {
-//				accelerating = 1;
-//			} else if (Gdx.input.isKeyPressed(Keys.S)) {
-//				accelerating = -1;
-//			}
+			if (Gdx.input.isKeyPressed(Keys.W)) {
+				accelerating = 1;
+			} else if (Gdx.input.isKeyPressed(Keys.S)) {
+				accelerating = -1;
+			}
 			if (Gdx.input.isKeyPressed(Keys.A)) {
 				turning = 1;
 			} else if (Gdx.input.isKeyPressed(Keys.D)) {
@@ -122,15 +122,15 @@ public class Player {
 		direction.rotate(turning * delta * speedRot);
 		sprite.setRotation(direction.angle()); // update sprite
 
-//		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
-//
-//		if (velocity.len() > speedMax) {
-//			velocity.nor().mul(speedMax);
-//		}
+		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
 
-//		position.add(velocity.tmp().mul(delta * 60));
+		if (velocity.len() > speedMax) {
+			velocity.nor().mul(speedMax);
+		}
 
-//		getPosition().add(velocity.tmp().mul(delta * 60));
+		position.add(velocity.tmp().mul(delta * 60));
+
+		getPosition().add(velocity.tmp().mul(delta * 60));
 
 		//TODO move into central collision detection logic
 		// Bounce
@@ -151,7 +151,7 @@ public class Player {
 		if(mayFireTime > System.nanoTime()){
 			return;
 		}
-		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),moon.velocity.cpy(),moon.getDirection().cpy());
+		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),velocity.cpy(),direction.cpy());
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
 		velocity.sub(direction.nor().mul(0.5f));
@@ -167,7 +167,7 @@ public class Player {
 		this.move(delta);
 		moon.move(delta);
 		
-		this.position.lerp(moon.getPosition(), 0.035f);
+		moon.setPosition(moon.getPosition().lerp(this.getPosition(), 0.035f));
 		sprite.setPosition(position.x, position.y); // update sprite
 //		Log.info(sprite.getX()+" "+sprite.getY());
 //		Log.info("x"+getBoundingRectangle().x+" y"+getBoundingRectangle().y+" a"+ getBoundingRectangle().x+getBoundingRectangle().width+ " b"+ getBoundingRectangle().y+getBoundingRectangle().height);
