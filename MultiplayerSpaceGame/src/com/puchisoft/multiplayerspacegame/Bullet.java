@@ -16,7 +16,8 @@ public class Bullet {
 	public Vector2 maxPosition;
 	
 	final private float speed = 15.0f;
-
+	int bulletCollision =0;
+	
 	private Sprite sprite;
 	
 	public boolean destroyed = false;
@@ -39,17 +40,17 @@ public class Bullet {
 	}
 	
 	//Bounces bullets off sides five times then destroys
-	int bulletCollision =0;
+
 	private boolean collision(){
 		if(getPosition().x < 0 || getPosition().x > maxPosition.x - sprite.getWidth()){
-			if(bulletCollision < 4){
+			if(bulletCollision < 15){
 				velocity.x = velocity.x * -1;
 				bulletCollision = bulletCollision + 1;
 				}
 				else return destroy();
 		}	
 		else if(getPosition().y < 0 || getPosition().y > maxPosition.y - sprite.getHeight()){
-			if(bulletCollision < 5){
+			if(bulletCollision < 15){
 			velocity.y = velocity.y * -1;
 			bulletCollision = bulletCollision + 1;
 			}
@@ -92,12 +93,14 @@ public class Bullet {
 			if (getBoundingRectangle().x + getBoundingRectangle().width / 2 < otherColRectangle.x) {
 				position.x -= overlapX+1;
 				setPosition(position);
-				velocity.x *= -0.3; //velocity.mul(0f);
+				velocity.x *= -0.75; //velocity.mul(0f);
+				bulletCollision = bulletCollision + 1;
 				Log.info("x left");
 			} else {
 				position.x += overlapX+1;
 				setPosition(position);
-				velocity.x *= -0.3;
+				velocity.x *= -0.75;
+				bulletCollision = bulletCollision + 1;
 				Log.info("x right");
 			}
 		} else {
@@ -106,14 +109,20 @@ public class Bullet {
 				Log.info("y below");
 				position.y -= overlapY+1;
 				setPosition(position);
-				velocity.y *= -0.3;
+				bulletCollision = bulletCollision + 1;
+				velocity.y *= -0.75;
 			} else {
 				Log.info("y above");
 				position.y += overlapY+1;
 				setPosition(position);
-				velocity.y *= -0.3;
+				bulletCollision = bulletCollision + 1;
+				velocity.y *= -0.75;
 			}
 		}
+		if(bulletCollision > 15){
+			destroy();
+		}
+		
 	}
 
 	public int getPlayerID() {
