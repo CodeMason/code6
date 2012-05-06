@@ -121,7 +121,7 @@ public class Player {
 
 		direction.rotate(turning * delta * speedRot);
 		sprite.setRotation(direction.angle()); // update sprite
-
+		
 		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
 
 		if (velocity.len() > speedMax) {

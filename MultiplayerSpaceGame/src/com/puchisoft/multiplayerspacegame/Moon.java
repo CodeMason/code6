@@ -100,7 +100,8 @@ public class Moon {
 
 	public void move(float delta) {
 
-		direction.rotate(turning * delta * speedRot);
+		Vector2 newDirection = direction.cpy().rotate(turning * delta * speedRot);
+		direction.lerp(newDirection, 0.05f);
 		sprite.setRotation(direction.angle()); // update sprite
 
 //		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
