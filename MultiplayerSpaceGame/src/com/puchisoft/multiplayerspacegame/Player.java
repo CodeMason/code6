@@ -18,11 +18,15 @@ import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
 public class Player {
-	private static final int FIRE_DELAY = 500 * 1000000;
-	private static final float speedAcc = 10.0f;
-	private static final float speedAccTouch = 1.0f;
-	private static final float speedRot = 180.0f; // angle degrees
-	private static final float speedMax = 50.0f;
+	private static final int FIRE_DELAY = 500 * 1000000; // nanosec
+	private static final float SPEED_ACC = 10.0f;
+	private static final float SPEED_ACC_TOUCH = 1.0f;
+	private static final float SPEED_ROT = 180.0f; // angle degrees
+	private static final float SPEED_MAX = 50.0f;
+	
+	private static final float BOUNDINGBOX_REDUCTION = 0.10f; // percentage
+	
+	private Rectangle boundingRectangle = new Rectangle();
 
 	private int id;
 	private String name;
@@ -85,7 +89,7 @@ public class Player {
 					touchPos.x *= -1;
 					Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
 					direction.set(touchPos.tmp()).nor();
-					velocity.add(touchPos.mul(speedAccTouch * delta));
+					velocity.add(touchPos.mul(SPEED_ACC_TOUCH * delta));
 				} else {
 					shoot();
 					Log.info("touch");
@@ -119,13 +123,13 @@ public class Player {
 
 	private void move(float delta) {
 
-		direction.rotate(turning * delta * speedRot);
+		direction.rotate(turning * delta * SPEED_ROT);
 		sprite.setRotation(direction.angle()); // update sprite
 
-		velocity.add(direction.tmp().mul(speedAcc * delta * accelerating));
+		velocity.add(direction.tmp().mul(SPEED_ACC * delta * accelerating));
 
-		if (velocity.len() > speedMax) {
-			velocity.nor().mul(speedMax);
+		if (velocity.len() > SPEED_MAX) {
+			velocity.nor().mul(SPEED_MAX);
 		}
 
 		getPosition().add(velocity.tmp().mul(delta * 60));
@@ -208,10 +212,13 @@ public class Player {
 		this.id = id;
 	}
 	
-	public Rectangle getBoundingRectangle(){
-		float scaleX = sprite.getBoundingRectangle().width * 0.1f;
-		float scaleY = sprite.getBoundingRectangle().height * 0.1f;
-		Rectangle boundingRectangle = new Rectangle(sprite.getBoundingRectangle().x+scaleX,sprite.getBoundingRectangle().y+scaleY,sprite.getBoundingRectangle().width-(scaleX * 2), sprite.getBoundingRectangle().height-(scaleY * 2));
+	public Rectangle getBoundingRectangle() {
+		float scaleX = sprite.getBoundingRectangle().width * BOUNDINGBOX_REDUCTION;
+		float scaleY = sprite.getBoundingRectangle().height * BOUNDINGBOX_REDUCTION;
+		boundingRectangle.x = sprite.getBoundingRectangle().x+scaleX;
+		boundingRectangle.y = sprite.getBoundingRectangle().y+scaleY;
+		boundingRectangle.width = sprite.getBoundingRectangle().width-(scaleX * 2);
+		boundingRectangle.height = sprite.getBoundingRectangle().height-(scaleY * 2);
 		
 		return boundingRectangle;
 	}
