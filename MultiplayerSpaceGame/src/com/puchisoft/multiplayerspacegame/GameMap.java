@@ -261,7 +261,7 @@ public class GameMap {
 		asteroids.add(new Asteroid(textureAstroid, postion, rotation));
 	}
 	
-	public void generateMap(GameConfigData gameConfigData){
+	public synchronized void generateMap(GameConfigData gameConfigData){
 		
 		random.setSeed(gameConfigData.mapGeneratorSeed);
 		// Generate asteroids
