@@ -17,7 +17,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.multiplayerspacegame.net.Network.AstroidLocations;
+import com.puchisoft.multiplayerspacegame.net.Network.GameConfigData;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
@@ -159,9 +159,6 @@ public class GameMap {
 	}
 	
 	public synchronized void render(){
-		if (client == null || playerLocal == null) {
-			return;
-		}
 		
 		spriteBatch.setProjectionMatrix(cam.combined);
 		spriteBatch.begin();
@@ -260,20 +257,19 @@ public class GameMap {
 		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
 	}
 	
-	private void addAsteroid(Vector2 postion){
-		asteroids.add(new Asteroid(textureAstroid, postion));
+	private void addAsteroid(Vector2 postion, float rotation){
+		asteroids.add(new Asteroid(textureAstroid, postion, rotation));
 	}
 	
-	
-	public void addAsteroidsRandom(int amount){
+	public void generateMap(GameConfigData gameConfigData){
 		
+		random.setSeed(gameConfigData.mapGeneratorSeed);
+		// Generate asteroids
 		int randomX = 0;
 		int randomY = 0;
 		int loopExit = 0;
-		Log.error("initial" + loopExit);
-		while(asteroids.size() < amount && loopExit < 1000){
+		while(asteroids.size() < gameConfigData.asteroidQuantity && loopExit < 1000){
 			loopExit++;
-			Log.info("current" + loopExit);
 			randomX = random.nextInt((int) maxPosition.x - textureAstroid.getRegionWidth()-100) + 100;
 			randomY = random.nextInt((int) maxPosition.y - textureAstroid.getRegionHeight()-100) + 100;
 			Rectangle box = new Rectangle(randomX , randomY, textureAstroid.getRegionWidth(), textureAstroid.getRegionHeight());
@@ -281,27 +277,13 @@ public class GameMap {
 			for (int j = 0; j < asteroids.size(); j++) {
 				if(asteroids.get(j).getBoundingRectangle().overlaps(box)){
 					canMakeAsteroid = false;
+					break;
 				}
 			}
-			if(canMakeAsteroid == true){
-			addAsteroid(new Vector2(randomX,randomY));
+			if(canMakeAsteroid){
+				addAsteroid(new Vector2(randomX,randomY),random.nextInt(360));
 			}
 			
-		}
-	}
-	
-	public AstroidLocations getAstroidLocations(){
-		Vector2[] positions = new Vector2[asteroids.size()];
-		for (int i = 0; i < asteroids.size(); i++) {
-			positions[i] = asteroids.get(i).getPosition();
-		}
-		
-		return new AstroidLocations(positions);
-	}
-	
-	public void addAstroidLocations(AstroidLocations astroidLocations){
-		for(Vector2 positon : astroidLocations.positions){
-			addAsteroid(positon);
 		}
 	}
 

@@ -217,42 +217,36 @@ public class Player {
 	}
 
 	public void preventOverlap(Rectangle otherColRectangle, float delta) {
-//		Log.info("revert...");
-//		Log.info("P x"+position.x+" y"+position.y);
-//		Log.info("PBB x" + getBoundingRectangle().x + " y" + getBoundingRectangle().y + " w" + getBoundingRectangle().width + " h" + getBoundingRectangle().height);
-//		Log.info("OBB x" + otherColRectangle.x + " y" + otherColRectangle.y + " w" + otherColRectangle.width + " h" + otherColRectangle.height);
 		
 		float distY = Math.abs((getBoundingRectangle().y + getBoundingRectangle().height / 2) - (otherColRectangle.y + otherColRectangle.height / 2));
 		float totalHeight = (getBoundingRectangle().height / 2 + otherColRectangle.height / 2);
 		float overlapY = totalHeight - distY;
-//		Log.info("O y" + overlapY);
 
 		float distX = Math.abs((getBoundingRectangle().x + getBoundingRectangle().width / 2) - (otherColRectangle.x + otherColRectangle.width / 2));
 		float totalWidth = (getBoundingRectangle().width / 2 + otherColRectangle.width / 2);
 		float overlapX = totalWidth - distX;
-//		Log.info("O x" + overlapX);
 		if (overlapX < overlapY) {
 			// Only do X
 			if (getBoundingRectangle().x + getBoundingRectangle().width / 2 < otherColRectangle.x) {
 				position.x -= overlapX+1;
 				setPosition(position);
 				velocity.x *= -0.3; //velocity.mul(0f);
-				Log.info("x left");
+//				Log.info("x left");
 			} else {
 				position.x += overlapX+1;
 				setPosition(position);
 				velocity.x *= -0.3;
-				Log.info("x right");
+//				Log.info("x right");
 			}
 		} else {
 			// Only do Y 
 			if (getBoundingRectangle().y + getBoundingRectangle().height / 2 < otherColRectangle.y + otherColRectangle.height / 2) {
-				Log.info("y below");
+//				Log.info("y below");
 				position.y -= overlapY+1;
 				setPosition(position);
 				velocity.y *= -0.3;
 			} else {
-				Log.info("y above");
+//				Log.info("y above");
 				position.y += overlapY+1;
 				setPosition(position);
 				velocity.y *= -0.3;

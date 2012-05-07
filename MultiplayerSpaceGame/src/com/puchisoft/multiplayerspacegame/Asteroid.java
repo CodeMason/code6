@@ -11,9 +11,10 @@ public class Asteroid {
 	private Sprite sprite;
 
 	
-	public Asteroid(TextureRegion texture, Vector2 position) {
+	public Asteroid(TextureRegion texture, Vector2 position, float rotation) {
 		this.sprite = new Sprite(texture);
 		this.sprite.setPosition(position.x, position.y);
+		this.sprite.rotate(rotation);
 	}
 
 	public void render(SpriteBatch spriteBatch) {

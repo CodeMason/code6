@@ -10,7 +10,7 @@ public class Network {
 
 	static public final int port = 6464;
 	static public final int portUdp = 6466;
-	static public final int version = 6;
+	static public final int version = 7;
 
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
@@ -24,7 +24,7 @@ public class Network {
 		kryo.register(PlayerJoinLeave.class);
 		kryo.register(MovementChange.class);
 		kryo.register(PlayerShoots.class);
-		kryo.register(AstroidLocations.class);
+		kryo.register(GameConfigData.class);
 		kryo.register(PlayerWasHit.class);
 	}
 
@@ -99,8 +99,7 @@ public class Network {
 		public Vector2 position;
 		public Vector2 direction;
 		public Vector2 baseVelocity;
-		public PlayerShoots() {
-		}
+		public PlayerShoots() {}
 		public PlayerShoots(int playerId, Vector2 position, Vector2 baseVelocity, Vector2 direction) {
 			this.playerID = playerId;
 			this.position = position;
@@ -109,12 +108,13 @@ public class Network {
 		}
 	}
 	
-	static public class AstroidLocations {
-		public Vector2[] positions;
-		public AstroidLocations() {
-		}
-		public AstroidLocations(Vector2[] positions) {
-			this.positions = positions;
+	static public class GameConfigData {
+		public int mapGeneratorSeed;
+		public int asteroidQuantity;
+		public GameConfigData() {}
+		public GameConfigData(int mapGeneratorSeed, int asteroidQuantity) {
+			this.mapGeneratorSeed = mapGeneratorSeed;
+			this.asteroidQuantity = asteroidQuantity;
 		}
 	}
 	static public class PlayerWasHit {
