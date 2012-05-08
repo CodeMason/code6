@@ -77,6 +77,7 @@ public class Network {
 		public int playerId;
 		public int turning;
 		public int accelerating;
+		public float health;
 		public Vector2 position;
 		public Vector2 direction;
 		public Vector2 velocity;
@@ -84,13 +85,14 @@ public class Network {
 		public MovementChange() {
 		}
 
-		public MovementChange(int playerId, int turning, int accelerating, Vector2 position, Vector2 direction, Vector2 velocity) {
+		public MovementChange(int playerId, int turning, int accelerating, Vector2 position, Vector2 direction, Vector2 velocity, float health) {
 			this.playerId = playerId;
 			this.turning = turning;
 			this.accelerating = accelerating;
 			this.position = position;
 			this.direction = direction;
 			this.velocity = velocity;
+			this.health = health;
 		}
 	}
 
@@ -120,10 +122,12 @@ public class Network {
 	static public class PlayerWasHit {
 		public int playerIdVictim;
 		public int playerIdHitter;
+		public float health;
 		public PlayerWasHit() {}
-		public PlayerWasHit(int playerIdVictim, int playerIdHitter) {
+		public PlayerWasHit(int playerIdVictim, int playerIdHitter, float health) {
 			this.playerIdVictim = playerIdVictim;
 			this.playerIdHitter = playerIdHitter;
+			this.health = health;
 		}
 		
 		

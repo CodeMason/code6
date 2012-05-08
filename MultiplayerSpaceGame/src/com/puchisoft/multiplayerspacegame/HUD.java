@@ -11,7 +11,7 @@ public class HUD {
 	public OrthographicCamera cam;
 	private BitmapFont font;
 	private String status = "Loading";
-	private int score = 0;
+	private Player playerLocal;
 	
 
 	public HUD() {
@@ -27,7 +27,13 @@ public class HUD {
 		spriteBatchStationary.setProjectionMatrix(cam.combined);
 		spriteBatchStationary.begin();
 		font.draw(spriteBatchStationary, status, 5, font.getLineHeight());
-		font.draw(spriteBatchStationary, "Score: "+score, 5, Gdx.graphics.getHeight() - font.getXHeight());
+		if(playerLocal != null){
+			font.draw(spriteBatchStationary, "Score: "+playerLocal.getScore(), 5, Gdx.graphics.getHeight() - font.getXHeight());
+			if(playerLocal.getHealth() > 0)
+				font.draw(spriteBatchStationary, "Health: "+(int)playerLocal.getHealth(), 5, Gdx.graphics.getHeight() - font.getXHeight()*4);
+			else
+				font.draw(spriteBatchStationary, "Dead", 5, Gdx.graphics.getHeight() - font.getXHeight()*4);
+		}
 		spriteBatchStationary.end();
 	}
 
@@ -35,8 +41,8 @@ public class HUD {
 		this.status = status;
 	}
 	
-	public void setScore(int score){
-		this.score  =score;
+	public void setPlayerLocal(Player playerLocal) {
+		this.playerLocal = playerLocal;
 	}
 
 	public void dispose() {

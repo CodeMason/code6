@@ -18,7 +18,8 @@ import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
 public class Player {
-	private static final int FIRE_DELAY = 500 * 1000000; // nanosec
+	private static final long FIRE_DELAY =    500 * 1000000L; // nanosec
+	private static final long SPAWN_DELAY =  2500 * 1000000L; // nanosec
 	private static final float SPEED_ACC = 6.0f;
 	private static final int   SPEED_ACC_TURBO = 3; //multiplier
 	private static final float SPEED_ACC_TOUCH = 1.0f;
@@ -41,6 +42,8 @@ public class Player {
 	private Vector2 velocity = new Vector2();
 
 	private Vector2 touchPos;
+	
+	private float health = 100;
 
 	// input state
 	private int turning = 0; // -1, 0, 1
@@ -49,23 +52,29 @@ public class Player {
 	private int acceleratingOld = turning;
 
 	private boolean wasTouched = false;
-	private long mayFireTime = System.nanoTime(); // ms
+	private long mayFireTime = 0; // ms
+	private long maySpawnTime = 0; // ms
 	
-	private Random random = new Random();
 	private int score = 0;
+	private int lastHitter = -1;
+	private boolean isLocal;
+	private Random random = new Random();
 
-	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color) {
+
+	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, boolean isLocal) {
 		this.sprite = new Sprite(texture);
 		this.sprite.setColor(color);
 //		this.sprite.setScale(1.5f);
 		this.setPosition(position);
 		this.maxPosition = maxPosition;
 		this.map = map;
+		this.isLocal = isLocal;
 	}
 
 	// Returns whether there was a change
 	// TODO move into GameMap?
 	public boolean handleInput(float delta) {
+		if(isDead()) return false;
 
 		turningOld = turning;
 		acceleratingOld = accelerating;
@@ -163,25 +172,45 @@ public class Player {
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
 	}
 	
-	public void hit(){
-		velocity.set(0,0);
-		direction.rotate(random.nextInt(360));
-		getPosition().set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
+	public void hit(float damage, int hitterID){
+		if(isDead() && !isLocal) return; // other players' health only updated from server messages
+		
+		lastHitter = hitterID;
+		
+		health -= damage;
+		if(health <= 0 && isLocal){ // only local player trigger self-death (otherwise wait on server)
+			velocity.set(0,0);
+			maySpawnTime = System.nanoTime() + SPAWN_DELAY;
+		}
+	}
+	
+	public boolean isDead(){
+		return health <= 0;
 	}
 	
 	public void update(float delta){
-		this.move(delta);
-//		Log.info(sprite.getX()+" "+sprite.getY());
-//		Log.info("x"+getBoundingRectangle().x+" y"+getBoundingRectangle().y+" a"+ getBoundingRectangle().x+getBoundingRectangle().width+ " b"+ getBoundingRectangle().y+getBoundingRectangle().height);
-//		Log.info("x"+getBoundingRectangle().x+" y"+getBoundingRectangle().y+" w"+ getBoundingRectangle().width+ " h"+ getBoundingRectangle().height);
+		if(isDead()){
+			if(System.nanoTime() > maySpawnTime && isLocal){
+				direction.rotate(random .nextInt(360));
+				getPosition().set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
+				health = 100;
+				map.sendMessage(getMovementState());
+			}
+		}else{
+			this.move(delta);
+		}
 	}
 
 	public void render(SpriteBatch spriteBatch) {
+		if(isDead()) return;
+		
 		sprite.draw(spriteBatch);
 	}
 	public void renderNameTag(SpriteBatch spriteBatch, BitmapFont fontNameTag) {
+		if(isDead()) return;
+		
 		fontNameTag.setColor(sprite.getColor());
-		fontNameTag.draw(spriteBatch, name+" ["+score+"]", getPosition().x-16, getPosition().y + fontNameTag.getLineHeight()+48);
+		fontNameTag.draw(spriteBatch, name+" ("+(int)health+"%)["+score+"]", getPosition().x-16, getPosition().y + fontNameTag.getLineHeight()+48);
 	}
 
 	public Vector3 getDesiredCameraPosition(Vector3 camPos, float delta) {
@@ -198,7 +227,7 @@ public class Player {
 	}
 
 	public MovementChange getMovementState() {
-		return new MovementChange(id, turning, accelerating, getPosition(), direction, velocity);
+		return new MovementChange(id, turning, accelerating, getPosition(), direction, velocity, health);
 	}
 
 	public void setMovementState(MovementChange msg) {
@@ -207,6 +236,7 @@ public class Player {
 		this.position = msg.position;
 		this.direction = msg.direction;
 		this.velocity = msg.velocity;
+		this.health = msg.health;
 	}
 
 	public int getID() {
@@ -289,5 +319,17 @@ public class Player {
 
 	public int getScore() {
 		return score;
+	}
+	
+	public float getHealth() {
+		return health;
+	}
+	
+	public void setHealth(float health) {
+		this.health = health;
+	}
+
+	public int getLastHitter() {
+		return lastHitter;
 	}
 }
