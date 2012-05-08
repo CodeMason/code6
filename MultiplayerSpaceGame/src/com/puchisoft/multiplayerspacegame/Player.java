@@ -59,11 +59,13 @@ public class Player {
 	private int lastHitter = -1;
 	private boolean isLocal;
 	private Random random = new Random();
+	private Color colorOrig;
 
 
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, boolean isLocal) {
 		this.sprite = new Sprite(texture);
-		this.sprite.setColor(color);
+		this.colorOrig = color;
+		this.sprite.setColor(colorOrig);
 //		this.sprite.setScale(1.5f);
 		this.setPosition(position);
 		this.maxPosition = maxPosition;
@@ -190,6 +192,10 @@ public class Player {
 	
 	public void update(float delta){
 		if(isDead()){
+			sprite.setColor(new Color(random.nextFloat(),random.nextFloat(),random.nextFloat(),1));
+			sprite.setScale(sprite.getScaleX() - 0.3f * delta);
+			
+			// Locally respawn and tell others
 			if(System.nanoTime() > maySpawnTime && isLocal){
 				direction.rotate(random .nextInt(360));
 				getPosition().set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
@@ -197,12 +203,15 @@ public class Player {
 				map.sendMessage(getMovementState());
 			}
 		}else{
+			// TODO this sets dirty flag - only do once when needed
+			sprite.setColor(colorOrig);
+			sprite.setScale(1);
 			this.move(delta);
 		}
 	}
 
 	public void render(SpriteBatch spriteBatch) {
-		if(isDead()) return;
+//		if(isDead()) return;
 		
 		sprite.draw(spriteBatch);
 	}

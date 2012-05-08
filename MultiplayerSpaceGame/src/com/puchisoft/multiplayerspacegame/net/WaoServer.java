@@ -63,22 +63,21 @@ public class WaoServer {
 					if(msg.version != Network.version){
 						Log.error("wrong version");
 						connection.close();
-					}
-					
-					
-					// Tell old people about new person
-					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, connection.color, connection.score);
-					server.sendToAllExceptTCP(connection.getID(), reply);
-					
-					// Tell new person about asteroids
-					connection.sendTCP(gameConfigData);
-					
-					// Tell new person about old people
-					for(Connection con: server.getConnections()){
-						WaoConnection conn = (WaoConnection)con;
-						if(conn.getID() != connection.getID() && conn.name != null){ // Not self, Have logged in
-							PlayerJoinLeave hereMsg  = new PlayerJoinLeave(conn.getID(), conn.name, true, conn.color, conn.score);
-							connection.sendTCP(hereMsg);
+					}else{
+						// Tell old people about new person
+						PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, connection.color, connection.score);
+						server.sendToAllExceptTCP(connection.getID(), reply);
+						
+						// Tell new person about asteroids
+						connection.sendTCP(gameConfigData);
+						
+						// Tell new person about old people
+						for(Connection con: server.getConnections()){
+							WaoConnection conn = (WaoConnection)con;
+							if(conn.getID() != connection.getID() && conn.name != null){ // Not self, Have logged in
+								PlayerJoinLeave hereMsg  = new PlayerJoinLeave(conn.getID(), conn.name, true, conn.color, conn.score);
+								connection.sendTCP(hereMsg);
+							}
 						}
 					}
 					return;

@@ -10,7 +10,7 @@ public class Network {
 
 	static public final int port = 6464;
 	static public final int portUdp = 6466;
-	static public final int version = 7;
+	static public final int version =8;
 
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
