@@ -74,9 +74,6 @@ public class GameMap {
 	}
 	
 	private void handleInput(float delta){
-		if (client == null || playerLocal == null) {
-			return;
-		}
 		
 		// Zooming
 		if (Gdx.input.isKeyPressed(Keys.Q)){

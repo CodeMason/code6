@@ -34,7 +34,7 @@ public class Player {
 	private Sprite sprite;
 	private GameMap map;
 	
-	public Vector2 maxPosition;
+	private Vector2 maxPosition;
 	private Vector2 position;
 
 	private Vector2 direction = new Vector2(1, 0);
@@ -48,8 +48,8 @@ public class Player {
 	private int accelerating = 0; // -1, 0, 1
 	private int acceleratingOld = turning;
 
-	boolean wasTouched = false;
-	long mayFireTime = System.nanoTime(); // ms
+	private boolean wasTouched = false;
+	private long mayFireTime = System.nanoTime(); // ms
 	
 	private Random random = new Random();
 	private int score = 0;
