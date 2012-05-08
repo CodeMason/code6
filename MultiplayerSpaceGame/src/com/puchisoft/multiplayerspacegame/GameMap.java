@@ -17,7 +17,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.multiplayerspacegame.net.Network.AstroidLocations;
+import com.puchisoft.multiplayerspacegame.net.Network.GameConfigData;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
@@ -74,9 +74,6 @@ public class GameMap {
 	}
 	
 	private void handleInput(float delta){
-		if (client == null || playerLocal == null) {
-			return;
-		}
 		
 		// Zooming
 		if (Gdx.input.isKeyPressed(Keys.Q)){
@@ -95,7 +92,15 @@ public class GameMap {
 		if (client != null && playerLocal != null) {
 			handleInput(delta);
 			
-			this.cam.position.set(playerLocal.getDesiredCameraPosition(this.cam.position, delta));
+			if(!playerLocal.isDead()){
+				this.cam.position.set(playerLocal.getDesiredCameraPosition(this.cam.position, delta));
+			}else{
+				Player killer = players.get(playerLocal.getLastHitter());
+				if(killer != null){
+					this.cam.position.set(killer.getDesiredCameraPosition(this.cam.position, delta));
+				}
+			}
+			
 			cam.update();
 			
 			// Handle local input and sent over network if changed
@@ -113,6 +118,7 @@ public class GameMap {
 			for(Asteroid asteroid : asteroids){
 				if(playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					playerCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
+//					playerCur.hit(5, -1);
 				}
 			}
 			// Collision with Players
@@ -134,14 +140,13 @@ public class GameMap {
 				Player playerCur = playerEntry.getValue();
 				if(playerCur.getID() != bulletCur.getPlayerID() && playerCur.getBoundingRectangle().overlaps(bulletCur.getBoundingRectangle())){
 					bulletCur.destroy();
-					playerCur.hit();
+					playerCur.hit(40, bulletCur.getPlayerID());
 					// I was hit
 					if(playerCur == playerLocal){
 						Gdx.input.vibrate(300);
 						players.get(bulletCur.getPlayerID()).addScore(1);
 						setStatus("You were hit by "+players.get(bulletCur.getPlayerID()).getName()+"!");
-						client.sendMessage(playerLocal.getMovementState()); // TODO Death time out, server decides where I go
-						client.sendMessage(new PlayerWasHit(playerLocal.getID(),bulletCur.getPlayerID()));
+						client.sendMessage(new PlayerWasHit(playerLocal.getID(),bulletCur.getPlayerID(),playerLocal.getHealth()));
 					}
 				}
 			}
@@ -159,9 +164,6 @@ public class GameMap {
 	}
 	
 	public synchronized void render(){
-		if (client == null || playerLocal == null) {
-			return;
-		}
 		
 		spriteBatch.setProjectionMatrix(cam.combined);
 		spriteBatch.begin();
@@ -208,10 +210,11 @@ public class GameMap {
 
 		if (this.client == null) {
 			this.client = client;
-			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color);
+			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, true);
 			this.playerLocal.setId(client.id);
 			this.playerLocal.setName(name);
 			players.put(client.id, playerLocal);
+			hud.setPlayerLocal(playerLocal);
 			setStatus("Connected to " + client.remoteIP);
 		} else {
 			Log.error("setNetworkClient called twice");
@@ -226,7 +229,7 @@ public class GameMap {
 
 	public synchronized void addPlayer(PlayerJoinLeave msg) {
 		Log.info("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color);
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, false);
 		newPlayer.setId(msg.playerId);
 		newPlayer.setName(msg.name);
 		newPlayer.addScore(msg.score);
@@ -242,7 +245,7 @@ public class GameMap {
 		players.remove(msg.playerId);
 	}
 
-	public void playerMoved(MovementChange msg) {
+	public synchronized void playerMoved(MovementChange msg) {
 		Player player = players.get(msg.playerId);
 		player.setMovementState(msg);
 
@@ -252,7 +255,7 @@ public class GameMap {
 		if(hud != null) hud.setStatus(status);
 	}
 
-	public void addBullet(PlayerShoots playerShoots) {
+	public synchronized void addBullet(PlayerShoots playerShoots) {
 		if (playerShoots.playerID == playerLocal.getID()) {
 			// tell others I shot
 			client.sendMessage(playerShoots);
@@ -260,20 +263,19 @@ public class GameMap {
 		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
 	}
 	
-	private void addAsteroid(Vector2 postion){
-		asteroids.add(new Asteroid(textureAstroid, postion));
+	private void addAsteroid(Vector2 postion, float rotation){
+		asteroids.add(new Asteroid(textureAstroid, postion, rotation));
 	}
 	
-	
-	public void addAsteroidsRandom(int amount){
+	public synchronized void generateMap(GameConfigData gameConfigData){
 		
+		random.setSeed(gameConfigData.mapGeneratorSeed);
+		// Generate asteroids
 		int randomX = 0;
 		int randomY = 0;
 		int loopExit = 0;
-		Log.error("initial" + loopExit);
-		while(asteroids.size() < amount && loopExit < 1000){
+		while(asteroids.size() < gameConfigData.asteroidQuantity && loopExit < 1000){
 			loopExit++;
-			Log.info("current" + loopExit);
 			randomX = random.nextInt((int) maxPosition.x - textureAstroid.getRegionWidth()-100) + 100;
 			randomY = random.nextInt((int) maxPosition.y - textureAstroid.getRegionHeight()-100) + 100;
 			Rectangle box = new Rectangle(randomX , randomY, textureAstroid.getRegionWidth(), textureAstroid.getRegionHeight());
@@ -281,27 +283,13 @@ public class GameMap {
 			for (int j = 0; j < asteroids.size(); j++) {
 				if(asteroids.get(j).getBoundingRectangle().overlaps(box)){
 					canMakeAsteroid = false;
+					break;
 				}
 			}
-			if(canMakeAsteroid == true){
-			addAsteroid(new Vector2(randomX,randomY));
+			if(canMakeAsteroid){
+				addAsteroid(new Vector2(randomX,randomY),random.nextInt(360));
 			}
 			
-		}
-	}
-	
-	public AstroidLocations getAstroidLocations(){
-		Vector2[] positions = new Vector2[asteroids.size()];
-		for (int i = 0; i < asteroids.size(); i++) {
-			positions[i] = asteroids.get(i).getPosition();
-		}
-		
-		return new AstroidLocations(positions);
-	}
-	
-	public void addAstroidLocations(AstroidLocations astroidLocations){
-		for(Vector2 positon : astroidLocations.positions){
-			addAsteroid(positon);
 		}
 	}
 
@@ -312,15 +300,23 @@ public class GameMap {
 
 	public void onMsgPlayerWasHit(PlayerWasHit msg) {
 		Player hitter = players.get(msg.playerIdHitter);
+		Player victim = players.get(msg.playerIdVictim);
+		// give hitter points
 		if(hitter != null){
-			Player victim = players.get(msg.playerIdVictim);
 			hitter.addScore(1);
 			if(hitter == playerLocal){
-				hud.setScore(playerLocal.getScore());
 				if(victim != null) setStatus("You hit "+victim.getName()+"!");
 			}else if(victim != null){
 				if(victim != null) setStatus(hitter.getName()+" "+msg.playerIdHitter+" hit "+victim.getName()+".");
 			}
 		}
+		// Update victim's health
+		if(victim != null){
+			victim.setHealth(msg.health);
+		}
+	}
+	
+	public void sendMessage(Object msg){
+		client.sendMessage(msg);
 	}
 }

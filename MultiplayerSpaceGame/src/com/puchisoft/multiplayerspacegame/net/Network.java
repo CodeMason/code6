@@ -10,7 +10,7 @@ public class Network {
 
 	static public final int port = 6464;
 	static public final int portUdp = 6466;
-	static public final int version = 6;
+	static public final int version = 7;
 
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
@@ -24,7 +24,7 @@ public class Network {
 		kryo.register(PlayerJoinLeave.class);
 		kryo.register(MovementChange.class);
 		kryo.register(PlayerShoots.class);
-		kryo.register(AstroidLocations.class);
+		kryo.register(GameConfigData.class);
 		kryo.register(PlayerWasHit.class);
 	}
 
@@ -77,6 +77,7 @@ public class Network {
 		public int playerId;
 		public int turning;
 		public int accelerating;
+		public float health;
 		public Vector2 position;
 		public Vector2 direction;
 		public Vector2 velocity;
@@ -84,13 +85,14 @@ public class Network {
 		public MovementChange() {
 		}
 
-		public MovementChange(int playerId, int turning, int accelerating, Vector2 position, Vector2 direction, Vector2 velocity) {
+		public MovementChange(int playerId, int turning, int accelerating, Vector2 position, Vector2 direction, Vector2 velocity, float health) {
 			this.playerId = playerId;
 			this.turning = turning;
 			this.accelerating = accelerating;
 			this.position = position;
 			this.direction = direction;
 			this.velocity = velocity;
+			this.health = health;
 		}
 	}
 
@@ -99,8 +101,7 @@ public class Network {
 		public Vector2 position;
 		public Vector2 direction;
 		public Vector2 baseVelocity;
-		public PlayerShoots() {
-		}
+		public PlayerShoots() {}
 		public PlayerShoots(int playerId, Vector2 position, Vector2 baseVelocity, Vector2 direction) {
 			this.playerID = playerId;
 			this.position = position;
@@ -109,21 +110,24 @@ public class Network {
 		}
 	}
 	
-	static public class AstroidLocations {
-		public Vector2[] positions;
-		public AstroidLocations() {
-		}
-		public AstroidLocations(Vector2[] positions) {
-			this.positions = positions;
+	static public class GameConfigData {
+		public int mapGeneratorSeed;
+		public int asteroidQuantity;
+		public GameConfigData() {}
+		public GameConfigData(int mapGeneratorSeed, int asteroidQuantity) {
+			this.mapGeneratorSeed = mapGeneratorSeed;
+			this.asteroidQuantity = asteroidQuantity;
 		}
 	}
 	static public class PlayerWasHit {
 		public int playerIdVictim;
 		public int playerIdHitter;
+		public float health;
 		public PlayerWasHit() {}
-		public PlayerWasHit(int playerIdVictim, int playerIdHitter) {
+		public PlayerWasHit(int playerIdVictim, int playerIdHitter, float health) {
 			this.playerIdVictim = playerIdVictim;
 			this.playerIdHitter = playerIdHitter;
+			this.health = health;
 		}
 		
 		

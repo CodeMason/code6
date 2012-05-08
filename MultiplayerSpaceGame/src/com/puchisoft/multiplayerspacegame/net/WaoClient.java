@@ -9,7 +9,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
-import com.puchisoft.multiplayerspacegame.net.Network.AstroidLocations;
+import com.puchisoft.multiplayerspacegame.net.Network.GameConfigData;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
@@ -114,9 +114,9 @@ public class WaoClient {
 		} else if (message instanceof PlayerShoots) {
 			PlayerShoots msg = (PlayerShoots) message;
 			map.addBullet(msg);
-		} else if (message instanceof AstroidLocations) {
-			AstroidLocations msg = (AstroidLocations) message;
-			map.addAstroidLocations(msg);
+		} else if (message instanceof GameConfigData) {
+			GameConfigData msg = (GameConfigData) message;
+			map.generateMap(msg);
 		} else if (message instanceof PlayerWasHit) {
 			PlayerWasHit msg = (PlayerWasHit) message;
 			map.onMsgPlayerWasHit(msg);
