@@ -260,7 +260,11 @@ public class GameMap {
 			// tell others I shot
 			client.sendMessage(playerShoots);
 		}
-		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
+		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position.cpy(), playerShoots.baseVelocity.cpy(), playerShoots.direction.cpy().rotate(-2), maxPosition));
+		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position.cpy(), playerShoots.baseVelocity.cpy(), playerShoots.direction.cpy().rotate(2), maxPosition));
+		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position.cpy(), playerShoots.baseVelocity.cpy(), playerShoots.direction.cpy().rotate(-4), maxPosition));
+		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position.cpy(), playerShoots.baseVelocity.cpy(), playerShoots.direction.cpy().rotate(4), maxPosition));
+		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position.cpy(), playerShoots.baseVelocity.cpy(), playerShoots.direction.cpy(), maxPosition));
 	}
 	
 	private void addAsteroid(Vector2 postion, float rotation){
