@@ -138,7 +138,7 @@ public class GameMap {
 			// Collision with Players
 			for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 				Player playerCur = playerEntry.getValue();
-				if(playerCur.getID() != bulletCur.getPlayerID() && playerCur.getBoundingRectangle().overlaps(bulletCur.getBoundingRectangle())){
+				if(!playerCur.isDead() && playerCur.getID() != bulletCur.getPlayerID() && playerCur.getBoundingRectangle().overlaps(bulletCur.getBoundingRectangle())){
 					bulletCur.destroy();
 					playerCur.hit(40, bulletCur.getPlayerID());
 					// I was hit
