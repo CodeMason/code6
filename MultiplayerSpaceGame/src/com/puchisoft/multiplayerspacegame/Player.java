@@ -19,9 +19,10 @@ import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
 public class Player {
 	private static final int FIRE_DELAY = 500 * 1000000; // nanosec
-	private static final float SPEED_ACC = 10.0f;
+	private static final float SPEED_ACC = 6.0f;
+	private static final int   SPEED_ACC_TURBO = 3; //multiplier
 	private static final float SPEED_ACC_TOUCH = 1.0f;
-	private static final float SPEED_ROT = 180.0f; // angle degrees
+	private static final float SPEED_ROT = 210.0f; // angle degrees per sec
 	private static final float SPEED_MAX = 50.0f;
 	
 	private static final float BOUNDINGBOX_REDUCTION = 0.10f; // percentage
@@ -110,7 +111,11 @@ public class Player {
 				turning = 1;
 			}else if (Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {
 				turning = -1;
-			}			
+			}		
+			
+			if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ||Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)){
+				accelerating *= SPEED_ACC_TURBO;
+			}
 			
 			// Shooting
 			if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
