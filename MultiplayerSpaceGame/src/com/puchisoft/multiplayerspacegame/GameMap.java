@@ -33,7 +33,9 @@ public class GameMap {
 	private Map<Integer, Player> players = new HashMap<Integer, Player>();
 	private List<Bullet> bullets = new ArrayList<Bullet>();
 	private List<Asteroid> asteroids = new ArrayList<Asteroid>();
-
+	private List<Mine> mines = new ArrayList<Mine>();
+	
+	
 	private Player playerLocal;
 	
 	public BitmapFont fontNameTag;
@@ -50,6 +52,7 @@ public class GameMap {
 	private TextureRegion textureAstroid;
 	
 	boolean isClient;
+	private TextureRegion textureMine;
 
 	public GameMap(boolean isClient) {
 		this.isClient = isClient;
@@ -60,6 +63,7 @@ public class GameMap {
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
 		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
 		textureAstroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
+		textureMine = new TextureRegion(new Texture(Gdx.files.internal("data/mine.png")), 0, 0, 32, 32);
 		
 		fontNameTag = new BitmapFont();
 		fontNameTag.setColor(Color.YELLOW);
@@ -180,6 +184,11 @@ public class GameMap {
 		// Render Asteroids
 		for (int i = 0; i < asteroids.size(); i++) {
 			asteroids.get(i).render(spriteBatch);
+		}
+		
+		// Render Mines
+		for (int i = 0; i < mines.size(); i++) {
+			mines.get(i).render(spriteBatch);
 		}
 		
 		// Render Players
@@ -322,5 +331,13 @@ public class GameMap {
 	
 	public void sendMessage(Object msg){
 		client.sendMessage(msg);
+	}
+
+	public void addMine(Vector2 position) {
+//		if (playerShoots.playerID == playerLocal.getID()) {
+//			// tell others I shot
+//			client.sendMessage(playerShoots);
+//		}
+		mines.add(new Mine(textureMine, position.cpy(), 0));
 	}
 }

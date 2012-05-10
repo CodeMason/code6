@@ -130,9 +130,22 @@ public class Player {
 			if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
 				shoot();
 			}
+			
+			//DEPLOY!
+			if (Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.ALT_LEFT)) {
+				deploy();
+			}
 		}
 		
 		return turning != turningOld || accelerating != acceleratingOld || touchMove;
+	}
+
+	private void deploy() {
+		if(mayFireTime > System.nanoTime()){
+			return;
+		}
+		mayFireTime = System.nanoTime() + FIRE_DELAY;
+		map.addMine(position);
 	}
 
 	private void move(float delta) {
