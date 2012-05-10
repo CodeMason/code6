@@ -81,9 +81,9 @@ public class GameMap {
 		}else if (Gdx.input.isKeyPressed(Keys.E)){
 			this.cam.zoom = Math.min(this.cam.zoom + 1.0f * delta, 10.0f);
 		}
-		else if (Gdx.input.isTouched(1)){
-			this.cam.zoom = Math.min(Math.max(this.cam.zoom + (Gdx.input.getDeltaX(1) * 0.5f * delta), 0.3f), 10.0f);
-		}
+//		else if (Gdx.input.isTouched(1)){
+//			this.cam.zoom = Math.min(Math.max(this.cam.zoom + (Gdx.input.getDeltaX(1) * 0.5f * delta), 0.3f), 10.0f);
+//		}
 	}
 
 	public synchronized void update(float delta){

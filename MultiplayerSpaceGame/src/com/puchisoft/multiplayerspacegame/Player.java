@@ -2,7 +2,6 @@ package com.puchisoft.multiplayerspacegame;
 
 import java.util.Random;
 
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -22,7 +21,7 @@ public class Player {
 	private static final long SPAWN_DELAY =  2500 * 1000000L; // nanosec
 	private static final float SPEED_ACC = 6.0f;
 	private static final int   SPEED_ACC_TURBO = 3; //multiplier
-	private static final float SPEED_ACC_TOUCH = 1.0f;
+//	private static final float SPEED_ACC_TOUCH = 1.0f;
 	private static final float SPEED_ROT = 210.0f; // angle degrees per sec
 	private static final float SPEED_MAX = 50.0f;
 	
@@ -50,6 +49,7 @@ public class Player {
 	private int turningOld = turning;
 	private int accelerating = 0; // -1, 0, 1
 	private int acceleratingOld = turning;
+//	private Vector2 directionOld = direction;
 
 	private boolean wasTouched = false;
 	private long mayFireTime = 0; // ms
@@ -80,6 +80,8 @@ public class Player {
 
 		turningOld = turning;
 		acceleratingOld = accelerating;
+//		directionOld.x = direction.x; // for new movement
+//		directionOld.y = direction.y; // for new movement
 
 		turning = 0;
 		accelerating = 0;
@@ -88,28 +90,55 @@ public class Player {
 
 		// Android
 		// Movement
-		if(Gdx.app.getType() == ApplicationType.Android){
-			if (Gdx.input.isTouched()) {
+//		if(Gdx.app.getType() == ApplicationType.Android){
+			if (Gdx.input.isTouched(0)) {
 				if (!wasTouched) { // touchPos == null // just started touching
-					touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+					touchPos = new Vector2(Gdx.input.getX(0), Gdx.input.getY(0));
+					wasTouched = true;
+					Log.info("Initial touch saved");
 				}
-				wasTouched = true;
-			} else if (wasTouched) { // just stopped touching
-				touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
-				if (touchPos.len() > 10) { // deadzone ... too short to be counted
-											// as a drag
-					touchPos.x *= -1;
-					Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
-					direction.set(touchPos.tmp()).nor();
-					velocity.add(touchPos.mul(SPEED_ACC_TOUCH * delta));
-				} else {
-					shoot();
-					Log.info("touch");
+				if (wasTouched) { // still touching
+					Vector2 touchDist = touchPos.cpy().sub(Gdx.input.getX(0), Gdx.input.getY(0));
+					touchDist.x *= -1;
+					// Turn towards goal direction
+					// float myDir = direction.angle();
+					// float desiredDir = touchDist.angle();
+					// // turning = (Math.abs(desiredDir - myDir)) > 180 ? 1 : -1;
+					// // 1 = counter, -1 = clockwise
+					// // turning = (desiredDir - ((myDir-180)%360)) > 0 ? -1 : 1;
+					// if(Math.abs(desiredDir - myDir) >5){
+					// float diff = desiredDir - myDir;
+					// if(diff < 0){ diff += 360; }
+					// turning = diff < 180 ? 1 : -1;
+					// Log.info("!!!!! turn debug m " + myDir + " d " + desiredDir +
+					// " || " +diff+" | "+turning);
+					// }
+					direction.set(touchDist.cpy()).nor(); // could be optimized
+	
+					if (touchDist.len() < 40) {
+						accelerating = 0;
+						// Log.info("short drag (turn) " + touchDist.x + " " +
+						// touchDist.y + " " + touchDist.len());
+					} else if (touchDist.len() < 80) {
+						accelerating = 1;
+						// Log.info("medium drag (accel) " + touchDist.x + " " +
+						// touchDist.y + " " + touchDist.len());
+					} else {
+						accelerating = SPEED_ACC_TURBO;
+						// Log.info("long drag (boost) " + touchDist.x + " " +
+						// touchDist.y + " " + touchDist.len());
+					}
 				}
-				wasTouched = false;
 				touchMove = true;
+			} else if (wasTouched) {
+				wasTouched = false;
+				accelerating = 0;
+				Log.info("Touch released");
 			}
-		}else{
+			if (Gdx.input.isTouched(1)) {
+				shoot();
+			}
+//		}else{
 			// Desktop
 			// Movement
 			if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP)) {
@@ -132,7 +161,6 @@ public class Player {
 			if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
 				shoot();
 			}
-		}
 		
 		return turning != turningOld || accelerating != acceleratingOld || touchMove;
 	}
