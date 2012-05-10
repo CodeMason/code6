@@ -247,7 +247,7 @@ public class GameMap {
 
 	public synchronized void playerMoved(MovementChange msg) {
 		Player player = players.get(msg.playerId);
-		player.setMovementState(msg);
+		if(player != null) player.setMovementState(msg);
 
 	}
 
