@@ -62,7 +62,17 @@ public class WaoClient {
 	protected void handleConnect(Connection connection) {
 		id = connection.getID();
 		remoteIP = connection.getRemoteAddressTCP().toString();
-		Color color = new Color(random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,1);
+		//Color color = new Color(random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,1);
+		Color color = new Color(0,0,0,1);
+		if (id%2 == 0){
+			color = new Color(0,255,0,1);
+		}
+		else if (id%2 == 1){
+			color = new Color(0,0,255,1);
+		}
+		else {
+			color = new Color(random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,random.nextFloat()*0.5f+0.5f,1);
+		}
 		Login registerName = new Login(name, Network.version, color);
 		client.sendTCP(registerName);
 		client.updateReturnTripTime();
