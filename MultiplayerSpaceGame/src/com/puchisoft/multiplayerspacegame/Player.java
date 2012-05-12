@@ -128,15 +128,12 @@ public class Player {
 						accelerating = 0;
 						// Log.info("short drag (turn) " + touchDist.x + " " +
 						// touchDist.y + " " + touchDist.len())
-						soundTurn.play();
 					} else if (touchDist.len() < 80) {
-						accelerating = 1;
-						soundAccel.play();			
+						accelerating = 1;		
 						// Log.info("medium drag (accel) " + touchDist.x + " " +
 						// touchDist.y + " " + touchDist.len());
 					} else {
 						accelerating = SPEED_ACC_TURBO;
-						soundBoost.play();
 						// Log.info("long drag (boost) " + touchDist.x + " " +
 						// touchDist.y + " " + touchDist.len());
 					}
@@ -155,16 +152,13 @@ public class Player {
 			// Movement
 			if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP)) {
 				accelerating = 1;
-				soundAccel.play();
 			}else if (Gdx.input.isKeyPressed(Keys.S) || Gdx.input.isKeyPressed(Keys.DOWN)) {
 				accelerating = -1;
-				soundAccel.play();
 			}
 			
 			if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ||Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)){
 				accelerating *= SPEED_ACC_TURBO;
 				soundAccel.stop();
-				soundBoost.play();
 			}
 			
 			if (Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {
@@ -178,6 +172,20 @@ public class Player {
 			if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
 				shoot();
 			}
+			
+			if(accelerating != acceleratingOld){
+			    soundAccel.stop();
+			    soundBoost.stop();
+			    if(accelerating == 0){
+//			     soundAccel.stop();
+			    }else if(accelerating == 1){
+			     long soundId = soundAccel.play();
+			     soundAccel.setLooping(soundId, true);
+			    }else if(accelerating == SPEED_ACC_TURBO){
+				     long soundId = soundBoost.play();
+				     soundBoost.setLooping(soundId, true);
+				    }
+			   }
 		
 		return turning != turningOld || accelerating != acceleratingOld || touchMove;
 	}
