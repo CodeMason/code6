@@ -1,5 +1,8 @@
 package com.puchisoft.multiplayerspacegame.net;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
@@ -24,8 +27,10 @@ public class Network {
 		kryo.register(PlayerJoinLeave.class);
 		kryo.register(MovementChange.class);
 		kryo.register(PlayerShoots.class);
-		kryo.register(GameConfigData.class);
+		kryo.register(GameMapData.class);
 		kryo.register(PlayerWasHit.class);
+		kryo.register(AsteroidData.class);
+		kryo.register(ArrayList.class);
 	}
 
 	static public class Login {
@@ -95,6 +100,18 @@ public class Network {
 			this.health = health;
 		}
 	}
+	
+	static public class PlayerWasHit {
+		public int playerIdVictim;
+		public int playerIdHitter;
+		public float health;
+		public PlayerWasHit() {}
+		public PlayerWasHit(int playerIdVictim, int playerIdHitter, float health) {
+			this.playerIdVictim = playerIdVictim;
+			this.playerIdHitter = playerIdHitter;
+			this.health = health;
+		}
+	}
 
 	static public class PlayerShoots {
 		public int playerID;
@@ -110,26 +127,23 @@ public class Network {
 		}
 	}
 	
-	static public class GameConfigData {
-		public int mapGeneratorSeed;
-		public int asteroidQuantity;
-		public GameConfigData() {}
-		public GameConfigData(int mapGeneratorSeed, int asteroidQuantity) {
-			this.mapGeneratorSeed = mapGeneratorSeed;
-			this.asteroidQuantity = asteroidQuantity;
+	static public class GameMapData {
+		public List<AsteroidData> asteroidDatas;
+		public GameMapData() {}
+		public GameMapData(List<AsteroidData> asteroidDatas) {
+			this.asteroidDatas = asteroidDatas;
 		}
 	}
-	static public class PlayerWasHit {
-		public int playerIdVictim;
-		public int playerIdHitter;
-		public float health;
-		public PlayerWasHit() {}
-		public PlayerWasHit(int playerIdVictim, int playerIdHitter, float health) {
-			this.playerIdVictim = playerIdVictim;
-			this.playerIdHitter = playerIdHitter;
-			this.health = health;
+
+	
+	static public class AsteroidData {
+		public Vector2 position;
+		public float rotation;
+		public AsteroidData(){}
+		public AsteroidData(Vector2 position, float rotation) {
+			this.position = position;
+			this.rotation = rotation;
 		}
-		
 		
 	}
 }

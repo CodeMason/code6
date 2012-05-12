@@ -17,7 +17,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.multiplayerspacegame.net.Network.GameConfigData;
+import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
+import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
@@ -271,14 +272,18 @@ public class GameMap {
 		asteroids.add(new Asteroid(textureAstroid, postion, rotation));
 	}
 	
-	public synchronized void generateMap(GameConfigData gameConfigData){
+	private void addAsteroid(AsteroidData asteroidData){
+		asteroids.add(new Asteroid(textureAstroid, asteroidData.position, asteroidData.rotation));
+	}
+	
+	public synchronized void generateMap(int asteroidQuantity){
 		
-		random.setSeed(gameConfigData.mapGeneratorSeed);
+//		random.setSeed(seed);
 		// Generate asteroids
 		int randomX = 0;
 		int randomY = 0;
 		int loopExit = 0;
-		while(asteroids.size() < gameConfigData.asteroidQuantity && loopExit < 1000){
+		while(asteroids.size() < asteroidQuantity && loopExit < 1000){
 			loopExit++;
 			randomX = random.nextInt((int) maxPosition.x - textureAstroid.getRegionWidth()-100) + 100;
 			randomY = random.nextInt((int) maxPosition.y - textureAstroid.getRegionHeight()-100) + 100;
@@ -294,6 +299,25 @@ public class GameMap {
 				addAsteroid(new Vector2(randomX,randomY),random.nextInt(360));
 			}
 			
+		}
+	}
+	
+	public synchronized GameMapData getStateData(){
+		List<AsteroidData> asteroidDatas = new ArrayList<AsteroidData>();
+		for(Asteroid asteroid : asteroids){
+			asteroidDatas.add(asteroid.getStateData());
+		}
+		return new GameMapData(asteroidDatas);
+	}
+	
+	public synchronized void setStateData(GameMapData gameMapData){
+		if(asteroids.size() > 0){
+			Log.error("GameMap setStateData called more than once?");
+		}else{
+			// Make asteroids from server data
+			for(AsteroidData asteroidData : gameMapData.asteroidDatas){
+				addAsteroid(asteroidData);
+			}
 		}
 	}
 

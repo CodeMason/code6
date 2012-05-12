@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
 
 public class Asteroid {
 	
@@ -44,6 +45,10 @@ public class Asteroid {
 		boundingRectangle.height = sprite.getBoundingRectangle().height-(scaleY * 2);
 		
 		return boundingRectangle;
+	}
+	
+	public AsteroidData getStateData(){
+		return new AsteroidData(position,sprite.getRotation());
 	}
 	
 }

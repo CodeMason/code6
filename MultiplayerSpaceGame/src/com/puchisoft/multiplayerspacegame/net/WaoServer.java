@@ -10,7 +10,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
-import com.puchisoft.multiplayerspacegame.net.Network.GameConfigData;
+import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
@@ -21,13 +21,11 @@ public class WaoServer {
 	Server server;
 	private GameMap map;
 	private Random random = new Random();
-	private GameConfigData gameConfigData;
 
 	public WaoServer() throws IOException {
 		//Log.set(Log.LEVEL_DEBUG);
-		gameConfigData = new GameConfigData(random.nextInt(),100);
 		map = new GameMap(false);
-		map.generateMap(gameConfigData);
+		map.generateMap(100);
 		
 		server = new Server() {
 			protected Connection newConnection() {
@@ -69,7 +67,7 @@ public class WaoServer {
 						server.sendToAllExceptTCP(connection.getID(), reply);
 						
 						// Tell new person about asteroids
-						connection.sendTCP(gameConfigData);
+						connection.sendTCP(map.getStateData());
 						
 						// Tell new person about old people
 						for(Connection con: server.getConnections()){
