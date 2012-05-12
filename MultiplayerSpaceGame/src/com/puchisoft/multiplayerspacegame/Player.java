@@ -69,7 +69,7 @@ public class Player {
 		this.colorOrig = color;
 		this.sprite.setColor(colorOrig);
 //		this.sprite.setScale(1.5f);
-		this.setPosition(position);
+		this.position = position;
 		this.maxPosition = maxPosition;
 		this.map = map;
 		this.isLocal = isLocal;
@@ -221,16 +221,24 @@ public class Player {
 		sprite.setPosition(getPosition().x, getPosition().y); // update sprite
 		
 	}
+	
+	public boolean mayShoot(){
+		return System.nanoTime() > mayFireTime;
+	}
 
-	public void shoot() {
-		if(mayFireTime > System.nanoTime()){
-			return;
+	public boolean shoot() {
+		if(!mayShoot()){
+			return false;
 		}
 //		soundShoot.play();
 		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),velocity.cpy(),direction.cpy());
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
-
+		
+		if(isLocal){
+			map.clientSendMessage(msgPlayerShoots);
+		}
+		return true;
 	}
 	
 	public void hit(float damage, int hitterID){
@@ -386,8 +394,17 @@ public class Player {
 	}
 
 	public void setPosition(Vector2 position) {
-		this.position = position;
-		sprite.setPosition(getPosition().x, getPosition().y); // update sprite
+		this.position.set(position.x,position.y);
+		this.sprite.setPosition(position.x,position.y); // update sprite
+	}
+	
+	public void setDirection(Vector2 direction){
+		this.direction.set(direction.x,direction.y).nor();
+		this.sprite.setRotation(direction.angle()); // update sprite
+	}
+	
+	public void setVelocity(Vector2 velocity) {
+		this.velocity.set(velocity.x,velocity.y);
 	}
 
 	public void addScore(int amount) {

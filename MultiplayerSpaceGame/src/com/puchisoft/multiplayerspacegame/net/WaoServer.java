@@ -94,9 +94,10 @@ public class WaoServer {
 				else if(message instanceof PlayerShoots) {
 					PlayerShoots msg = (PlayerShoots)message;
 					msg.playerID = connection.getID();
-					map.addBullet(msg);
-					// TODO some sort of validation: remember last shot time or such 
-					server.sendToAllExceptTCP(connection.getID(), msg);
+					// server validates that timeout wasn't too low, and only passes message on if valid
+					if(map.onMsgPlayerShoots(msg)){ 
+						server.sendToAllExceptTCP(connection.getID(), msg);
+					}
 				}
 				else if(message instanceof PlayerWasHit) {
 					PlayerWasHit msg = (PlayerWasHit)message;

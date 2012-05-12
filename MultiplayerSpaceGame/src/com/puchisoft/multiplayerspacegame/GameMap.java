@@ -291,12 +291,25 @@ public class GameMap {
 	public synchronized void setStatus(String status) {
 		if(hud != null) hud.setStatus(status);
 	}
+	
+	// returns of move was valid
+	public synchronized boolean onMsgPlayerShoots(PlayerShoots playerShoots){
+		Player player = getPlayerById(playerShoots.playerID);
+		if(player != null){
+			player.setPosition(playerShoots.position);
+			player.setDirection(playerShoots.direction);
+//			player.setVelocity(playerShoots.baseVelocity); // fixme
+			if(!player.shoot()){
+				logInfo(player.getName()+" tried to Cheat with bullet spam!");
+				return false;
+			}
+		}else{
+			logInfo("onMsgPlayerShoots has unknown playerId");
+		}
+		return true;
+	}
 
 	public synchronized void addBullet(PlayerShoots playerShoots) {
-		if (isClient && playerShoots.playerID == playerLocal.getID()) {
-			// tell others I shot
-			client.sendMessage(playerShoots);
-		}
 		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
 	}
 	

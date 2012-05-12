@@ -116,7 +116,7 @@ public class WaoClient {
 			map.playerMoved(msg);
 		} else if (message instanceof PlayerShoots) {
 			PlayerShoots msg = (PlayerShoots) message;
-			map.addBullet(msg);
+			map.onMsgPlayerShoots(msg);
 		} else if (message instanceof GameMapData) {
 			GameMapData msg = (GameMapData) message;
 			map.setStateData(msg);
