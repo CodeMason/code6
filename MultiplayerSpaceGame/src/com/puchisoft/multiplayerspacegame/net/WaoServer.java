@@ -106,10 +106,7 @@ public class WaoServer {
 					}
 				}
 				else if(message instanceof AsteroidWasHit) {
-					AsteroidWasHit msg = (AsteroidWasHit)message;
-					// remove from our own list also
-					map.removeAsteroid(msg.position);
-					server.sendToAllExceptTCP(connection.getID(), msg);
+					Log.error("Client tried to send message only server sends");
 				}
 				
 			}

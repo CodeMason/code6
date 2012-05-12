@@ -198,7 +198,6 @@ public class GameMap {
 		// Remove asteroids
 		for (int i = 0; i < asteroids.size(); i++) {
 			if (asteroids.get(i).destroyed){
-				Log.info("asteroid hit");
 				asteroids.remove(i);
 			}
 		}
