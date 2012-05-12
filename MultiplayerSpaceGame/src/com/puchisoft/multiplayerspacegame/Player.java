@@ -234,12 +234,12 @@ public class Player {
 	}
 	
 	public void hit(float damage, int hitterID){
-		if(isDead() && !isLocal) return; // other players' health only updated from server messages
+		if(isDead()) return; //only called from server messages
 		
 		lastHitter = hitterID;
 		
 		health -= damage;
-		if(health <= 0 && isLocal){ // only local player trigger self-death (otherwise wait on server)
+		if(health <= 0){ // only local player trigger self-death (otherwise wait on server)
 			velocity.set(0,0);
 			maySpawnTime = System.nanoTime() + SPAWN_DELAY;
 		}
@@ -249,20 +249,29 @@ public class Player {
 		return health <= 0;
 	}
 	
+	/*
+	 * Called only by server to spawn player 
+	 */
+	public boolean spawnIfAppropriate(){
+		if(isDead() && System.nanoTime() > maySpawnTime){
+			direction.rotate(random .nextInt(360));
+			getPosition().set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
+			health =100;
+			map.serverSendMessage(getMovementState());
+			return true;
+		}
+		else return false;
+		
+	}
+	
 	public void update(float delta){
 		if(isDead()){
-			sprite.setColor(new Color(random.nextFloat(),random.nextFloat(),random.nextFloat(),1));
-			sprite.setScale(sprite.getScaleX() - 0.3f * delta);
-			
-			// Locally respawn and tell others
-			if(System.nanoTime() > maySpawnTime && isLocal){
-				direction.rotate(random .nextInt(360));
-				getPosition().set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
-				health = 100;
-				map.sendMessage(getMovementState());
+			if(sprite.getScaleX() > 0.3f){
+				sprite.setColor(new Color(random.nextFloat(),random.nextFloat(),random.nextFloat(),1));
+				sprite.setScale(sprite.getScaleX() - 0.3f * delta);
 			}
 		}else{
-			// TODO this sets dirty flag - only do once when needed
+			// TODO this sets dirty flag - only do once onSpawn
 			sprite.setColor(colorOrig);
 			sprite.setScale(1);
 			this.move(delta);
@@ -399,5 +408,9 @@ public class Player {
 
 	public int getLastHitter() {
 		return lastHitter;
+	}
+
+	public Color getColor() {
+		return this.sprite.getColor();
 	}
 }

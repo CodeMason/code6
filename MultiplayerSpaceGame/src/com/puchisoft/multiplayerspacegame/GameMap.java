@@ -149,14 +149,9 @@ public class GameMap {
 					logInfo("Player touched asteroid");
 				}
 			}
-			// Collision with Players
-//			for (Map.Entry<Integer, Player> otherPlayerEntry : players.entrySet()) {
-//				Player playerCurOther = otherPlayerEntry.getValue();
-//				if(playerCurOther.getID() != playerCur.getID() && playerCurOther.getBoundingRectangle().overlaps(playerCur.getBoundingRectangle())){
-//					playerCur.preventOverlap(playerCurOther.getBoundingRectangle(),delta);
-//					playerCurOther.preventOverlap(playerCur.getBoundingRectangle(),delta);
-//				}
-//			}
+			
+			// Spawn dead players (sends a message to clients)
+			if(!isClient) playerCur.spawnIfAppropriate();
 		}
 
 		// Update Bullets
@@ -168,13 +163,10 @@ public class GameMap {
 				Player playerCur = playerEntry.getValue();
 				if(!playerCur.isDead() && playerCur.getID() != bulletCur.getPlayerID() && playerCur.getBoundingRectangle().overlaps(bulletCur.getBoundingRectangle())){
 					bulletCur.destroy();
-					playerCur.hit(40, bulletCur.getPlayerID());
-					// I was hit
-					if(isClient && playerCur == playerLocal){ // TODO make server side
-						Gdx.input.vibrate(300);
-						players.get(bulletCur.getPlayerID()).addScore(1);
-						setStatus("You were hit by "+players.get(bulletCur.getPlayerID()).getName()+"!");
-						client.sendMessage(new PlayerWasHit(playerLocal.getID(),bulletCur.getPlayerID(),playerLocal.getHealth()));
+					if(!isClient){
+						PlayerWasHit msg = new PlayerWasHit(playerCur.getID(),bulletCur.getPlayerID(), 45);
+						this.onMsgPlayerWasHit(msg);
+						server.sendMessage(msg);
 					}
 				}
 			}
@@ -280,9 +272,6 @@ public class GameMap {
 		newPlayer.addScore(msg.score);
 		players.put(msg.playerId, newPlayer);
 
-		// tell people where I am again
-		// TODO server should remember this and tell others based on emulating players movements locally
-		if(isClient) client.sendMessage(playerLocal.getMovementState());
 	}
 
 	public synchronized void removePlayer(PlayerJoinLeave msg) { // synchronized
@@ -386,22 +375,28 @@ public class GameMap {
 		Player hitter = players.get(msg.playerIdHitter);
 		Player victim = players.get(msg.playerIdVictim);
 		// give hitter points
-		if(hitter != null){
+		if(hitter != null && victim != null){
+			victim.hit(msg.damage, msg.playerIdHitter);
 			hitter.addScore(1);
 			if(hitter == playerLocal){
-				if(victim != null) setStatus("You hit "+victim.getName()+"!");
-			}else if(victim != null){
-				if(victim != null) setStatus(hitter.getName()+" "+msg.playerIdHitter+" hit "+victim.getName()+".");
+				setStatus("You hit "+victim.getName()+"!");
+			}else if(victim == playerLocal){
+				setStatus(hitter.getName()+" hit you!");
+			}else{
+				setStatus(hitter.getName()+" hit "+victim.getName()+".");
 			}
 		}
-		// Update victim's health
-		if(victim != null){
-			victim.setHealth(msg.health);
+		else{
+			Log.error("PlayerWasHit msg referred to invalid players");
 		}
 	}
 	
-	public synchronized void sendMessage(Object msg){
+	public synchronized void clientSendMessage(Object msg){
 		client.sendMessage(msg);
+	}
+	
+	public synchronized void serverSendMessage(Object msg){
+		server.sendMessage(msg);
 	}
 	
 	public synchronized GameSounds gameSounds(){

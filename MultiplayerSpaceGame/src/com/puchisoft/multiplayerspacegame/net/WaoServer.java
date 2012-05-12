@@ -10,8 +10,8 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
+import com.puchisoft.multiplayerspacegame.Player;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
-import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
@@ -58,7 +58,6 @@ public class WaoServer {
 					if (name.length() == 0) return;
 					// Store the name on the connection.
 					connection.name = name;
-					connection.color = msg.color;
 					if(msg.version != Network.version){
 						Log.error("wrong version");
 						connection.close();
@@ -67,7 +66,7 @@ public class WaoServer {
 						connection.sendTCP(map.getStateData());
 						
 						// Tell old people about new person
-						PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, connection.color, connection.score);
+						PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, new Vector2(50,50), msg.color, 0);
 						server.sendToAllExceptTCP(connection.getID(), reply);
 						// Remember for our state too
 						map.addPlayer(reply);
@@ -76,8 +75,11 @@ public class WaoServer {
 						for(Connection con: server.getConnections()){
 							WaoConnection conn = (WaoConnection)con;
 							if(conn.getID() != connection.getID() && conn.name != null){ // Not self, Have logged in
-								PlayerJoinLeave hereMsg  = new PlayerJoinLeave(conn.getID(), conn.name, true, conn.color, conn.score);
-								connection.sendTCP(hereMsg);
+								Player herePlayer = map.getPlayerById(conn.getID());
+								// todo position in here is redundant
+								PlayerJoinLeave hereMsg  = new PlayerJoinLeave(conn.getID(), herePlayer.getName(), true, herePlayer.getPosition(), herePlayer.getColor(), herePlayer.getScore());
+								connection.sendTCP(hereMsg); // basic info
+								connection.sendTCP(herePlayer.getMovementState()); // info about current movement
 							}
 						}
 					}
@@ -87,8 +89,6 @@ public class WaoServer {
 					MovementChange msg = (MovementChange)message;
 					msg.playerId = connection.getID();
 					map.playerMoved(msg);
-					// TODO Remember more about player movement state, compute changes
-					connection.position = msg.position;
 					server.sendToAllExceptTCP(connection.getID(), msg);
 				}
 				else if(message instanceof PlayerShoots) {
@@ -103,9 +103,11 @@ public class WaoServer {
 					msg.playerIdVictim = connection.getID();
 					WaoConnection hitter = getConnectionById(msg.playerIdHitter);
 					if(hitter != null){
-						hitter.score++;
-						Log.info(hitter.name+" "+hitter.getID()+" hit someone");
+						Log.info(hitter.name+" "+hitter.getID()+" hit "+hitter.name);
+						map.onMsgPlayerWasHit(msg);
 						server.sendToAllExceptTCP(connection.getID(), msg);
+					}else{
+						Log.error(" server recv invalid PlayerWasHit msg");
 					}
 				}
 				else if(message instanceof AsteroidWasHit) {
@@ -118,7 +120,7 @@ public class WaoServer {
 				WaoConnection connection = (WaoConnection)c;
 				if (connection.name != null) {
 					// Announce to everyone that someone has left.
-					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, false, connection.color, connection.score);
+					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, false, null, null, 0);
 					server.sendToAllExceptTCP(connection.getID(), reply);
 					map.removePlayer(reply);
 				}
@@ -136,9 +138,6 @@ public class WaoServer {
 	// Connection specific attributes
 	static class WaoConnection extends Connection {
 		public String name;
-		public Vector2 position;
-		protected Color color;
-		public int score = 0;
 	}
 	
 	private WaoConnection getConnectionById(int id){

@@ -13,7 +13,7 @@ public class Network {
 
 	static public final int port = 6464;
 	static public final int portUdp = 6466;
-	static public final int version = 9;
+	static public final int version = 10;
 
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
@@ -65,14 +65,16 @@ public class Network {
 		public boolean hasJoined;
 		public Color color; // only for joined
 		public int score;
+		public Vector2 position;
 
 		public PlayerJoinLeave() {
 		}
 
-		public PlayerJoinLeave(int playerId, String name, boolean hasJoined, Color color, int score) {
+		public PlayerJoinLeave(int playerId, String name, boolean hasJoined, Vector2 position, Color color, int score) {
 			this.playerId = playerId;
 			this.name = name;
 			this.hasJoined = hasJoined;
+			this.position = position; // remove, we need to send a movementmsg on join anyaway
 			this.color = color;
 			this.score = score;
 		}
@@ -104,12 +106,12 @@ public class Network {
 	static public class PlayerWasHit {
 		public int playerIdVictim;
 		public int playerIdHitter;
-		public float health;
+		public float damage;
 		public PlayerWasHit() {}
-		public PlayerWasHit(int playerIdVictim, int playerIdHitter, float health) {
+		public PlayerWasHit(int playerIdVictim, int playerIdHitter, float damage) {
 			this.playerIdVictim = playerIdVictim;
 			this.playerIdHitter = playerIdHitter;
-			this.health = health;
+			this.damage = damage;
 		}
 	}
 	
