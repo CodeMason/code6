@@ -48,7 +48,8 @@ public class GameMap {
 
 	private WaoClient client;
 	private HUD hud;
-	private TextureRegion textureAstroid;
+	private TextureRegion textureAsteroid;
+	private TextureRegion textureAsteroidGold;
 	
 	private GameSounds gameSounds;
 	
@@ -62,7 +63,8 @@ public class GameMap {
 
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
 		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
-		textureAstroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
+		textureAsteroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
+		textureAsteroidGold = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid_gold.png")), 0, 0, 64, 64);
 		
 		gameSounds = new GameSounds();
 		
@@ -268,12 +270,25 @@ public class GameMap {
 		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
 	}
 	
-	private void addAsteroid(Vector2 postion, float rotation){
-		asteroids.add(new Asteroid(textureAstroid, postion, rotation));
+	private void addAsteroid(Vector2 position, float rotation){
+		
+		if(position.x < maxPosition.x * 0.6 && position.x > maxPosition.x * 0.3){
+			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, position, rotation, 1));
+		}
+		else{
+			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, position, rotation, 0));
+		}
+		
+	
 	}
 	
 	private void addAsteroid(AsteroidData asteroidData){
-		asteroids.add(new Asteroid(textureAstroid, asteroidData.position, asteroidData.rotation));
+		if(asteroidData.position.x < maxPosition.x * 0.6 && asteroidData.position.x > maxPosition.x * 0.3){
+			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, asteroidData.position, asteroidData.rotation, 1));
+		}
+		else {
+		asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, asteroidData.position, asteroidData.rotation, 0));
+		}
 	}
 	
 	public synchronized void generateMap(int asteroidQuantity){
@@ -285,9 +300,9 @@ public class GameMap {
 		int loopExit = 0;
 		while(asteroids.size() < asteroidQuantity && loopExit < 1000){
 			loopExit++;
-			randomX = random.nextInt((int) maxPosition.x - textureAstroid.getRegionWidth()-100) + 100;
-			randomY = random.nextInt((int) maxPosition.y - textureAstroid.getRegionHeight()-100) + 100;
-			Rectangle box = new Rectangle(randomX , randomY, textureAstroid.getRegionWidth(), textureAstroid.getRegionHeight());
+			randomX = random.nextInt((int) maxPosition.x - textureAsteroid.getRegionWidth()-100) + 100;
+			randomY = random.nextInt((int) maxPosition.y - textureAsteroid.getRegionHeight()-100) + 100;
+			Rectangle box = new Rectangle(randomX , randomY, textureAsteroid.getRegionWidth(), textureAsteroid.getRegionHeight());
 			boolean canMakeAsteroid = true;
 			for (int j = 0; j < asteroids.size(); j++) {
 				if(asteroids.get(j).getBoundingRectangle().overlaps(box)){

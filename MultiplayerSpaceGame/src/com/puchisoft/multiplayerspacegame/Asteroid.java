@@ -13,11 +13,13 @@ public class Asteroid {
 	private Sprite sprite;
 	Vector2 position;
 	private Rectangle boundingRectangle = new Rectangle();
+	private int type;
 
-	
-	public Asteroid(TextureRegion texture, Vector2 position, float rotation) {
+	//0 = normal 1 = gold
+	public Asteroid(TextureRegion texture,TextureRegion textureGold,  Vector2 position, float rotation, int type) {
 		this.position = position;
-		this.sprite = new Sprite(texture);
+		this.type = type;
+		this.sprite = new Sprite(type == 0 ? texture: textureGold);
 		this.sprite.setPosition(position.x, position.y);
 		this.sprite.rotate(rotation);
 	}
