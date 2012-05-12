@@ -11,7 +11,7 @@ public class Asteroid {
 	
 	private static final float BOUNDINGBOX_REDUCTION = 0.17f; // percentage
 	private Sprite sprite;
-	Vector2 position;
+	private Vector2 position;
 	private Rectangle boundingRectangle = new Rectangle();
 	private int type;
 	

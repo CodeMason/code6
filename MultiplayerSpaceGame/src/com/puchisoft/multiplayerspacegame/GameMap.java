@@ -171,7 +171,7 @@ public class GameMap {
 			}
 			
 			// Remove impacted bullets
-			if (bullets.get(i).destroyed){
+			if (bullets.get(i).destroyed()){
 				bullets.remove(i);
 			}
 		}
