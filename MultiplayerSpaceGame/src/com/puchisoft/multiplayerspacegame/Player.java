@@ -128,15 +128,17 @@ public class Player {
 						accelerating = 0;
 						// Log.info("short drag (turn) " + touchDist.x + " " +
 						// touchDist.y + " " + touchDist.len())
-						soundTurn.play();
+//						soundTurn.play();
 					} else if (touchDist.len() < 80) {
 						accelerating = 1;
-						soundAccel.play();			
+//						long soundId = soundAccel.play();
+//						soundAccel.setLooping(soundId, false);
+//						Gdx.audio.
 						// Log.info("medium drag (accel) " + touchDist.x + " " +
 						// touchDist.y + " " + touchDist.len());
 					} else {
 						accelerating = SPEED_ACC_TURBO;
-						soundBoost.play();
+//						soundBoost.play();
 						// Log.info("long drag (boost) " + touchDist.x + " " +
 						// touchDist.y + " " + touchDist.len());
 					}
@@ -154,17 +156,15 @@ public class Player {
 			// Desktop
 			// Movement
 			if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP)) {
-				accelerating = 1;
-				soundAccel.play();
+				if(accelerating != 1){
+					accelerating = 1;
+				}
 			}else if (Gdx.input.isKeyPressed(Keys.S) || Gdx.input.isKeyPressed(Keys.DOWN)) {
 				accelerating = -1;
-				soundAccel.play();
 			}
 			
 			if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ||Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)){
 				accelerating *= SPEED_ACC_TURBO;
-				soundAccel.stop();
-				soundBoost.play();
 			}
 			
 			if (Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {
@@ -177,6 +177,20 @@ public class Player {
 			// Shooting
 			if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
 				shoot();
+			}
+			
+			// Sounds
+			if(accelerating != acceleratingOld){
+				soundAccel.stop();
+				soundBoost.stop();
+				if(accelerating == 0){
+				}else if(Math.abs(accelerating) == 1){
+					long soundId = soundAccel.play();
+					soundAccel.setLooping(soundId, true);
+				}else if(Math.abs(accelerating) == SPEED_ACC_TURBO){
+					long soundId = soundBoost.play();
+					soundBoost.setLooping(soundId, true);
+				}
 			}
 		
 		return turning != turningOld || accelerating != acceleratingOld || touchMove;
