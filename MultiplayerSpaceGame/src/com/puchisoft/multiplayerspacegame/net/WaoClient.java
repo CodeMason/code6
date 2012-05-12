@@ -88,6 +88,7 @@ public class WaoClient {
 	}
 
 	public void sendMessage(Object message) {
+		Log.info("SENT packet");
 		if (client.isConnected()) {
 			client.sendTCP(message);
 		}

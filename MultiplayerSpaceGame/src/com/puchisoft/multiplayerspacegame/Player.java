@@ -51,7 +51,7 @@ public class Player {
 	private int turningOld = turning;
 	private int accelerating = 0; // -1, 0, 1
 	private int acceleratingOld = turning;
-//	private Vector2 directionOld = direction;
+	private float angleLastSent = direction.angle();
 
 	private boolean wasTouched = false;
 	private long mayFireTime = 0; // ms
@@ -106,44 +106,50 @@ public class Player {
 					wasTouched = true;
 					Log.info("Initial touch saved");
 				}
-				if (wasTouched) { // still touching
-					Vector2 touchDist = touchPos.cpy().sub(Gdx.input.getX(0), Gdx.input.getY(0));
-					touchDist.x *= -1;
-					// Turn towards goal direction
-					// float myDir = direction.angle();
-					// float desiredDir = touchDist.angle();
-					// // turning = (Math.abs(desiredDir - myDir)) > 180 ? 1 : -1;
-					// // 1 = counter, -1 = clockwise
-					// // turning = (desiredDir - ((myDir-180)%360)) > 0 ? -1 : 1;
-					// if(Math.abs(desiredDir - myDir) >5){
-					// float diff = desiredDir - myDir;
-					// if(diff < 0){ diff += 360; }
-					// turning = diff < 180 ? 1 : -1;
-					// Log.info("!!!!! turn debug m " + myDir + " d " + desiredDir +
-					// " || " +diff+" | "+turning);
-					// }
-					direction.set(touchDist.cpy()).nor(); // could be optimized
-	
-					if (touchDist.len() < 40) {
-						accelerating = 0;
-						// Log.info("short drag (turn) " + touchDist.x + " " +
-						// touchDist.y + " " + touchDist.len())
+				Vector2 touchDist = touchPos.cpy().sub(Gdx.input.getX(0), Gdx.input.getY(0));
+				touchDist.x *= -1;
+				// Turn towards goal direction
+				// float myDir = direction.angle();
+				// float desiredDir = touchDist.angle();
+				// // turning = (Math.abs(desiredDir - myDir)) > 180 ? 1 : -1;
+				// // 1 = counter, -1 = clockwise
+				// // turning = (desiredDir - ((myDir-180)%360)) > 0 ? -1 : 1;
+				// if(Math.abs(desiredDir - myDir) >5){
+				// float diff = desiredDir - myDir;
+				// if(diff < 0){ diff += 360; }
+				// turning = diff < 180 ? 1 : -1;
+				// Log.info("!!!!! turn debug m " + myDir + " d " + desiredDir +
+				// " || " +diff+" | "+turning);
+				// }
+				direction.set(touchDist.cpy()).nor(); // could be optimized
+				sprite.setRotation(direction.angle()); // update sprite
+
+				if (touchDist.len() < 40) {
+					accelerating = 0;
+					// Log.info("short drag (turn) " + touchDist.x + " " +
+					// touchDist.y + " " + touchDist.len())
 //						soundTurn.play();
-					} else if (touchDist.len() < 80) {
-						accelerating = 1;
+				} else if (touchDist.len() < 80) {
+					accelerating = 1;
 //						long soundId = soundAccel.play();
 //						soundAccel.setLooping(soundId, false);
 //						Gdx.audio.
-						// Log.info("medium drag (accel) " + touchDist.x + " " +
-						// touchDist.y + " " + touchDist.len());
-					} else {
-						accelerating = SPEED_ACC_TURBO;
+					// Log.info("medium drag (accel) " + touchDist.x + " " +
+					// touchDist.y + " " + touchDist.len());
+				} else {
+					accelerating = SPEED_ACC_TURBO;
 //						soundBoost.play();
-						// Log.info("long drag (boost) " + touchDist.x + " " +
-						// touchDist.y + " " + touchDist.len());
-					}
+					// Log.info("long drag (boost) " + touchDist.x + " " +
+					// touchDist.y + " " + touchDist.len());
 				}
-				touchMove = true;
+				
+				//force packet only if last sent angle differs a bit
+				if(Math.abs(direction.angle() - angleLastSent) > 1){
+					touchMove = true;
+					angleLastSent = direction.angle();	
+				}
+				
+				
 			} else if (wasTouched) {
 				wasTouched = false;
 				accelerating = 0;
@@ -228,7 +234,7 @@ public class Player {
 		if(mayFireTime > System.nanoTime()){
 			return;
 		}
-		soundShoot.play();
+//		soundShoot.play();
 		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),velocity.cpy(),direction.cpy());
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
