@@ -4,7 +4,6 @@ import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -62,17 +61,10 @@ public class Player {
 	private boolean isLocal;
 	private Random random = new Random();
 	private Color colorOrig;
-	private Sound soundShoot;
-	private Sound soundTurn;
-	private Sound soundAccel;
-	private Sound soundBoost;
+	
 	
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, boolean isLocal) {
 		this.sprite = new Sprite(texture);
-		this.soundShoot = Gdx.audio.newSound(Gdx.files.internal("data/shoot.wav"));
-		this.soundTurn = Gdx.audio.newSound(Gdx.files.internal("data/turn.wav"));
-		this.soundAccel = Gdx.audio.newSound(Gdx.files.internal("data/accel.wav"));
-		this.soundBoost = Gdx.audio.newSound(Gdx.files.internal("data/boost.wav"));
 		this.colorOrig = color;
 		this.sprite.setColor(colorOrig);
 //		this.sprite.setScale(1.5f);
@@ -187,15 +179,13 @@ public class Player {
 			
 			// Sounds
 			if(accelerating != acceleratingOld){
-				soundAccel.stop();
-				soundBoost.stop();
+				map.gameSounds().stopSound("accel");
+				map.gameSounds().stopSound("boost");
 				if(accelerating == 0){
 				}else if(Math.abs(accelerating) == 1){
-					long soundId = soundAccel.play();
-					soundAccel.setLooping(soundId, true);
+					map.gameSounds().playAndLoopSound("accel");
 				}else if(Math.abs(accelerating) == SPEED_ACC_TURBO){
-					long soundId = soundBoost.play();
-					soundBoost.setLooping(soundId, true);
+					map.gameSounds().playAndLoopSound("boost");
 				}
 			}
 		

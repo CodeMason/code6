@@ -49,6 +49,8 @@ public class GameMap {
 	private HUD hud;
 	private TextureRegion textureAstroid;
 	
+	private GameSounds gameSounds;
+	
 	boolean isClient;
 
 	public GameMap(boolean isClient) {
@@ -60,6 +62,8 @@ public class GameMap {
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
 		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
 		textureAstroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
+		
+		gameSounds = new GameSounds();
 		
 		fontNameTag = new BitmapFont();
 		fontNameTag.setColor(Color.YELLOW);
@@ -318,5 +322,9 @@ public class GameMap {
 	
 	public void sendMessage(Object msg){
 		client.sendMessage(msg);
+	}
+	
+	public synchronized GameSounds gameSounds(){
+		return gameSounds;
 	}
 }
