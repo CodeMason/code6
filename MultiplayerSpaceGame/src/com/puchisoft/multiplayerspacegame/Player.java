@@ -2,6 +2,7 @@ package com.puchisoft.multiplayerspacegame;
 
 import java.util.Random;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -19,7 +20,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 public class Player {
 	
 	private static final long FIRE_DELAY =    500 * 1000000L; // nanosec
-	private static final long SPAWN_DELAY =  2500 * 1000000L; // nanosec
+	private static final long SPAWN_DELAY =  4500 * 1000000L; // nanosec
 	private static final float SPEED_ACC = 6.0f;
 	private static final int   SPEED_ACC_TURBO = 3; //multiplier
 //	private static final float SPEED_ACC_TOUCH = 1.0f;
@@ -91,7 +92,7 @@ public class Player {
 
 		// Android
 		// Movement
-//		if(Gdx.app.getType() == ApplicationType.Android){
+		if(Gdx.app.getType() == ApplicationType.Android){
 			if (Gdx.input.isTouched(0)) {
 				if (!wasTouched) { // touchPos == null // just started touching
 					touchPos = new Vector2(Gdx.input.getX(0), Gdx.input.getY(0));
@@ -150,7 +151,7 @@ public class Player {
 			if (Gdx.input.isTouched(1)) {
 				shoot();
 			}
-//		}else{
+		}else{
 			// Desktop
 			// Movement
 			if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP)) {
@@ -176,18 +177,19 @@ public class Player {
 			if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
 				shoot();
 			}
-			
-			// Sounds
-			if(accelerating != acceleratingOld){
-				map.gameSounds().stopSound("accel");
-				map.gameSounds().stopSound("boost");
-				if(accelerating == 0){
-				}else if(Math.abs(accelerating) == 1){
-					map.gameSounds().playAndLoopSound("accel");
-				}else if(Math.abs(accelerating) == SPEED_ACC_TURBO){
-					map.gameSounds().playAndLoopSound("boost");
-				}
+		}
+		
+		// Sounds
+		if(accelerating != acceleratingOld){
+			map.gameSounds().stopSound("accel");
+			map.gameSounds().stopSound("boost");
+			if(accelerating == 0){
+			}else if(Math.abs(accelerating) == 1){
+				map.gameSounds().playAndLoopSound("accel");
+			}else if(Math.abs(accelerating) == SPEED_ACC_TURBO){
+				map.gameSounds().playAndLoopSound("boost");
 			}
+		}
 		
 		return turning != turningOld || accelerating != acceleratingOld || touchMove;
 	}
