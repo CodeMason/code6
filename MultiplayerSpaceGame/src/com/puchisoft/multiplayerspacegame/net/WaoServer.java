@@ -25,7 +25,7 @@ public class WaoServer {
 
 	public WaoServer() throws IOException {
 		//Log.set(Log.LEVEL_DEBUG);
-		map = new GameMap(false);
+		map = new GameMap(this);
 		map.generateMap(100);
 		
 		server = new Server() {

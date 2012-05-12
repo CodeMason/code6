@@ -39,9 +39,8 @@ public class ScreenGame extends ScreenCore {
 		
 		Gdx.input.setCatchBackKey(true);
 
-		map = new GameMap(true);
-		
-		client = new WaoClient(map,name);
+		client = new WaoClient(name);
+		map = client.getMap();
 		
 		if(isHost){
 			// Start server

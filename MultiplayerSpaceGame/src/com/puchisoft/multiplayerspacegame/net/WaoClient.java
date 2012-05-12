@@ -28,8 +28,8 @@ public class WaoClient {
 	
 	private Random random = new Random();
 
-	public WaoClient(final GameMap game, String name) { //
-		this.map = game;
+	public WaoClient(String name) { //final GameMap game,
+		this.map = new GameMap(this);
 		this.name = name;
 
 		client = new Client();
@@ -68,7 +68,7 @@ public class WaoClient {
 		Login registerName = new Login(name, Network.version, color);
 		client.sendTCP(registerName);
 		client.updateReturnTripTime();
-		map.onConnect(this,name,color);
+		map.onConnect(name,color);
 	}
 
 	public void connectLocal() {
@@ -139,6 +139,10 @@ public class WaoClient {
 	public void shutdown() {
 		client.stop();
 		client.close();
+	}
+
+	public GameMap getMap() {
+		return this.map;
 	}
 
 }

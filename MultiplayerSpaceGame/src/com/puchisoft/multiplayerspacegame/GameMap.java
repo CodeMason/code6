@@ -25,6 +25,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
 import com.puchisoft.multiplayerspacegame.net.WaoClient;
+import com.puchisoft.multiplayerspacegame.net.WaoServer;
 
 public class GameMap {
 	public OrthographicCamera cam;
@@ -47,7 +48,8 @@ public class GameMap {
 
 	private Vector2 maxPosition;
 
-	private WaoClient client;
+	private WaoClient client; // only if I'm the client
+	private WaoServer server; // only if I'm internal to the server
 	private HUD hud;
 	private TextureRegion textureAsteroid;
 	private TextureRegion textureAsteroidGold;
@@ -56,10 +58,37 @@ public class GameMap {
 	
 	boolean isClient;
 
-	public GameMap(boolean isClient) {
-		this.isClient = isClient;
-		if(isClient) this.hud = new HUD();
-		Gdx.files.internal("data/background.png");
+	/*
+	 * For client
+	 */
+	public GameMap(WaoClient client) {
+		this.client = client;
+		this.isClient = true;
+		
+		initCommon();
+		
+		this.hud = new HUD();
+		this.gameSounds = new GameSounds();
+		this.fontNameTag = new BitmapFont();
+		this.fontNameTag.setColor(Color.YELLOW);
+		
+		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+		spriteBatch = new SpriteBatch(); //
+	}
+	
+	/*
+	 * For server
+	 */
+	public GameMap(WaoServer server) {
+		this.server = server;
+		this.isClient = false;
+		
+		initCommon();
+		
+	}
+
+	private void initCommon(){
 		textureBg = new Texture(Gdx.files.internal("data/background.png"));
 
 		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
@@ -67,19 +96,9 @@ public class GameMap {
 		textureAsteroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
 		textureAsteroidGold = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid_gold.png")), 0, 0, 64, 64);
 		
-		gameSounds = new GameSounds();
-		
-		fontNameTag = new BitmapFont();
-		fontNameTag.setColor(Color.YELLOW);
-//		fontNameTag.setScale(0.9f);
-
 		maxPosition = new Vector2(textureBg.getWidth() * tilesCount, textureBg.getHeight() * tilesCount);
-		
-		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-		spriteBatch = new SpriteBatch(); //
-
 	}
+	
 	
 	private void handleInput(float delta){
 		
@@ -229,10 +248,9 @@ public class GameMap {
 		gameSounds.dispose();
 	}
 
-	public void onConnect(WaoClient client, String name, Color color) {
+	public void onConnect(String name, Color color) {
 
-		if (this.client == null) {
-			this.client = client;
+		if (this.playerLocal == null) {
 			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, true);
 			this.playerLocal.setId(client.id);
 			this.playerLocal.setName(name);
