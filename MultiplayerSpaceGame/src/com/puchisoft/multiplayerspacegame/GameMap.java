@@ -132,7 +132,7 @@ public class GameMap {
 			
 			// Handle local input and sent over network if changed
 			if (playerLocal.handleInput(delta)) {
-				Log.info("changed input");
+				logInfo("changed input");
 				client.sendMessage(playerLocal.getMovementState());
 			}
 		}
@@ -146,6 +146,7 @@ public class GameMap {
 				if(playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					playerCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
 //					playerCur.hit(5, -1);
+					logInfo("Player touched asteroid");
 				}
 			}
 			// Collision with Players
@@ -203,6 +204,10 @@ public class GameMap {
 		}
 	}
 	
+	public synchronized void logInfo(String string) {
+		Log.info((isClient ? "[Client] " : "[Server] ")+string);
+	}
+
 	public synchronized void render(){
 		
 		spriteBatch.setProjectionMatrix(cam.combined);
@@ -268,7 +273,7 @@ public class GameMap {
 	}
 
 	public synchronized void addPlayer(PlayerJoinLeave msg) {
-		Log.info("add player");
+		Log.debug("add player");
 		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, false);
 		newPlayer.setId(msg.playerId);
 		newPlayer.setName(msg.name);
@@ -277,18 +282,21 @@ public class GameMap {
 
 		// tell people where I am again
 		// TODO server should remember this and tell others based on emulating players movements locally
-		client.sendMessage(playerLocal.getMovementState());
+		if(isClient) client.sendMessage(playerLocal.getMovementState());
 	}
 
 	public synchronized void removePlayer(PlayerJoinLeave msg) { // synchronized
-		Log.info("remove player");
+		logInfo("remove player");
 		players.remove(msg.playerId);
 	}
 
 	public synchronized void playerMoved(MovementChange msg) {
 		Player player = players.get(msg.playerId);
 		if(player != null) player.setMovementState(msg);
-
+	}
+	
+	public synchronized Player getPlayerById(int id){
+		return players.get(id);
 	}
 
 	public synchronized void setStatus(String status) {
@@ -405,7 +413,7 @@ public class GameMap {
 		for (int i = 0; i < asteroids.size(); i++) {
 			Asteroid asteroid = asteroids.get(i);
 			if (asteroid.getPosition().equals(position)){
-				Log.info("asteroid hit from server");
+				logInfo("asteroid hit from server");
 				asteroid.destroy();
 				asteroids.remove(i);
 			}

@@ -63,12 +63,14 @@ public class WaoServer {
 						Log.error("wrong version");
 						connection.close();
 					}else{
+						// Tell new person about map state (asteroids)
+						connection.sendTCP(map.getStateData());
+						
 						// Tell old people about new person
 						PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, connection.color, connection.score);
 						server.sendToAllExceptTCP(connection.getID(), reply);
-						
-						// Tell new person about asteroids
-						connection.sendTCP(map.getStateData());
+						// Remember for our state too
+						map.addPlayer(reply);
 						
 						// Tell new person about old people
 						for(Connection con: server.getConnections()){
@@ -84,6 +86,7 @@ public class WaoServer {
 				else if(message instanceof MovementChange) {
 					MovementChange msg = (MovementChange)message;
 					msg.playerId = connection.getID();
+					map.playerMoved(msg);
 					// TODO Remember more about player movement state, compute changes
 					connection.position = msg.position;
 					server.sendToAllExceptTCP(connection.getID(), msg);
@@ -117,6 +120,7 @@ public class WaoServer {
 					// Announce to everyone that someone has left.
 					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, false, connection.color, connection.score);
 					server.sendToAllExceptTCP(connection.getID(), reply);
+					map.removePlayer(reply);
 				}
 			}
 		});
