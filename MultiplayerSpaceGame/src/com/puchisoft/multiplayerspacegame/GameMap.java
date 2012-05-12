@@ -169,7 +169,7 @@ public class GameMap {
 					bulletCur.destroy();
 					playerCur.hit(40, bulletCur.getPlayerID());
 					// I was hit
-					if(playerCur == playerLocal){
+					if(isClient && playerCur == playerLocal){ // TODO make server side
 						Gdx.input.vibrate(300);
 						players.get(bulletCur.getPlayerID()).addScore(1);
 						setStatus("You were hit by "+players.get(bulletCur.getPlayerID()).getName()+"!");
@@ -181,9 +181,9 @@ public class GameMap {
 			for(Asteroid asteroid : asteroids){
 				if(bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					bulletCur.destroy();
-					// Only my own bullets kill asteroids locally
-					if(playerLocal.getID() == bulletCur.getPlayerID()){
-						client.sendMessage(new AsteroidWasHit(asteroid.getPosition()));
+					// Only server makes call whether asteroids are killed
+					if(!isClient){
+						server.sendMessage(new AsteroidWasHit(asteroid.getPosition()));
 						asteroid.destroy();
 					}
 				}
@@ -292,19 +292,19 @@ public class GameMap {
 
 	}
 
-	public void setStatus(String status) {
+	public synchronized void setStatus(String status) {
 		if(hud != null) hud.setStatus(status);
 	}
 
 	public synchronized void addBullet(PlayerShoots playerShoots) {
-		if (playerShoots.playerID == playerLocal.getID()) {
+		if (isClient && playerShoots.playerID == playerLocal.getID()) {
 			// tell others I shot
 			client.sendMessage(playerShoots);
 		}
 		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
 	}
 	
-	private void addAsteroid(Vector2 position, float rotation){
+	private synchronized void addAsteroid(Vector2 position, float rotation){
 		
 		if(position.x < maxPosition.x * 0.6 && position.x > maxPosition.x * 0.3){
 			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, position, rotation, 1));
@@ -316,7 +316,7 @@ public class GameMap {
 	
 	}
 	
-	private void addAsteroid(AsteroidData asteroidData){
+	private synchronized void addAsteroid(AsteroidData asteroidData){
 		if(asteroidData.position.x < maxPosition.x * 0.6 && asteroidData.position.x > maxPosition.x * 0.3){
 			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, asteroidData.position, asteroidData.rotation, 1));
 		}
@@ -370,12 +370,12 @@ public class GameMap {
 		}
 	}
 
-	public void resize(int width, int height) {
+	public synchronized void resize(int width, int height) {
 		cam.setToOrtho(false, width, height);
 		hud.resize(width, height);
 	}
 
-	public void onMsgPlayerWasHit(PlayerWasHit msg) {
+	public synchronized void onMsgPlayerWasHit(PlayerWasHit msg) {
 		Player hitter = players.get(msg.playerIdHitter);
 		Player victim = players.get(msg.playerIdVictim);
 		// give hitter points
@@ -393,7 +393,7 @@ public class GameMap {
 		}
 	}
 	
-	public void sendMessage(Object msg){
+	public synchronized void sendMessage(Object msg){
 		client.sendMessage(msg);
 	}
 	
@@ -401,7 +401,7 @@ public class GameMap {
 		return gameSounds;
 	}
 
-	public void removeAsteroid(Vector2 position) {
+	public synchronized void removeAsteroid(Vector2 position) {
 		// Remove asteroids
 		for (int i = 0; i < asteroids.size(); i++) {
 			Asteroid asteroid = asteroids.get(i);

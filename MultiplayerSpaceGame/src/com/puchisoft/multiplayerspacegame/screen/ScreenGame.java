@@ -69,6 +69,10 @@ public class ScreenGame extends ScreenCore {
 
 		map.update(delta);
 		map.render();
+		
+		if(isHost){
+			server.update(delta);
+		}
 
 		// emulate terrible fps
 		// try {

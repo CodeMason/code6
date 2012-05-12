@@ -91,6 +91,7 @@ public class WaoServer {
 				else if(message instanceof PlayerShoots) {
 					PlayerShoots msg = (PlayerShoots)message;
 					msg.playerID = connection.getID();
+					map.addBullet(msg);
 					// TODO some sort of validation: remember last shot time or such 
 					server.sendToAllExceptTCP(connection.getID(), msg);
 				}
@@ -127,8 +128,8 @@ public class WaoServer {
 		server.start();
 	}
 	
-	public void stop() {
-		server.stop();
+	public void update(float delta) {
+		map.update(delta);
 	}
 	
 	// Connection specific attributes
@@ -150,6 +151,10 @@ public class WaoServer {
 	public void shutdown() {
 		server.close();
 		server.stop();
+	}
+
+	public void sendMessage(Object message) {
+		server.sendToAllTCP(message);
 	}
 
 }
