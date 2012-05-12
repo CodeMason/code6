@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
+import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
@@ -121,6 +123,9 @@ public class WaoClient {
 		} else if (message instanceof PlayerWasHit) {
 			PlayerWasHit msg = (PlayerWasHit) message;
 			map.onMsgPlayerWasHit(msg);
+		} else if (message instanceof AsteroidWasHit) {
+			AsteroidWasHit msg = (AsteroidWasHit) message;
+			map.removeAsteroid(msg.position);
 		}
 
 	}

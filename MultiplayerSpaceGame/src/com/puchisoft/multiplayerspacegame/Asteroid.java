@@ -14,6 +14,8 @@ public class Asteroid {
 	Vector2 position;
 	private Rectangle boundingRectangle = new Rectangle();
 	private int type;
+	
+	public boolean destroyed = false;
 
 	//0 = normal 1 = gold
 	public Asteroid(TextureRegion texture,TextureRegion textureGold,  Vector2 position, float rotation, int type) {
@@ -51,6 +53,10 @@ public class Asteroid {
 	
 	public AsteroidData getStateData(){
 		return new AsteroidData(position,sprite.getRotation());
+	}
+	
+	public void destroy(){
+		destroyed = true;
 	}
 	
 }

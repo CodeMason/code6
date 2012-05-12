@@ -13,7 +13,7 @@ public class Network {
 
 	static public final int port = 6464;
 	static public final int portUdp = 6466;
-	static public final int version =8;
+	static public final int version = 9;
 
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
@@ -22,7 +22,6 @@ public class Network {
 		kryo.register(Login.class);
 //		kryo.register(LogMessage.class);
 		kryo.register(Vector2.class);
-		kryo.register(com.badlogic.gdx.math.Vector2[].class);
 		kryo.register(Color.class);
 		kryo.register(PlayerJoinLeave.class);
 		kryo.register(MovementChange.class);
@@ -31,6 +30,7 @@ public class Network {
 		kryo.register(PlayerWasHit.class);
 		kryo.register(AsteroidData.class);
 		kryo.register(ArrayList.class);
+		kryo.register(AsteroidWasHit.class);
 	}
 
 	static public class Login {
@@ -112,6 +112,14 @@ public class Network {
 			this.health = health;
 		}
 	}
+	
+	static public class AsteroidWasHit {
+		public Vector2 position; // used as ID
+		public AsteroidWasHit() {}
+		public AsteroidWasHit(Vector2 position) {
+			this.position = position;
+		}
+	}
 
 	static public class PlayerShoots {
 		public int playerID;
@@ -144,6 +152,6 @@ public class Network {
 			this.position = position;
 			this.rotation = rotation;
 		}
-		
 	}
+	
 }

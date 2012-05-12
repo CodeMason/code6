@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
+import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
@@ -161,12 +162,26 @@ public class GameMap {
 			for(Asteroid asteroid : asteroids){
 				if(bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					bulletCur.destroy();
+					// Only my own bullets kill asteroids locally
+					if(playerLocal.getID() == bulletCur.getPlayerID()){
+						client.sendMessage(new AsteroidWasHit(asteroid.getPosition()));
+						asteroid.destroy();
+					}
 				}
 			}
 			
 			// Remove impacted bullets
-			if (bullets.get(i).destroyed)
+			if (bullets.get(i).destroyed){
 				bullets.remove(i);
+			}
+		}
+
+		// Remove asteroids
+		for (int i = 0; i < asteroids.size(); i++) {
+			if (asteroids.get(i).destroyed){
+				Log.info("asteroid hit");
+				asteroids.remove(i);
+			}
 		}
 	}
 	
@@ -211,6 +226,7 @@ public class GameMap {
 		textureBg.dispose();
 		spriteBatch.dispose();
 		hud.dispose();
+		gameSounds.dispose();
 	}
 
 	public void onConnect(WaoClient client, String name, Color color) {
@@ -365,5 +381,17 @@ public class GameMap {
 	
 	public synchronized GameSounds gameSounds(){
 		return gameSounds;
+	}
+
+	public void removeAsteroid(Vector2 position) {
+		// Remove asteroids
+		for (int i = 0; i < asteroids.size(); i++) {
+			Asteroid asteroid = asteroids.get(i);
+			if (asteroid.getPosition().equals(position)){
+				Log.info("asteroid hit from server");
+				asteroid.destroy();
+				asteroids.remove(i);
+			}
+		}
 	}
 }

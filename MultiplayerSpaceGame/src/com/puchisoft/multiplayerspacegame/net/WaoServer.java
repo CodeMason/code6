@@ -10,6 +10,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
+import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
@@ -102,6 +103,12 @@ public class WaoServer {
 						Log.info(hitter.name+" "+hitter.getID()+" hit someone");
 						server.sendToAllExceptTCP(connection.getID(), msg);
 					}
+				}
+				else if(message instanceof AsteroidWasHit) {
+					AsteroidWasHit msg = (AsteroidWasHit)message;
+					// remove from our own list also
+					map.removeAsteroid(msg.position);
+					server.sendToAllExceptTCP(connection.getID(), msg);
 				}
 				
 			}
