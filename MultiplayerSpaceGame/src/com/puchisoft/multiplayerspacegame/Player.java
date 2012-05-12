@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -17,6 +18,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
 public class Player {
+	
 	private static final long FIRE_DELAY =    500 * 1000000L; // nanosec
 	private static final long SPAWN_DELAY =  2500 * 1000000L; // nanosec
 	private static final float SPEED_ACC = 6.0f;
@@ -60,10 +62,17 @@ public class Player {
 	private boolean isLocal;
 	private Random random = new Random();
 	private Color colorOrig;
-
-
+	private Sound soundShoot;
+	private Sound soundTurn;
+	private Sound soundAccel;
+	private Sound soundBoost;
+	
 	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, boolean isLocal) {
 		this.sprite = new Sprite(texture);
+		this.soundShoot = Gdx.audio.newSound(Gdx.files.internal("data/shoot.wav"));
+		this.soundTurn = Gdx.audio.newSound(Gdx.files.internal("data/turn.wav"));
+		this.soundAccel = Gdx.audio.newSound(Gdx.files.internal("data/accel.wav"));
+		this.soundBoost = Gdx.audio.newSound(Gdx.files.internal("data/boost.wav"));
 		this.colorOrig = color;
 		this.sprite.setColor(colorOrig);
 //		this.sprite.setScale(1.5f);
@@ -118,13 +127,16 @@ public class Player {
 					if (touchDist.len() < 40) {
 						accelerating = 0;
 						// Log.info("short drag (turn) " + touchDist.x + " " +
-						// touchDist.y + " " + touchDist.len());
+						// touchDist.y + " " + touchDist.len())
+						soundTurn.play();
 					} else if (touchDist.len() < 80) {
 						accelerating = 1;
+						soundAccel.play();			
 						// Log.info("medium drag (accel) " + touchDist.x + " " +
 						// touchDist.y + " " + touchDist.len());
 					} else {
 						accelerating = SPEED_ACC_TURBO;
+						soundBoost.play();
 						// Log.info("long drag (boost) " + touchDist.x + " " +
 						// touchDist.y + " " + touchDist.len());
 					}
@@ -143,20 +155,25 @@ public class Player {
 			// Movement
 			if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP)) {
 				accelerating = 1;
+				soundAccel.play();
 			}else if (Gdx.input.isKeyPressed(Keys.S) || Gdx.input.isKeyPressed(Keys.DOWN)) {
 				accelerating = -1;
+				soundAccel.play();
+			}
+			
+			if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ||Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)){
+				accelerating *= SPEED_ACC_TURBO;
+				soundAccel.stop();
+				soundBoost.play();
 			}
 			
 			if (Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {
 				turning = 1;
 			}else if (Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {
 				turning = -1;
-			}		
-			
-			if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) ||Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)){
-				accelerating *= SPEED_ACC_TURBO;
 			}
 			
+
 			// Shooting
 			if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
 				shoot();
@@ -197,9 +214,11 @@ public class Player {
 		if(mayFireTime > System.nanoTime()){
 			return;
 		}
+		soundShoot.play();
 		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),velocity.cpy(),direction.cpy());
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
+
 	}
 	
 	public void hit(float damage, int hitterID){
