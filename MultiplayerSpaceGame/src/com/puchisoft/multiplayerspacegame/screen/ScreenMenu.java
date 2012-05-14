@@ -1,5 +1,7 @@
 package com.puchisoft.multiplayerspacegame.screen;
 
+import java.util.Random;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -20,13 +22,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 
 public class ScreenMenu extends ScreenCore {
-	Texture title;
-	SpriteBatch batch;
-	float time = 0;
+	private Texture title;
+	private SpriteBatch batch;
 	
-	Skin skin;
-	Stage stage;
-	TextField textfieldIP;
+	private Skin skin;
+	private Stage stage;
+	private TextField textfieldIP;
+	private TextField textfieldName;
+	
+	private Random random = new Random();
 
 	public ScreenMenu(Game game) {
 		super(game);
@@ -52,6 +56,12 @@ public class ScreenMenu extends ScreenCore {
 		textfieldIP.y = Gdx.graphics.getHeight() - textfieldIP.height - 65 -200;
 		textfieldIP.x = Gdx.graphics.getWidth()/2 - textfieldIP.width/2;
 		
+		textfieldName = new TextField("", "Enter Name", skin.getStyle(TextFieldStyle.class), "textfield_name");
+		textfieldName.width = 400;
+		textfieldName.height = 30;
+		textfieldName.y = Gdx.graphics.getHeight() - textfieldName.height - 0 -200;
+		textfieldName.x = Gdx.graphics.getWidth()/2 - textfieldName.width/2;
+		
 //		final Button buttonFind = new TextButton("Find", skin.getStyle(TextButtonStyle.class), "button_join");
 //		buttonFind.width = 60;
 //		buttonFind.height = textfieldIP.height;
@@ -73,6 +83,7 @@ public class ScreenMenu extends ScreenCore {
 		
 		stage.addActor(labelTitle);
 		stage.addActor(textfieldIP);
+		stage.addActor(textfieldName);
 //		stage.addActor(buttonFind);
 		stage.addActor(buttonJoin);
 		stage.addActor(buttonHost);
@@ -122,12 +133,19 @@ public class ScreenMenu extends ScreenCore {
 //	}
 
 	private void goJoin(){
-		game.setScreen(new ScreenGame(game, false, textfieldIP.getText()));
+		game.setScreen(new ScreenGame(game, false, textfieldIP.getText(), getName()));
 	}
 	private void goHost(){
-		game.setScreen(new ScreenGame(game, true, "localhost"));
+		game.setScreen(new ScreenGame(game, true, "localhost", getName()));
 	}
 	
+	private String getName(){
+		String name = textfieldName.getText();
+		if(name.isEmpty()){
+			name = "Guest" + random.nextInt(10000); // default name
+		}
+		return name;
+	}
 
 	@Override
 	public void render(float delta) {

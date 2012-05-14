@@ -22,16 +22,18 @@ public class ScreenGame extends ScreenCore {
 	private final boolean isHost;
 	private final String ip;
 	private String name;
-	private Random random = new Random();
 
 	private FPSLogger fps = new FPSLogger();
 
-	public ScreenGame(Game game, boolean isHost, String ip) {
+	public ScreenGame(Game game, boolean isHost, String ip, String name) {
 		super(game);
 		this.isHost = isHost;
-		this.ip = ip;
-
-		this.name = "Guest" + random.nextInt(10000);
+		if(!ip.isEmpty()){
+			this.ip = ip;
+		}else{
+			this.ip = "localhost";
+		}
+		this.name = name;
 	}
 
 	@Override
