@@ -99,20 +99,8 @@ public class WaoServer {
 						server.sendToAllExceptTCP(connection.getID(), msg);
 					}
 				}
-				else if(message instanceof PlayerWasHit) {
-					PlayerWasHit msg = (PlayerWasHit)message;
-					msg.playerIdVictim = connection.getID();
-					WaoConnection hitter = getConnectionById(msg.playerIdHitter);
-					if(hitter != null){
-						Log.info(hitter.name+" "+hitter.getID()+" hit "+hitter.name);
-						map.onMsgPlayerWasHit(msg);
-						server.sendToAllExceptTCP(connection.getID(), msg);
-					}else{
-						Log.error(" server recv invalid PlayerWasHit msg");
-					}
-				}
-				else if(message instanceof AsteroidWasHit) {
-					Log.error("Client tried to send message only server sends");
+				else{
+					Log.error("Client tried to send message only server sends/ or unknown");
 				}
 				
 			}

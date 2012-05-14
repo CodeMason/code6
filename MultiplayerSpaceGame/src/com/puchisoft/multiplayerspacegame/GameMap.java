@@ -145,7 +145,7 @@ public class GameMap {
 			for(Asteroid asteroid : asteroids){
 				if(playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					playerCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
-//					playerCur.hit(5, -1);
+					playerCur.hit(1, -1);
 					logInfo("Player touched asteroid");
 				}
 			}
@@ -175,10 +175,10 @@ public class GameMap {
 				if(bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					bulletCur.destroy();
 					// Only server makes call whether asteroids are killed
-					if(!isClient){
-						server.sendMessage(new AsteroidWasHit(asteroid.getPosition()));
-						asteroid.destroy();
-					}
+//					if(!isClient){
+//						server.sendMessage(new AsteroidWasHit(asteroid.getPosition()));
+//						asteroid.destroy();
+//					}
 				}
 			}
 			
