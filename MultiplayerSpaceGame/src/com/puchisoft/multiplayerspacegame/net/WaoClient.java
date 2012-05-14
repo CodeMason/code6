@@ -80,7 +80,7 @@ public class WaoClient {
 			client.connect(5000, host, Network.port);//, Network.portUdp);
 		} catch (IOException e) {
 			// e.printStackTrace();
-			map.setStatus("Can't connect to " + host);
+			map.setStatus(host.length() > 0 ? "Can't connect to " + host +". Hit ESC." : "You didn't enter an IP to connect to. Hit ESC and try again.");
 			Log.error("Can't connect to " + host);
 		}
 	}
