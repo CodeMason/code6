@@ -3,7 +3,6 @@ package com.puchisoft.multiplayerspacegame.net;
 import java.io.IOException;
 import java.util.Random;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -11,12 +10,11 @@ import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
 import com.puchisoft.multiplayerspacegame.Player;
-import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
-import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
+import com.puchisoft.multiplayerspacegame.net.Network.RoundEnd;
 
 public class WaoServer {
 	Server server;
@@ -24,9 +22,7 @@ public class WaoServer {
 	private Random random = new Random();
 
 	public WaoServer() throws IOException {
-		//Log.set(Log.LEVEL_DEBUG);
-		map = new GameMap(this);
-		map.generateMap(100);
+//		Log.set(Log.LEVEL_DEBUG);
 		
 		server = new Server() {
 			protected Connection newConnection() {
@@ -36,6 +32,8 @@ public class WaoServer {
 				return new WaoConnection();
 			}
 		};
+		
+		map = new GameMap(this);
 
 		// For consistency, the classes to be sent over the network are
 		// registered by the same method for both the client and server.
@@ -64,7 +62,6 @@ public class WaoServer {
 					}else{
 						// Tell new person about map state (asteroids)
 						connection.sendTCP(map.getStateData());
-						
 						// Tell old people about new person
 						PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, new Vector2(50,50), msg.color, 0);
 						server.sendToAllExceptTCP(connection.getID(), reply);
@@ -88,6 +85,7 @@ public class WaoServer {
 				else if(message instanceof MovementChange) {
 					MovementChange msg = (MovementChange)message;
 					msg.playerId = connection.getID();
+					// TODO Server updates its copy of player health from what its told
 					map.playerMoved(msg);
 					server.sendToAllExceptTCP(connection.getID(), msg);
 				}
@@ -129,13 +127,13 @@ public class WaoServer {
 		public String name;
 	}
 	
-	private WaoConnection getConnectionById(int id){
-		for(Connection con: server.getConnections()){
-			WaoConnection conn = (WaoConnection)con;
-			if (conn.getID() == id) return conn;
-		}
-		return null;
-	}
+//	private WaoConnection getConnectionById(int id){
+//		for(Connection con: server.getConnections()){
+//			WaoConnection conn = (WaoConnection)con;
+//			if (conn.getID() == id) return conn;
+//		}
+//		return null;
+//	}
 
 	public void shutdown() {
 		server.close();

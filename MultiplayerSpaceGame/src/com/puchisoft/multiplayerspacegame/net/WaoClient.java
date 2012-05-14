@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -17,6 +16,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
+import com.puchisoft.multiplayerspacegame.net.Network.RoundEnd;
 
 public class WaoClient {
 
@@ -122,10 +122,13 @@ public class WaoClient {
 			map.setStateData(msg);
 		} else if (message instanceof PlayerWasHit) {
 			PlayerWasHit msg = (PlayerWasHit) message;
-			map.onMsgPlayerWasHit(msg);
+			map.onPlayerWasHit(msg);
 		} else if (message instanceof AsteroidWasHit) {
 			AsteroidWasHit msg = (AsteroidWasHit) message;
 			map.removeAsteroid(msg.position);
+		} else if (message instanceof RoundEnd) {
+			RoundEnd msg = (RoundEnd) message;
+			map.onRoundEnd(msg);
 		}
 
 	}

@@ -13,7 +13,7 @@ public class Network {
 
 	static public final int port = 6464;
 	static public final int portUdp = 6466;
-	static public final int version = 10;
+	static public final int version = 11;
 
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
@@ -31,6 +31,7 @@ public class Network {
 		kryo.register(AsteroidData.class);
 		kryo.register(ArrayList.class);
 		kryo.register(AsteroidWasHit.class);
+		kryo.register(RoundEnd.class);
 	}
 
 	static public class Login {
@@ -38,9 +39,7 @@ public class Network {
 		public int version;
 		public Color color;
 
-		public Login() {
-		}
-
+		public Login() {}
 		public Login(String name, int version, Color color) {
 			this.name = name;
 			this.version = version;
@@ -67,9 +66,7 @@ public class Network {
 		public int score;
 		public Vector2 position;
 
-		public PlayerJoinLeave() {
-		}
-
+		public PlayerJoinLeave() {}
 		public PlayerJoinLeave(int playerId, String name, boolean hasJoined, Vector2 position, Color color, int score) {
 			this.playerId = playerId;
 			this.name = name;
@@ -79,7 +76,10 @@ public class Network {
 			this.score = score;
 		}
 	}
-
+	
+	/*
+	 * Movement
+	 */
 	static public class MovementChange {
 		public int playerId;
 		public int turning;
@@ -89,9 +89,7 @@ public class Network {
 		public Vector2 direction;
 		public Vector2 velocity;
 
-		public MovementChange() {
-		}
-
+		public MovementChange() {}
 		public MovementChange(int playerId, int turning, int accelerating, Vector2 position, Vector2 direction, Vector2 velocity, float health) {
 			this.playerId = playerId;
 			this.turning = turning;
@@ -102,11 +100,14 @@ public class Network {
 			this.health = health;
 		}
 	}
-	
+	/*
+	 * Shooting and Hitting
+	 */
 	static public class PlayerWasHit {
 		public int playerIdVictim;
 		public int playerIdHitter;
 		public float damage;
+		
 		public PlayerWasHit() {}
 		public PlayerWasHit(int playerIdVictim, int playerIdHitter, float damage) {
 			this.playerIdVictim = playerIdVictim;
@@ -117,6 +118,7 @@ public class Network {
 	
 	static public class AsteroidWasHit {
 		public Vector2 position; // used as ID
+		
 		public AsteroidWasHit() {}
 		public AsteroidWasHit(Vector2 position) {
 			this.position = position;
@@ -128,6 +130,7 @@ public class Network {
 		public Vector2 position;
 		public Vector2 direction;
 		public Vector2 baseVelocity;
+		
 		public PlayerShoots() {}
 		public PlayerShoots(int playerId, Vector2 position, Vector2 baseVelocity, Vector2 direction) {
 			this.playerID = playerId;
@@ -137,14 +140,21 @@ public class Network {
 		}
 	}
 	
+	/*
+	 * Map Data 
+	 */
+	// Sent to someone when they join, also sent to existing people when a new round begins to reset map / fill with this data
 	static public class GameMapData {
+		public boolean roundOver;
 		public List<AsteroidData> asteroidDatas;
+		
 		public GameMapData() {}
-		public GameMapData(List<AsteroidData> asteroidDatas) {
+		
+		public GameMapData(List<AsteroidData> asteroidDatas, boolean roundOver) {
 			this.asteroidDatas = asteroidDatas;
+			this.roundOver = roundOver;
 		}
 	}
-
 	
 	static public class AsteroidData {
 		public Vector2 position;
@@ -156,4 +166,15 @@ public class Network {
 		}
 	}
 	
+	/*
+	 * Round End
+	 */
+	static public class RoundEnd {
+		public int winnerID;
+
+		public RoundEnd(){}
+		public RoundEnd(int winnerID) {
+			this.winnerID = winnerID;
+		}
+	}
 }
