@@ -40,7 +40,7 @@ public class Player {
 	private Vector2 position;
 
 	private Vector2 direction = new Vector2(1, 0);
-	private Vector2 velocity = new Vector2();
+	public Vector2 velocity = new Vector2();
 
 	private Vector2 touchPos;
 	
@@ -56,6 +56,7 @@ public class Player {
 	private boolean wasTouched = false;
 	private long mayFireTime = 0; // ms
 	private long maySpawnTime = 0; // ms
+	public Moon moon;
 	
 	private int score = 0;
 	private int lastHitter = -1;
@@ -64,7 +65,7 @@ public class Player {
 	private Color colorOrig;
 	
 	
-	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, boolean isLocal) {
+	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, boolean isLocal, Moon moon) {
 		this.sprite = new Sprite(texture);
 		this.colorOrig = color;
 		this.sprite.setColor(colorOrig);
@@ -73,6 +74,7 @@ public class Player {
 		this.maxPosition = maxPosition;
 		this.map = map;
 		this.isLocal = isLocal;
+		this.moon = moon;
 	}
 
 	// Returns whether there was a change
@@ -190,20 +192,22 @@ public class Player {
 				map.gameSounds().playAndLoopSound("boost");
 			}
 		}
-		
-		return turning != turningOld || accelerating != acceleratingOld || touchMove;
+
+		return turning != turningOld || accelerating != acceleratingOld || touchMove || moon.handleInput(delta);
 	}
 
 	private void move(float delta) {
 
 		direction.rotate(turning * delta * SPEED_ROT);
 		sprite.setRotation(direction.angle()); // update sprite
-
+		
 		velocity.add(direction.tmp().mul(SPEED_ACC * delta * accelerating));
 
 		if (velocity.len() > SPEED_MAX) {
 			velocity.nor().mul(SPEED_MAX);
 		}
+
+		position.add(velocity.tmp().mul(delta * 60));
 
 		getPosition().add(velocity.tmp().mul(delta * 60));
 
@@ -234,11 +238,7 @@ public class Player {
 		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),velocity.cpy(),direction.cpy());
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
-		
-		if(isLocal){
-			map.clientSendMessage(msgPlayerShoots);
-		}
-		return true;
+		velocity.sub(direction.nor().mul(0.5f));
 	}
 	
 	public void hit(float damage, int hitterID){
@@ -283,11 +283,19 @@ public class Player {
 			sprite.setColor(colorOrig);
 			sprite.setScale(1);
 			this.move(delta);
+			moon.move)delta);
+			
+			moon.setPosition(moon.getPosition().lerp(this.getPosition(), 0.035f));
+			sprite.setPosition(position.x, position.y); // update sprite
 		}
 	}
 
 	public void render(SpriteBatch spriteBatch) {
 //		if(isDead()) return;
+		
+		
+		
+		moon.render(spriteBatch);		
 		
 		sprite.draw(spriteBatch);
 	}
@@ -316,11 +324,11 @@ public class Player {
 	}
 
 	public void setMovementState(MovementChange msg) {
-		this.turning = msg.turning;
-		this.accelerating = msg.accelerating;
-		this.position = msg.position;
-		this.direction = msg.direction;
-		this.velocity = msg.velocity;
+		turning = msg.turning;
+		accelerating = msg.accelerating;
+		position = msg.position;
+		direction = msg.direction;
+		velocity = msg.velocity;
 		this.health = msg.health;
 	}
 
@@ -330,6 +338,7 @@ public class Player {
 
 	public void setId(int id) {
 		this.id = id;
+		moon.setId(id);
 	}
 	
 	public Rectangle getBoundingRectangle() {

@@ -33,7 +33,7 @@ public class GameMap {
 	private static final int BG_TILE_COUNT = 3;
 	public OrthographicCamera cam;
 	private SpriteBatch spriteBatch;
-	
+
 	private Random random = new Random();
 
 	private Map<Integer, Player> players = new HashMap<Integer, Player>();
@@ -41,12 +41,16 @@ public class GameMap {
 	private List<Asteroid> asteroids = new ArrayList<Asteroid>();
 
 	private Player playerLocal;
-	
+
 	public BitmapFont fontNameTag;
 
 	private TextureRegion texturePlayer;
 	private TextureRegion textureBullet;
 	private Texture textureBg;
+
+	private Texture texturemoon;
+	private Texture textureChasemoon;
+	private Vector2 sizemoon;
 
 	private Vector2 maxPosition;
 
@@ -55,7 +59,7 @@ public class GameMap {
 	private HUD hud;
 	private TextureRegion textureAsteroid;
 	private TextureRegion textureAsteroidGold;
-	
+
 	private GameSounds gameSounds;
 	
 	private long timeRoundBegins = 0; // ms
@@ -63,14 +67,22 @@ public class GameMap {
 	boolean isClient;
 	private boolean roundOver = false;
 
+	private Moon moonChase;
+
 	/*
 	 * For client
 	 */
 	public GameMap(WaoClient client) {
 		this.client = client;
 		this.isClient = true;
-		
+
 		initCommon();
+
+
+		moonChase = new Moon(textureChasemoon, new Vector2(50, 50), maxPosition);
+
+		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+		sizemoon = new Vector2(texturemoon.getWidth(), texturemoon.getHeight());
 		
 		this.hud = new HUD();
 		this.gameSounds = new GameSounds();
@@ -78,6 +90,7 @@ public class GameMap {
 		this.fontNameTag.setColor(Color.YELLOW);
 		
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		moonChase.setPosition(maxPosition.cpy().mul(0.5f));
 
 		spriteBatch = new SpriteBatch(); //
 	}
@@ -104,14 +117,16 @@ public class GameMap {
 		
 		maxPosition = new Vector2(textureBg.getWidth() * BG_TILE_COUNT, textureBg.getHeight() * BG_TILE_COUNT);
 	}
-	
-	private void handleInput(float delta){
-		
+
+	private void handleInput(float delta) {
+
 		// Zooming
-		if (Gdx.input.isKeyPressed(Keys.Q)){
-			this.cam.zoom = Math.max(this.cam.zoom - 1.0f * delta , 0.3f);
-		}else if (Gdx.input.isKeyPressed(Keys.E)){
+		if (Gdx.input.isKeyPressed(Keys.Q)) {
+			this.cam.zoom = Math.max(this.cam.zoom - 1.0f * delta, 0.3f);
+		} else if (Gdx.input.isKeyPressed(Keys.E)) {
 			this.cam.zoom = Math.min(this.cam.zoom + 1.0f * delta, 10.0f);
+		} else if (Gdx.input.isTouched(1)) {
+			this.cam.zoom = Math.min(Math.max(this.cam.zoom	+ (Gdx.input.getDeltaX(1) * 0.5f * delta), 0.3f), 10.0f);
 		}
 //		else if (Gdx.input.isTouched(1)){
 //			this.cam.zoom = Math.min(Math.max(this.cam.zoom + (Gdx.input.getDeltaX(1) * 0.5f * delta), 0.3f), 10.0f);
@@ -120,7 +135,11 @@ public class GameMap {
 
 	public synchronized void update(float delta){
 		
-		// Client ready and player is spawned 
+		if (client == null || playerLocal == null) {
+			return;
+		}
+
+		// Client ready and player is spawned
 		if (client != null && playerLocal != null) {
 			handleInput(delta);
 			
@@ -134,24 +153,150 @@ public class GameMap {
 			}
 			
 			cam.update();
-			
+
 			// Handle local input and sent over network if changed
 			if (playerLocal.handleInput(delta)) {
 				logInfo("changed input");
-				client.sendMessage(playerLocal.getMovementState());
+				client.sendMessage(playerLocal.moon.getMovementState());
 			}
 		}
+
+		Player closestPlayer = playerLocal;
+		float moonChaseDist = 999999999;
+
+		Vector2 gravitySum;
+		float gravityForce;
+		
+		//Gravity Constants
+		float gravityShip = (0.0000000000667384f * 7360000000000f * 3040f);
+		float gravityBullet = (0.0000000000667384f * 7360000000000f * 340f);
+		float gravityAsteroid = (0.0000000000667384f * 7360000000f * 340f);
+
+		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+
+			// Chase Moon
+			float currentdist = playerEntry.getValue().getPosition().dst2(moonChase.getPosition());
+			if (currentdist < moonChaseDist) {
+				moonChaseDist = currentdist;
+				closestPlayer = playerEntry.getValue();
+			}
+
+			// Gravity
+
+			// gravityForce = 0;
+			// if (playerLocal != playerEntry.getValue()) {
+			// if
+			// (!playerLocal.moon.position.equals(playerEntry.getValue().moon.position)){
+			// gravityForce =(gravityShip /
+			// playerLocal.moon.position.dst2(playerEntry.getValue().position));
+			// if (gravityForce > 10){
+			// gravityForce = 10;
+			// }
+			// Vector2 gravityVector =
+			// playerEntry.getValue().position.cpy().sub(playerLocal.moon.position).nor().mul(gravityForce);
+			// playerLocal.moon.velocity.add(gravityVector.mul(delta));
+			// Log.info(String.valueOf(gravityForce));
+			// }
+			// }
+			
+			//Gravity on Players from Moons
+			for (Map.Entry<Integer, Player> playerEntryMoon : players
+					.entrySet()) {
+				gravityForce = 0;
+				if (playerEntryMoon.getValue() != playerEntry.getValue()) {
+					if (!playerEntryMoon.getValue().moon.getPosition().equals(playerEntry.getValue().moon.getPosition())) {
+						gravityForce = (gravityShip / playerEntryMoon.getValue().moon.getPosition().dst2(moonChase.getPosition()));
+						if (gravityForce > 10) {
+							gravityForce = 10;
+						}
+						Vector2 gravityVector = moonChase.getPosition().cpy().sub(playerEntryMoon.getValue().moon.getPosition()).nor().mul(gravityForce);
+						playerEntryMoon.getValue().moon.velocity.add(gravityVector.mul(delta));
+						//Log.info(String.valueOf(gravityForce));
+					}
+				}
+				//Gravity on Players from Chase Moon (Gravity Well)
+				gravityForce = (gravityAsteroid / playerEntryMoon.getValue().moon.getPosition().dst2(playerEntry.getValue().getPosition()));
+				if (gravityForce > 15) {
+					gravityForce = 15;
+				}
+				Vector2 gravityVector = moonChase.getPosition().cpy().sub(playerEntryMoon.getValue().moon.getPosition()).nor().mul(gravityForce);
+				playerEntryMoon.getValue().moon.velocity.add(gravityVector.mul(delta));
+				//Log.info(String.valueOf(gravityForce));
+			}
+			//Gravity on Bullets from Moons
+//			for (int i = 0; i < bullets.size(); i++) {
+//				Bullet bulletCur = bullets.get(i);
+//				gravityForce = 0;
+//				if (!bulletCur.getPosition().equals(
+//						playerEntry.getValue().moon.getPosition())) {
+//					gravityForce = (gravityBullet / bulletCur.getPosition()
+//							.dst2(playerEntry.getValue().moon.getPosition()));
+//					if (gravityForce > 10) {
+//						gravityForce = 10;
+//					}
+//					Vector2 gravityVector = playerEntry.getValue().moon.getPosition()
+//							.cpy().sub(bulletCur.getPosition()).nor()
+//							.mul(gravityForce);
+//					bulletCur.setVelocity(bulletCur.getVelocity().add(
+//							gravityVector.mul(delta)));
+//					Log.info(String.valueOf(gravityForce));
+//				}
+//
+//			}
+		}
+
+		for (int i = 0; i < bullets.size(); i++) {
+			Bullet bulletCurI = bullets.get(i);
+			gravityForce = 0;
+			//Gravity on Bullets from Bullets - Overkilled
+//			for (int j = 0; j < bullets.size(); j++) {
+//				Bullet bulletCurJ = bullets.get(j);
+//				gravityForce = 0;
+//				if (!bulletCurI.getPosition().equals(bulletCurJ.getPosition())) {
+//					gravityForce = (gravityShip / bulletCurI.getPosition()
+//							.dst2(bulletCurJ.getPosition()));
+//					if (gravityForce > 15) {
+//						gravityForce = 15;
+//					}
+//					Vector2 gravityVector = bulletCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
+//					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
+//					Log.info(String.valueOf(gravityForce));
+//				}
+//
+//			}
+			//Gravity on Bullets from Asteroids
+			for (int j = 0; j < asteroids.size(); j++) {
+				Asteroid asteroidCurJ = asteroids.get(j);
+				gravityForce = 0;
+				if (!bulletCurI.getPosition().equals(asteroidCurJ.getPosition())) {
+					gravityForce = (gravityAsteroid / bulletCurI.getPosition()
+							.dst2(asteroidCurJ.getPosition()));
+					if (gravityForce > 15) {
+						gravityForce = 15;
+					}
+					Vector2 gravityVector = asteroidCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
+					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
+					//Log.info(String.valueOf(gravityForce));
+				}
+
+			}
+		}
+		//Moves Chase Moon towards closest Player
+		//moonChase.getPosition().lerp(closestPlayer.getPosition(), 0.01f);
 
 		// Update Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 			Player playerCur = playerEntry.getValue();
 			playerCur.update(delta);
 			// Collision with asteroids
-			for(Asteroid asteroid : asteroids){
-				if(playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
+			for (Asteroid asteroid : asteroids) {
+				if (playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())) {
 					playerCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
 					playerCur.hit(1, -1);
 					logInfo("Player touched asteroid");
+				}
+				if (playerCur.moon.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())) {
+					playerCur.moon.preventOverlap(asteroid.getBoundingRectangle(),delta);
 				}
 			}
 			
@@ -174,6 +319,9 @@ public class GameMap {
 						server.sendMessage(msg);
 					}
 				}
+				if (bulletCur.getBoundingRectangle().overlaps(playerCur.moon.getBoundingRectangle())) {
+					bulletCur.preventOverlap(playerCur.moon.getBoundingRectangle(),delta);
+				}
 			}
 			// Collision with Asteroids
 			for(Asteroid asteroid : asteroids){
@@ -187,6 +335,12 @@ public class GameMap {
 				}
 			}
 			
+			for (Asteroid asteroid : asteroids) {
+				if (bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())) {
+					bulletCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
+				}
+			}
+
 			// Remove impacted bullets
 			if (bullets.get(i).destroyed()){
 				bullets.remove(i);
@@ -211,24 +365,25 @@ public class GameMap {
 	}
 
 	public synchronized void render(){
-		
+
 		spriteBatch.setProjectionMatrix(cam.combined);
 		spriteBatch.begin();
 		spriteBatch.setColor(Color.WHITE);
-		
+
 		// Background
 		for (int i = 0; i < BG_TILE_COUNT; i++) {
 			for (int j = 0; j < BG_TILE_COUNT; j++) {
-				spriteBatch.draw(textureBg, textureBg.getWidth() * i, textureBg.getHeight() * j, 0, 0, textureBg.getWidth(),
+				spriteBatch.draw(textureBg, textureBg.getWidth() * i,
+						textureBg.getHeight() * j, 0, 0, textureBg.getWidth(),
 						textureBg.getHeight());
 			}
 		}
-		
+
 		// Render Asteroids
 		for (int i = 0; i < asteroids.size(); i++) {
 			asteroids.get(i).render(spriteBatch);
 		}
-		
+
 		// Render Players
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 			Player curPlayer = playerEntry.getValue();
@@ -240,10 +395,13 @@ public class GameMap {
 		for (int i = 0; i < bullets.size(); i++) {
 			bullets.get(i).render(spriteBatch);
 		}
-		
+
+		moonChase.render(spriteBatch);
+
 		spriteBatch.end();
-		
-		if(hud != null) hud.render();
+
+		if (hud != null)
+			hud.render();
 	}
 
 	public void dispose() {
@@ -257,6 +415,9 @@ public class GameMap {
 	public void onConnect(String name, Color color) {
 
 		if (this.playerLocal == null) {
+			Moon moonLocal = new Moon(texturemoon, new Vector2(50, 50),
+					maxPosition);
+
 			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, true);
 			this.playerLocal.setId(client.id);
 			this.playerLocal.setName(name);
@@ -282,6 +443,7 @@ public class GameMap {
 		newPlayer.addScore(msg.score);
 		players.put(msg.playerId, newPlayer);
 
+		//client.sendMessage(playerLocal.moon.getMovementState());
 	}
 
 	public synchronized void removePlayer(PlayerJoinLeave msg) { // synchronized
@@ -299,7 +461,8 @@ public class GameMap {
 	}
 
 	public synchronized void setStatus(String status) {
-		if(hud != null) hud.setStatus(status);
+		if (hud != null)
+			hud.setStatus(status);
 	}
 	public synchronized void setStatusCenter(String status) {
 		if(hud != null) hud.setStatusCenter(status);
@@ -323,7 +486,9 @@ public class GameMap {
 	}
 
 	public synchronized void addBullet(PlayerShoots playerShoots) {
-		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
+		bullets.add(new Bullet(textureBullet, playerShoots.playerID,
+				playerShoots.position, playerShoots.baseVelocity,
+				playerShoots.direction, maxPosition));
 	}
 	
 	private synchronized void addAsteroid(Vector2 position, float rotation){
@@ -369,7 +534,7 @@ public class GameMap {
 			Rectangle box = new Rectangle(randomX , randomY, textureAsteroid.getRegionWidth(), textureAsteroid.getRegionHeight());
 			boolean canMakeAsteroid = true;
 			for (int j = 0; j < asteroids.size(); j++) {
-				if(asteroids.get(j).getBoundingRectangle().overlaps(box)){
+				if (asteroids.get(j).getBoundingRectangle().overlaps(box)) {
 					canMakeAsteroid = false;
 					break;
 				}
