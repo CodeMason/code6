@@ -176,7 +176,7 @@ public class GameMap {
 						}
 						Vector2 gravityVector = moonChase.getPosition().cpy().sub(playerEntryMoon.getValue().moon.getPosition()).nor().mul(gravityForce);
 						playerEntryMoon.getValue().moon.velocity.add(gravityVector.mul(delta));
-						Log.info(String.valueOf(gravityForce));
+						//Log.info(String.valueOf(gravityForce));
 					}
 				}
 				//Gravity on Players from Chase Moon (Gravity Well)
@@ -186,7 +186,7 @@ public class GameMap {
 				}
 				Vector2 gravityVector = moonChase.getPosition().cpy().sub(playerEntryMoon.getValue().moon.getPosition()).nor().mul(gravityForce);
 				playerEntryMoon.getValue().moon.velocity.add(gravityVector.mul(delta));
-				Log.info(String.valueOf(gravityForce));
+				//Log.info(String.valueOf(gravityForce));
 			}
 			//Gravity on Bullets from Moons
 //			for (int i = 0; i < bullets.size(); i++) {
@@ -241,7 +241,7 @@ public class GameMap {
 					}
 					Vector2 gravityVector = asteroidCurJ.getPosition().cpy().sub(bulletCurI.getPosition()).nor().mul(gravityForce);
 					bulletCurI.setVelocity(bulletCurI.getVelocity().add(gravityVector.mul(delta)));
-					Log.info(String.valueOf(gravityForce));
+					//Log.info(String.valueOf(gravityForce));
 				}
 
 			}
