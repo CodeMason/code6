@@ -241,8 +241,9 @@ public class Player {
 		return true;
 	}
 	
-	public void hit(float damage, int hitterID){
-		if(isDead()) return; //only called from server messages
+	// returns if Player was killed by hit
+	public boolean hit(float damage, int hitterID){
+		if(isDead()) return false; //only called from server messages
 		
 		lastHitter = hitterID;
 		
@@ -250,7 +251,9 @@ public class Player {
 		if(health <= 0){ // only local player trigger self-death (otherwise wait on server)
 			velocity.set(0,0);
 			maySpawnTime = System.nanoTime() + SPAWN_DELAY;
+			return true;
 		}
+		return false;
 	}
 	
 	public boolean isDead(){

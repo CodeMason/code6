@@ -29,7 +29,7 @@ import com.puchisoft.multiplayerspacegame.net.WaoClient;
 import com.puchisoft.multiplayerspacegame.net.WaoServer;
 
 public class GameMap {
-	private static final int GOAL_SCORE = 20;
+	private static final int GOAL_SCORE = 10;
 	private static final int ASTEROID_QUANITY = 100;
 	private static final long ROUND_OVER_DELAY = 10000 * 1000000L; // nanosec
 	private static final int BG_TILE_COUNT = 3;
@@ -152,8 +152,13 @@ public class GameMap {
 			for(Asteroid asteroid : asteroids){
 				if(playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					playerCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
-					playerCur.hit(1, -1);
 					logInfo("Player touched asteroid");
+					if(!isClient){
+//						playerCur.hit(1, -1);
+						PlayerWasHit msg = new PlayerWasHit(playerCur.getID(),-1, 1); // hit by non-Player
+						this.onPlayerWasHit(msg);
+						server.sendMessage(msg);
+					}
 				}
 			}
 			
@@ -431,22 +436,24 @@ public class GameMap {
 		Player hitter = players.get(msg.playerIdHitter);
 		Player victim = players.get(msg.playerIdVictim);
 		// give hitter points
-		if(hitter != null && victim != null){ // TODO Won't work if there is not hitter
-			victim.hit(msg.damage, msg.playerIdHitter);
-			hitter.addScore(1);
-			if(!isClient){
-				if(hitter.getScore() >= GOAL_SCORE){
-					RoundEnd msgRE = new RoundEnd(hitter.getID());
-					this.onRoundEnd(msgRE);
-					server.sendMessage(msgRE);
-				}
-			}else{
-				if(hitter == playerLocal){
-					setStatus("You hit "+victim.getName()+"!");
-				}else if(victim == playerLocal){
-					setStatus(hitter.getName()+" hit you!");
+		if(victim != null){ // TODO Won't work if there is not hitter
+			victim.hit(msg.damage, msg.playerIdHitter); // might be -1 for non-Player
+			if(hitter != null){
+				hitter.addScore(1);
+				if(!isClient){
+					if(hitter.getScore() >= GOAL_SCORE){
+						RoundEnd msgRE = new RoundEnd(hitter.getID());
+						this.onRoundEnd(msgRE);
+						server.sendMessage(msgRE);
+					}
 				}else{
-					setStatus(hitter.getName()+" hit "+victim.getName()+".");
+					if(hitter == playerLocal){
+						setStatus("You hit "+victim.getName()+"!");
+					}else if(victim == playerLocal){
+						setStatus(hitter.getName()+" hit you!");
+					}else{
+						setStatus(hitter.getName()+" hit "+victim.getName()+".");
+					}
 				}
 			}
 		}
