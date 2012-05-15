@@ -50,7 +50,7 @@ public class ScreenMenu extends ScreenCore {
 		labelTitle.y = Gdx.graphics.getHeight() - labelTitle.height - 10;
 		labelTitle.x = Gdx.graphics.getWidth()/2 - labelTitle.width/2;
 		
-		textfieldIP = new TextField("", "Enter Server IP Here", skin.getStyle(TextFieldStyle.class), "textfield_ip");
+		textfieldIP = new TextField("puchisoft.servegame.com", "Enter Server IP Here", skin.getStyle(TextFieldStyle.class), "textfield_ip");
 		textfieldIP.width = 400;
 		textfieldIP.height = 30;
 		textfieldIP.y = Gdx.graphics.getHeight() - textfieldIP.height - 65 -200;

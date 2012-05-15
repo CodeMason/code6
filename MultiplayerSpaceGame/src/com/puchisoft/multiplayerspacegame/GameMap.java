@@ -483,6 +483,7 @@ public class GameMap {
 		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
 			Player playerCur = playerEntry.getValue();
 			if(playerCur != survivor){
+				// FIXME shouldn't change your score by you losing
 				playerCur.hit(9999, survivor != null ? survivor.getID() : -1); // make everyone else look at winner
 			}
 		}
