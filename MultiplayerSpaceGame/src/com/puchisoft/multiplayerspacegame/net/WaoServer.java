@@ -5,6 +5,8 @@ import java.util.Random;
 
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.FrameworkMessage.KeepAlive;
+import com.esotericsoftware.kryonet.FrameworkMessage.Ping;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
@@ -96,7 +98,7 @@ public class WaoServer {
 						server.sendToAllExceptTCP(connection.getID(), msg);
 					}
 				}
-				else{
+				else if(!(message instanceof Ping) && !(message instanceof KeepAlive)){
 					Log.error("Client tried to send message only server sends/ or unknown");
 				}
 				

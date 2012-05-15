@@ -439,9 +439,9 @@ public class GameMap {
 		Player victim = players.get(msg.playerIdVictim);
 		// give hitter points
 		if(victim != null){ // TODO Won't work if there is not hitter
-			victim.hit(msg.damage, msg.playerIdHitter); // might be -1 for non-Player
+			boolean victimDied = victim.hit(msg.damage, msg.playerIdHitter); // might be -1 for non-Player
 			if(hitter != null){
-				hitter.addScore(1);
+				hitter.addScore(victimDied ? 2 : 1);
 				if(!isClient){
 					if(hitter.getScore() >= GOAL_SCORE){
 						RoundEnd msgRE = new RoundEnd(hitter.getID());
