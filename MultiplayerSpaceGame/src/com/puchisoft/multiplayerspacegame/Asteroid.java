@@ -13,11 +13,10 @@ public class Asteroid {
 	private Sprite sprite;
 	private Vector2 position;
 	private Rectangle boundingRectangle = new Rectangle();
-	private int type;
+	private int type; //0 = normal, 1 = gold
 	
 	public boolean destroyed = false;
 
-	//0 = normal 1 = gold
 	public Asteroid(TextureRegion texture,TextureRegion textureGold,  Vector2 position, float rotation, int type) {
 		this.position = position;
 		this.type = type;

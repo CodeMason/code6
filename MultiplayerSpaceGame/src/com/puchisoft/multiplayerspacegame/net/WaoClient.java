@@ -17,6 +17,7 @@ import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.RoundEnd;
+import com.puchisoft.multiplayerspacegame.net.Network.RoundStart;
 
 public class WaoClient {
 
@@ -129,6 +130,9 @@ public class WaoClient {
 		} else if (message instanceof RoundEnd) {
 			RoundEnd msg = (RoundEnd) message;
 			map.onRoundEnd(msg);
+		} else if (message instanceof RoundStart) {
+			RoundStart msg = (RoundStart) message;
+			map.onRoundStart(msg);
 		}
 
 	}

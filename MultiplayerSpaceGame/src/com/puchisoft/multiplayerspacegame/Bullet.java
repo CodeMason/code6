@@ -23,8 +23,6 @@ public class Bullet {
 	private long expirationTime = System.nanoTime() + TIME_TO_LIVE;
 	private boolean destroyed = false;
 	
-
-	
 	public Bullet(TextureRegion texture, int playerID, Vector2 position, Vector2 baseVelocity, Vector2 direction, Vector2 maxPosition) {
 		this.playerID = playerID;
 		this.position = position;

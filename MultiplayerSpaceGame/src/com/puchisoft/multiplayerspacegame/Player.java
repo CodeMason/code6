@@ -258,18 +258,24 @@ public class Player {
 	}
 	
 	/*
-	 * Called only by server to spawn player 
+	 * Called only by server to spawn player, if he may spawn
 	 */
 	public boolean spawnIfAppropriate(){
 		if(isDead() && System.nanoTime() > maySpawnTime){
-			direction.rotate(random .nextInt(360));
-			getPosition().set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
-			health =100;
-			map.serverSendMessage(getMovementState());
+			spawn();
 			return true;
 		}
-		else return false;
-		
+		return false;
+	}
+	/*
+	 * Called only by server to spawn player (call directly for new rounds)
+	 */
+	public void spawn(){
+		direction.rotate(random .nextInt(360));
+		position.set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
+		velocity.set(0,0);
+		health = 100;
+		map.serverSendMessage(getMovementState());
 	}
 	
 	public void update(float delta){
@@ -409,6 +415,10 @@ public class Player {
 
 	public void addScore(int amount) {
 		score  += amount;
+	}
+	
+	public void setScore(int amount) {
+		score  = amount;
 	}
 
 	public int getScore() {

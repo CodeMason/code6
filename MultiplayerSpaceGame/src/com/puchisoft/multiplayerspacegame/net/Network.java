@@ -32,6 +32,7 @@ public class Network {
 		kryo.register(ArrayList.class);
 		kryo.register(AsteroidWasHit.class);
 		kryo.register(RoundEnd.class);
+		kryo.register(RoundStart.class);
 	}
 
 	static public class Login {
@@ -167,7 +168,7 @@ public class Network {
 	}
 	
 	/*
-	 * Round End
+	 * Rounds
 	 */
 	static public class RoundEnd {
 		public int winnerID;
@@ -176,5 +177,10 @@ public class Network {
 		public RoundEnd(int winnerID) {
 			this.winnerID = winnerID;
 		}
+	}
+
+	static public class RoundStart {
+		
+		public RoundStart(){}
 	}
 }

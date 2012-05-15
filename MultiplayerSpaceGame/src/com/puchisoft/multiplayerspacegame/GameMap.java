@@ -24,12 +24,14 @@ import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.RoundEnd;
+import com.puchisoft.multiplayerspacegame.net.Network.RoundStart;
 import com.puchisoft.multiplayerspacegame.net.WaoClient;
 import com.puchisoft.multiplayerspacegame.net.WaoServer;
 
 public class GameMap {
+	private static final int GOAL_SCORE = 20;
 	private static final int ASTEROID_QUANITY = 100;
-	private static final long ROUND_OVER_DELAY = 5000 * 1000000L; // nanosec
+	private static final long ROUND_OVER_DELAY = 10000 * 1000000L; // nanosec
 	private static final int BG_TILE_COUNT = 3;
 	public OrthographicCamera cam;
 	private SpriteBatch spriteBatch;
@@ -200,12 +202,32 @@ public class GameMap {
 			}
 		}
 		
-		//Check for new Round
+		//Check for new Round - Server Only
 		if(!isClient && roundOver && System.nanoTime() > timeRoundBegins){
 			generateMap(ASTEROID_QUANITY);
+			RoundStart msg = new RoundStart();
+			onRoundStart(msg);
+			server.sendMessage(msg);
+			
+			// Respawn everyone
+			for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+				Player playerCur = playerEntry.getValue();
+				playerCur.spawn(); // make their position reset, regardless of whether they are dead or how healthy they were
+			}
 		}
 	}
 	
+	// Client and Server
+	public synchronized void onRoundStart(RoundStart msgRoundStart) {
+		logInfo("Round Start");
+		roundOver = false;
+		// Reset everyone's score
+		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+			Player playerCur = playerEntry.getValue();
+			playerCur.setScore(0);
+		}
+	}
+
 	public synchronized void logInfo(String string) {
 		Log.info((isClient ? "[Client] " : "[Server] ")+string);
 	}
@@ -348,15 +370,14 @@ public class GameMap {
 	}
 	
 	private void cleanUpMap(){
-		// Reset map
-		roundOver  = false;
-		asteroids.clear();
-		killAllPlayers();
+		
 	}
 	
 	// Run only by server; Needs to clean up; Client will then setState, which also needs to clean up
 	public synchronized void generateMap(int asteroidQuantity){
-		cleanUpMap(); // note quite right...
+		
+		// Reset map
+		asteroids.clear();
 		
 		// Generate asteroids
 		int randomX = 0;
@@ -414,7 +435,7 @@ public class GameMap {
 			victim.hit(msg.damage, msg.playerIdHitter);
 			hitter.addScore(1);
 			if(!isClient){
-				if(hitter.getScore() >= 20){
+				if(hitter.getScore() >= GOAL_SCORE){
 					RoundEnd msgRE = new RoundEnd(hitter.getID());
 					this.onRoundEnd(msgRE);
 					server.sendMessage(msgRE);
