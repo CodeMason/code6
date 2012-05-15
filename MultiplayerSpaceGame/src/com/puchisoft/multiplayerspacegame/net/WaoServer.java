@@ -86,6 +86,7 @@ public class WaoServer {
 					MovementChange msg = (MovementChange)message;
 					msg.playerId = connection.getID();
 					// TODO Server updates its copy of player health from what its told
+					// TODO prevent non-winner from moving / server should be in charge of spawning players
 					map.playerMoved(msg);
 					server.sendToAllExceptTCP(connection.getID(), msg);
 				}
