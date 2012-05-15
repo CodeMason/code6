@@ -239,6 +239,7 @@ public class Player {
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
 		velocity.sub(direction.nor().mul(0.5f));
+		return true;
 	}
 	
 	public void hit(float damage, int hitterID){
@@ -283,7 +284,7 @@ public class Player {
 			sprite.setColor(colorOrig);
 			sprite.setScale(1);
 			this.move(delta);
-			moon.move)delta);
+			moon.move(delta);
 			
 			moon.setPosition(moon.getPosition().lerp(this.getPosition(), 0.035f));
 			sprite.setPosition(position.x, position.y); // update sprite

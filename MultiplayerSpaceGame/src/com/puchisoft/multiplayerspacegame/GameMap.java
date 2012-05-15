@@ -114,6 +114,8 @@ public class GameMap {
 		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
 		textureAsteroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
 		textureAsteroidGold = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid_gold.png")), 0, 0, 64, 64);
+		texturemoon = new Texture(Gdx.files.internal("data/moon.png"));
+		textureChasemoon = new Texture(Gdx.files.internal("data/moonchase.png"));
 		
 		maxPosition = new Vector2(textureBg.getWidth() * BG_TILE_COUNT, textureBg.getHeight() * BG_TILE_COUNT);
 	}
@@ -418,7 +420,7 @@ public class GameMap {
 			Moon moonLocal = new Moon(texturemoon, new Vector2(50, 50),
 					maxPosition);
 
-			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, true);
+			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, true, moonLocal);
 			this.playerLocal.setId(client.id);
 			this.playerLocal.setName(name);
 			players.put(client.id, playerLocal);
@@ -437,7 +439,8 @@ public class GameMap {
 
 	public synchronized void addPlayer(PlayerJoinLeave msg) {
 		Log.debug("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, false);
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, false, new Moon(texturemoon, new Vector2(50, 50),
+				maxPosition));
 		newPlayer.setId(msg.playerId);
 		newPlayer.setName(msg.name);
 		newPlayer.addScore(msg.score);

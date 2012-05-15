@@ -37,6 +37,7 @@ public class Moon {
 	private int acceleratingOld = turning;
 
 	boolean wasTouched = false;
+	private float health;
 	
 	public Moon(Texture texture, Vector2 position, Vector2 maxPosition) {
 		this.sprite = new Sprite(texture);
@@ -196,7 +197,7 @@ public class Moon {
 	}
 	
 	public MovementChange getMovementState() {
-		return new MovementChange(id, turning, accelerating, position, direction, velocity);
+		return new MovementChange(id, turning, accelerating, position, direction, velocity, health);
 	}
 
 	public void setMovementState(MovementChange msg) {
@@ -205,6 +206,7 @@ public class Moon {
 		position = msg.position;
 		direction = msg.direction;
 		velocity = msg.velocity;
+		health = msg.health;
 	}
 	
 	public int getID() {
