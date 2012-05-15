@@ -13,7 +13,7 @@ public class Network {
 
 	static public final int port = 6464;
 	static public final int portUdp = 6466;
-	static public final int version = 11;
+	static public final int version = 12;
 
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
@@ -24,7 +24,8 @@ public class Network {
 		kryo.register(Vector2.class);
 		kryo.register(Color.class);
 		kryo.register(PlayerJoinLeave.class);
-		kryo.register(MovementChange.class);
+		kryo.register(MovementState.class);
+		kryo.register(PlayerSpawns.class);
 		kryo.register(PlayerShoots.class);
 		kryo.register(GameMapData.class);
 		kryo.register(PlayerWasHit.class);
@@ -81,24 +82,33 @@ public class Network {
 	/*
 	 * Movement
 	 */
-	static public class MovementChange {
+	static public class MovementState {
 		public int playerId;
 		public int turning;
 		public int accelerating;
-		public float health;
 		public Vector2 position;
 		public Vector2 direction;
 		public Vector2 velocity;
 
-		public MovementChange() {}
-		public MovementChange(int playerId, int turning, int accelerating, Vector2 position, Vector2 direction, Vector2 velocity, float health) {
+		public MovementState() {}
+		public MovementState(int playerId, int turning, int accelerating, Vector2 position, Vector2 direction, Vector2 velocity) {
 			this.playerId = playerId;
 			this.turning = turning;
 			this.accelerating = accelerating;
 			this.position = position;
 			this.direction = direction;
 			this.velocity = velocity;
-			this.health = health;
+		}
+	}
+	
+	static public class PlayerSpawns{
+		public int playerId;
+		public MovementState movementState;
+
+		public PlayerSpawns() {}
+		public PlayerSpawns(int playerId, MovementState movementState) {
+			this.playerId = playerId;
+			this.movementState = movementState;
 		}
 	}
 	/*
@@ -116,15 +126,6 @@ public class Network {
 			this.damage = damage;
 		}
 	}
-	
-	static public class AsteroidWasHit {
-		public Vector2 position; // used as ID
-		
-		public AsteroidWasHit() {}
-		public AsteroidWasHit(Vector2 position) {
-			this.position = position;
-		}
-	}
 
 	static public class PlayerShoots {
 		public int playerID;
@@ -138,6 +139,15 @@ public class Network {
 			this.position = position;
 			this.direction = direction;
 			this.baseVelocity = baseVelocity;
+		}
+	}
+	
+	static public class AsteroidWasHit {
+		public Vector2 position; // used as ID
+		
+		public AsteroidWasHit() {}
+		public AsteroidWasHit(Vector2 position) {
+			this.position = position;
 		}
 	}
 	

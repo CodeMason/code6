@@ -11,7 +11,7 @@ import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
 import com.puchisoft.multiplayerspacegame.Player;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
-import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
+import com.puchisoft.multiplayerspacegame.net.Network.MovementState;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 
@@ -81,11 +81,10 @@ public class WaoServer {
 					}
 					return;
 				}
-				else if(message instanceof MovementChange) {
-					MovementChange msg = (MovementChange)message;
+				else if(message instanceof MovementState) {
+					MovementState msg = (MovementState)message;
 					msg.playerId = connection.getID();
-					// TODO Server updates its copy of player health from what its told
-					// TODO prevent non-winner from moving / server should be in charge of spawning players
+					// TODO Server updates its copy of player from what its told
 					map.playerMoved(msg);
 					server.sendToAllExceptTCP(connection.getID(), msg);
 				}

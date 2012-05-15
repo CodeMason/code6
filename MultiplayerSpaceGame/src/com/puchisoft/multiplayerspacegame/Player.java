@@ -14,8 +14,9 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
+import com.puchisoft.multiplayerspacegame.net.Network.MovementState;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerSpawns;
 
 public class Player {
 	
@@ -278,7 +279,16 @@ public class Player {
 		position.set(random.nextInt((int)maxPosition.x),random.nextInt((int)maxPosition.y));
 		velocity.set(0,0);
 		health = 100;
-		map.serverSendMessage(getMovementState());
+		
+		PlayerSpawns msg = new PlayerSpawns(id,getMovementState());
+		map.onPlayerSpawn(msg);
+		map.serverSendMessage(msg);
+	}
+	
+	// Client
+	public void spawn(PlayerSpawns msg){
+		health = 100;
+		setMovementState(msg.movementState);
 	}
 	
 	public void update(float delta){
@@ -320,17 +330,16 @@ public class Player {
 		return camPos;
 	}
 
-	public MovementChange getMovementState() {
-		return new MovementChange(id, turning, accelerating, getPosition(), direction, velocity, health);
+	public MovementState getMovementState() {
+		return new MovementState(id, turning, accelerating, getPosition(), direction, velocity);
 	}
 
-	public void setMovementState(MovementChange msg) {
+	public void setMovementState(MovementState msg) {
 		this.turning = msg.turning;
 		this.accelerating = msg.accelerating;
 		this.position = msg.position;
 		this.direction = msg.direction;
 		this.velocity = msg.velocity;
-		this.health = msg.health;
 	}
 
 	public int getID() {

@@ -19,9 +19,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
 import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
-import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
+import com.puchisoft.multiplayerspacegame.net.Network.MovementState;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerSpawns;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.RoundEnd;
 import com.puchisoft.multiplayerspacegame.net.Network.RoundStart;
@@ -316,7 +317,7 @@ public class GameMap {
 		players.remove(msg.playerId);
 	}
 
-	public synchronized void playerMoved(MovementChange msg) {
+	public synchronized void playerMoved(MovementState msg) {
 		Player player = players.get(msg.playerId);
 		if(player != null) player.setMovementState(msg);
 	}
@@ -335,9 +336,10 @@ public class GameMap {
 	// returns of move was valid
 	public synchronized boolean onMsgPlayerShoots(PlayerShoots playerShoots){
 		Player player = getPlayerById(playerShoots.playerID);
+		logInfo(playerShoots.playerID+" shoots");
 		if(player != null){
-			player.setPosition(playerShoots.position);
-			player.setDirection(playerShoots.direction);
+//			player.setPosition(playerShoots.position);
+//			player.setDirection(playerShoots.direction);
 //			player.setVelocity(playerShoots.baseVelocity); // fixme
 			if(!player.shoot()){
 				logInfo(player.getName()+" tried to Cheat with bullet spam!");
@@ -507,6 +509,13 @@ public class GameMap {
 				asteroid.destroy();
 				asteroids.remove(i);
 			}
+		}
+	}
+
+	public synchronized void onPlayerSpawn(PlayerSpawns msg) {
+		Player spawner = players.get(msg.playerId);
+		if(spawner != null){
+			spawner.spawn(msg);
 		}
 	}
 }

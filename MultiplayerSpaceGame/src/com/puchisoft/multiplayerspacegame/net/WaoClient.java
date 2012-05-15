@@ -12,9 +12,10 @@ import com.puchisoft.multiplayerspacegame.GameMap;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
-import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
+import com.puchisoft.multiplayerspacegame.net.Network.MovementState;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerSpawns;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.RoundEnd;
 import com.puchisoft.multiplayerspacegame.net.Network.RoundStart;
@@ -112,8 +113,8 @@ public class WaoClient {
 				map.setStatus(msg.name + " left");
 				map.removePlayer(msg);
 			}
-		} else if (message instanceof MovementChange) {
-			MovementChange msg = (MovementChange) message;
+		} else if (message instanceof MovementState) {
+			MovementState msg = (MovementState) message;
 			map.playerMoved(msg);
 		} else if (message instanceof PlayerShoots) {
 			PlayerShoots msg = (PlayerShoots) message;
@@ -133,6 +134,9 @@ public class WaoClient {
 		} else if (message instanceof RoundStart) {
 			RoundStart msg = (RoundStart) message;
 			map.onRoundStart(msg);
+		} else if (message instanceof PlayerSpawns) {
+			PlayerSpawns msg = (PlayerSpawns) message;
+			map.onPlayerSpawn(msg);
 		}
 
 	}
