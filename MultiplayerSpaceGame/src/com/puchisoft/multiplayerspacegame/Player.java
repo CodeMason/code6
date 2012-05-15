@@ -149,7 +149,7 @@ public class Player {
 				Log.info("Touch released");
 			}
 			if (Gdx.input.isTouched(1)) {
-				shoot();
+				if(mayShoot()) shoot();
 			}
 		}else{
 			// Desktop
@@ -175,7 +175,7 @@ public class Player {
 
 			// Shooting
 			if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
-				shoot();
+				if(mayShoot()) shoot();
 			}
 		}
 		
@@ -227,9 +227,9 @@ public class Player {
 	}
 
 	public boolean shoot() {
-		if(!mayShoot()){
-			return false;
-		}
+//		if(!mayShoot()){ // Commented out to turn off spam cheat detection
+//			return false;
+//		}
 //		soundShoot.play();
 		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),velocity.cpy(),direction.cpy());
 		map.addBullet(msgPlayerShoots);
