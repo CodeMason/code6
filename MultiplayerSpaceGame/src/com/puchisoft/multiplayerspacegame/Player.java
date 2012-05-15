@@ -252,6 +252,7 @@ public class Player {
 		if(health <= 0){ // only local player trigger self-death (otherwise wait on server)
 			velocity.set(0,0);
 			maySpawnTime = System.nanoTime() + SPAWN_DELAY;
+			score--;
 			return true;
 		}
 		return false;
