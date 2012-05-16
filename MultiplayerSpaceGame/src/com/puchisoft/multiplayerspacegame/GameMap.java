@@ -17,14 +17,23 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
-import com.puchisoft.multiplayerspacegame.net.Network.GameConfigData;
-import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
+import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
+import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
+import com.puchisoft.multiplayerspacegame.net.Network.MovementState;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerSpawns;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
+import com.puchisoft.multiplayerspacegame.net.Network.RoundEnd;
+import com.puchisoft.multiplayerspacegame.net.Network.RoundStart;
 import com.puchisoft.multiplayerspacegame.net.WaoClient;
+import com.puchisoft.multiplayerspacegame.net.WaoServer;
 
 public class GameMap {
+	private static final int GOAL_SCORE = 10;
+	private static final int ASTEROID_QUANITY = 100;
+	private static final long ROUND_OVER_DELAY = 10000 * 1000000L; // nanosec
+	private static final int BG_TILE_COUNT = 3;
 	public OrthographicCamera cam;
 	private SpriteBatch spriteBatch;
 	
@@ -41,36 +50,62 @@ public class GameMap {
 	private TextureRegion texturePlayer;
 	private TextureRegion textureBullet;
 	private Texture textureBg;
-	private int tilesCount = 3;
 
 	private Vector2 maxPosition;
 
-	private WaoClient client;
+	private WaoClient client; // only if I'm the client
+	private WaoServer server; // only if I'm internal to the server
 	private HUD hud;
-	private TextureRegion textureAstroid;
+	private TextureRegion textureAsteroid;
+	private TextureRegion textureAsteroidGold;
+	
+	private GameSounds gameSounds;
+	
+	private long timeRoundBegins = 0; // ms
 	
 	boolean isClient;
+	private boolean roundOver = false;
 
-	public GameMap(boolean isClient) {
-		this.isClient = isClient;
-		if(isClient) this.hud = new HUD();
-		Gdx.files.internal("data/background.png");
-		textureBg = new Texture(Gdx.files.internal("data/background.png"));
-
-		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
-		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
-		textureAstroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
+	/*
+	 * For client
+	 */
+	public GameMap(WaoClient client) {
+		this.client = client;
+		this.isClient = true;
 		
-		fontNameTag = new BitmapFont();
-		fontNameTag.setColor(Color.YELLOW);
-//		fontNameTag.setScale(0.9f);
-
-		maxPosition = new Vector2(textureBg.getWidth() * tilesCount, textureBg.getHeight() * tilesCount);
+		initCommon();
+		
+		this.hud = new HUD();
+		this.gameSounds = new GameSounds();
+		this.fontNameTag = new BitmapFont();
+		this.fontNameTag.setColor(Color.YELLOW);
 		
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		spriteBatch = new SpriteBatch(); //
+	}
+	
+	/*
+	 * For server
+	 */
+	public GameMap(WaoServer server) {
+		this.server = server;
+		this.isClient = false;
+		
+		initCommon();
+		
+		generateMap(ASTEROID_QUANITY);
+	}
 
+	private void initCommon(){
+		textureBg = new Texture(Gdx.files.internal("data/background.png"));
+
+		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
+		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
+		textureAsteroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
+		textureAsteroidGold = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid_gold.png")), 0, 0, 64, 64);
+		
+		maxPosition = new Vector2(textureBg.getWidth() * BG_TILE_COUNT, textureBg.getHeight() * BG_TILE_COUNT);
 	}
 	
 	private void handleInput(float delta){
@@ -105,7 +140,7 @@ public class GameMap {
 			
 			// Handle local input and sent over network if changed
 			if (playerLocal.handleInput(delta)) {
-				Log.info("changed input");
+				logInfo("changed input");
 				client.sendMessage(playerLocal.getMovementState());
 			}
 		}
@@ -118,17 +153,18 @@ public class GameMap {
 			for(Asteroid asteroid : asteroids){
 				if(playerCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					playerCur.preventOverlap(asteroid.getBoundingRectangle(),delta);
-//					playerCur.hit(5, -1);
+					logInfo("Player touched asteroid");
+					if(!isClient){
+//						playerCur.hit(1, -1);
+						PlayerWasHit msg = new PlayerWasHit(playerCur.getID(),-1, 1); // hit by non-Player
+						this.onPlayerWasHit(msg);
+						server.sendMessage(msg);
+					}
 				}
 			}
-			// Collision with Players
-//			for (Map.Entry<Integer, Player> otherPlayerEntry : players.entrySet()) {
-//				Player playerCurOther = otherPlayerEntry.getValue();
-//				if(playerCurOther.getID() != playerCur.getID() && playerCurOther.getBoundingRectangle().overlaps(playerCur.getBoundingRectangle())){
-//					playerCur.preventOverlap(playerCurOther.getBoundingRectangle(),delta);
-//					playerCurOther.preventOverlap(playerCur.getBoundingRectangle(),delta);
-//				}
-//			}
+			
+			// Spawn dead players (sends a message to clients)
+			if(!isClient && !roundOver) playerCur.spawnIfAppropriate();
 		}
 
 		// Update Bullets
@@ -140,13 +176,10 @@ public class GameMap {
 				Player playerCur = playerEntry.getValue();
 				if(!playerCur.isDead() && playerCur.getID() != bulletCur.getPlayerID() && playerCur.getBoundingRectangle().overlaps(bulletCur.getBoundingRectangle())){
 					bulletCur.destroy();
-					playerCur.hit(40, bulletCur.getPlayerID());
-					// I was hit
-					if(playerCur == playerLocal){
-						Gdx.input.vibrate(300);
-						players.get(bulletCur.getPlayerID()).addScore(1);
-						setStatus("You were hit by "+players.get(bulletCur.getPlayerID()).getName()+"!");
-						client.sendMessage(new PlayerWasHit(playerLocal.getID(),bulletCur.getPlayerID(),playerLocal.getHealth()));
+					if(!isClient && !roundOver){ // no getting hit once round ends
+						PlayerWasHit msg = new PlayerWasHit(playerCur.getID(),bulletCur.getPlayerID(), 45);
+						this.onPlayerWasHit(msg);
+						server.sendMessage(msg);
 					}
 				}
 			}
@@ -154,15 +187,57 @@ public class GameMap {
 			for(Asteroid asteroid : asteroids){
 				if(bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					bulletCur.destroy();
+					// Only server makes call whether asteroids are killed
+//					if(!isClient){
+//						server.sendMessage(new AsteroidWasHit(asteroid.getPosition()));
+//						asteroid.destroy();
+//					}
 				}
 			}
 			
 			// Remove impacted bullets
-			if (bullets.get(i).destroyed)
+			if (bullets.get(i).destroyed()){
 				bullets.remove(i);
+			}
+		}
+
+		// Remove asteroids
+		for (int i = 0; i < asteroids.size(); i++) {
+			if (asteroids.get(i).destroyed){
+				asteroids.remove(i);
+			}
+		}
+		
+		//Check for new Round - Server Only
+		if(!isClient && roundOver && System.nanoTime() > timeRoundBegins){
+			generateMap(ASTEROID_QUANITY);
+			RoundStart msg = new RoundStart();
+			onRoundStart(msg);
+			server.sendMessage(msg);
+			
+			// Respawn everyone
+			for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+				Player playerCur = playerEntry.getValue();
+				playerCur.spawn(); // make their position reset, regardless of whether they are dead or how healthy they were
+			}
 		}
 	}
 	
+	// Client and Server
+	public synchronized void onRoundStart(RoundStart msgRoundStart) {
+		logInfo("Round Start");
+		roundOver = false;
+		// Reset everyone's score
+		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+			Player playerCur = playerEntry.getValue();
+			playerCur.setScore(0);
+		}
+	}
+
+	public synchronized void logInfo(String string) {
+		Log.info((isClient ? "[Client] " : "[Server] ")+string);
+	}
+
 	public synchronized void render(){
 		
 		spriteBatch.setProjectionMatrix(cam.combined);
@@ -170,8 +245,8 @@ public class GameMap {
 		spriteBatch.setColor(Color.WHITE);
 		
 		// Background
-		for (int i = 0; i < tilesCount; i++) {
-			for (int j = 0; j < tilesCount; j++) {
+		for (int i = 0; i < BG_TILE_COUNT; i++) {
+			for (int j = 0; j < BG_TILE_COUNT; j++) {
 				spriteBatch.draw(textureBg, textureBg.getWidth() * i, textureBg.getHeight() * j, 0, 0, textureBg.getWidth(),
 						textureBg.getHeight());
 			}
@@ -204,13 +279,14 @@ public class GameMap {
 		textureBg.dispose();
 		spriteBatch.dispose();
 		hud.dispose();
+		gameSounds.dispose();
 	}
 
-	public void onConnect(WaoClient client, String name, Color color) {
+	public void onConnect(String name, Color color) {
 
-		if (this.client == null) {
-			this.client = client;
-			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, true);
+		if (this.playerLocal == null) {
+			// TODO Server should spawn localPlayer too
+			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, true, 100);
 			this.playerLocal.setId(client.id);
 			this.playerLocal.setName(name);
 			players.put(client.id, playerLocal);
@@ -227,58 +303,99 @@ public class GameMap {
 		setStatus("Disconnected");
 	}
 
-	public synchronized void addPlayer(PlayerJoinLeave msg) {
-		Log.info("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, false);
+	public synchronized Player addPlayer(PlayerJoinLeave msg) {
+		Log.debug("add player");
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, false, msg.health);
 		newPlayer.setId(msg.playerId);
 		newPlayer.setName(msg.name);
 		newPlayer.addScore(msg.score);
 		players.put(msg.playerId, newPlayer);
-
-		// tell people where I am again
-		// TODO server should remember this and tell others based on emulating players movements locally
-		client.sendMessage(playerLocal.getMovementState());
+		return newPlayer;
 	}
 
 	public synchronized void removePlayer(PlayerJoinLeave msg) { // synchronized
-		Log.info("remove player");
+		logInfo("remove player");
 		players.remove(msg.playerId);
 	}
 
-	public synchronized void playerMoved(MovementChange msg) {
+	public synchronized void playerMoved(MovementState msg) {
 		Player player = players.get(msg.playerId);
 		if(player != null) player.setMovementState(msg);
-
+	}
+	
+	public synchronized Player getPlayerById(int id){
+		return players.get(id);
 	}
 
-	public void setStatus(String status) {
+	public synchronized void setStatus(String status) {
 		if(hud != null) hud.setStatus(status);
+	}
+	public synchronized void setStatusCenter(String status) {
+		if(hud != null) hud.setStatusCenter(status);
+	}
+	
+	// returns of move was valid
+	public synchronized boolean onMsgPlayerShoots(PlayerShoots playerShoots){
+		Player player = getPlayerById(playerShoots.playerID);
+		logInfo(playerShoots.playerID+" shoots");
+		if(player != null){
+//			player.setPosition(playerShoots.position);
+//			player.setDirection(playerShoots.direction);
+//			player.setVelocity(playerShoots.baseVelocity); // fixme
+			if(!player.shoot()){
+				logInfo(player.getName()+" tried to Cheat with bullet spam!");
+				return false;
+			}
+		}else{
+			logInfo("onMsgPlayerShoots has unknown playerId");
+		}
+		return true;
 	}
 
 	public synchronized void addBullet(PlayerShoots playerShoots) {
-		if (playerShoots.playerID == playerLocal.getID()) {
-			// tell others I shot
-			client.sendMessage(playerShoots);
-		}
 		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
 	}
 	
-	private void addAsteroid(Vector2 postion, float rotation){
-		asteroids.add(new Asteroid(textureAstroid, postion, rotation));
+	private synchronized void addAsteroid(Vector2 position, float rotation){
+		
+		if(position.x < maxPosition.x * 0.6 && position.x > maxPosition.x * 0.3){
+			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, position, rotation, 1));
+		}
+		else{
+			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, position, rotation, 0));
+		}
+		
+	
 	}
 	
-	public synchronized void generateMap(GameConfigData gameConfigData){
+	private synchronized void addAsteroid(AsteroidData asteroidData){
+		if(asteroidData.position.x < maxPosition.x * 0.6 && asteroidData.position.x > maxPosition.x * 0.3){
+			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, asteroidData.position, asteroidData.rotation, 1));
+		}
+		else {
+		asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, asteroidData.position, asteroidData.rotation, 0));
+		}
+	}
+	
+	private void cleanUpMap(){
 		
-		random.setSeed(gameConfigData.mapGeneratorSeed);
+	}
+	
+	// Run only by server; Needs to clean up; Client will then setState, which also needs to clean up
+	public synchronized void generateMap(int asteroidQuantity){
+		
+		// Reset map
+		asteroids.clear();
+		
 		// Generate asteroids
 		int randomX = 0;
 		int randomY = 0;
 		int loopExit = 0;
-		while(asteroids.size() < gameConfigData.asteroidQuantity && loopExit < 1000){
+		while(asteroids.size() < asteroidQuantity && loopExit < 1000){
 			loopExit++;
-			randomX = random.nextInt((int) maxPosition.x - textureAstroid.getRegionWidth()-100) + 100;
-			randomY = random.nextInt((int) maxPosition.y - textureAstroid.getRegionHeight()-100) + 100;
-			Rectangle box = new Rectangle(randomX , randomY, textureAstroid.getRegionWidth(), textureAstroid.getRegionHeight());
+			randomX = random.nextInt((int) maxPosition.x - textureAsteroid.getRegionWidth()-100) + 100;
+			randomY = random.nextInt((int) maxPosition.y - textureAsteroid.getRegionHeight()-100) + 100;
+			Rectangle box = new Rectangle(randomX , randomY, textureAsteroid.getRegionWidth(), textureAsteroid.getRegionHeight());
 			boolean canMakeAsteroid = true;
 			for (int j = 0; j < asteroids.size(); j++) {
 				if(asteroids.get(j).getBoundingRectangle().overlaps(box)){
@@ -289,34 +406,118 @@ public class GameMap {
 			if(canMakeAsteroid){
 				addAsteroid(new Vector2(randomX,randomY),random.nextInt(360));
 			}
-			
+		}
+		
+		server.sendMessage(getStateData());
+	}
+	
+	public synchronized GameMapData getStateData(){
+		List<AsteroidData> asteroidDatas = new ArrayList<AsteroidData>();
+		for(Asteroid asteroid : asteroids){
+			asteroidDatas.add(asteroid.getStateData());
+		}
+		return new GameMapData(asteroidDatas, roundOver);
+	}
+	
+	public synchronized void setStateData(GameMapData gameMapData){
+		setStatusCenter("");
+		roundOver = gameMapData.roundOver;
+		
+		asteroids.clear();
+		// Make asteroids from server data
+		for(AsteroidData asteroidData : gameMapData.asteroidDatas){
+			addAsteroid(asteroidData);
 		}
 	}
 
-	public void resize(int width, int height) {
+	public synchronized void resize(int width, int height) {
 		cam.setToOrtho(false, width, height);
 		hud.resize(width, height);
 	}
 
-	public void onMsgPlayerWasHit(PlayerWasHit msg) {
+	public synchronized void onPlayerWasHit(PlayerWasHit msg) {
 		Player hitter = players.get(msg.playerIdHitter);
 		Player victim = players.get(msg.playerIdVictim);
 		// give hitter points
-		if(hitter != null){
-			hitter.addScore(1);
-			if(hitter == playerLocal){
-				if(victim != null) setStatus("You hit "+victim.getName()+"!");
-			}else if(victim != null){
-				if(victim != null) setStatus(hitter.getName()+" "+msg.playerIdHitter+" hit "+victim.getName()+".");
+		if(victim != null){ // TODO Won't work if there is not hitter
+			boolean victimDied = victim.hit(msg.damage, msg.playerIdHitter); // might be -1 for non-Player
+			if(hitter != null){
+				hitter.addScore(victimDied ? 2 : 1);
+				if(!isClient){
+					if(hitter.getScore() >= GOAL_SCORE){
+						RoundEnd msgRE = new RoundEnd(hitter.getID());
+						this.onRoundEnd(msgRE);
+						server.sendMessage(msgRE);
+					}
+				}else{
+					if(hitter == playerLocal){
+						setStatus("You hit "+victim.getName()+"!");
+					}else if(victim == playerLocal){
+						setStatus(hitter.getName()+" hit you!");
+					}else{
+						setStatus(hitter.getName()+" hit "+victim.getName()+".");
+					}
+				}
 			}
 		}
-		// Update victim's health
-		if(victim != null){
-			victim.setHealth(msg.health);
+		else{
+			Log.error("PlayerWasHit msg referred to invalid players");
 		}
 	}
 	
-	public void sendMessage(Object msg){
+	public synchronized void onRoundEnd(RoundEnd msg) {
+		logInfo("Round over");
+		roundOver = true;
+		Player winner = players.get(msg.winnerID);
+		if(winner != null){
+			timeRoundBegins = System.nanoTime() + ROUND_OVER_DELAY;
+			setStatusCenter("Round Over! "+winner.getName()+" is the winner.");
+			killAllPlayersExcept(winner);
+		}
+	}
+	
+	private void killAllPlayers(){
+		killAllPlayersExcept(null);
+	}
+	
+	private void killAllPlayersExcept(Player survivor){
+		for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+			Player playerCur = playerEntry.getValue();
+			if(playerCur != survivor){
+				// FIXME shouldn't change your score by you losing
+				playerCur.hit(9999, survivor != null ? survivor.getID() : -1); // make everyone else look at winner
+			}
+		}
+	}
+
+	public synchronized void clientSendMessage(Object msg){
 		client.sendMessage(msg);
+	}
+	
+	public synchronized void serverSendMessage(Object msg){
+		server.sendMessage(msg);
+	}
+	
+	public synchronized GameSounds gameSounds(){
+		return gameSounds;
+	}
+
+	public synchronized void removeAsteroid(Vector2 position) {
+		// Remove asteroids
+		for (int i = 0; i < asteroids.size(); i++) {
+			Asteroid asteroid = asteroids.get(i);
+			if (asteroid.getPosition().equals(position)){
+				logInfo("asteroid hit from server");
+				asteroid.destroy();
+				asteroids.remove(i);
+			}
+		}
+	}
+
+	public synchronized void onPlayerSpawn(PlayerSpawns msg) {
+		Player spawner = players.get(msg.playerId);
+		if(spawner != null){
+			spawner.spawn(msg);
+		}
 	}
 }

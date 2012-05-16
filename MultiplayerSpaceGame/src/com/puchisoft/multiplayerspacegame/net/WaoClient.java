@@ -9,12 +9,16 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
-import com.puchisoft.multiplayerspacegame.net.Network.GameConfigData;
+import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
+import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
-import com.puchisoft.multiplayerspacegame.net.Network.MovementChange;
+import com.puchisoft.multiplayerspacegame.net.Network.MovementState;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
+import com.puchisoft.multiplayerspacegame.net.Network.PlayerSpawns;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerWasHit;
+import com.puchisoft.multiplayerspacegame.net.Network.RoundEnd;
+import com.puchisoft.multiplayerspacegame.net.Network.RoundStart;
 
 public class WaoClient {
 
@@ -26,8 +30,8 @@ public class WaoClient {
 	
 	private Random random = new Random();
 
-	public WaoClient(final GameMap game, String name) { //
-		this.map = game;
+	public WaoClient(String name) { //final GameMap game,
+		this.map = new GameMap(this);
 		this.name = name;
 
 		client = new Client();
@@ -66,7 +70,7 @@ public class WaoClient {
 		Login registerName = new Login(name, Network.version, color);
 		client.sendTCP(registerName);
 		client.updateReturnTripTime();
-		map.onConnect(this,name,color);
+		map.onConnect(name,color);
 	}
 
 	public void connectLocal() {
@@ -78,7 +82,7 @@ public class WaoClient {
 			client.connect(5000, host, Network.port);//, Network.portUdp);
 		} catch (IOException e) {
 			// e.printStackTrace();
-			map.setStatus("Can't connect to " + host);
+			map.setStatus(!host.equals("localhost") ? "Can't connect to " + host +". Hit ESC." : "You didn't enter an IP to connect to. Hit ESC and try again.");
 			Log.error("Can't connect to " + host);
 		}
 	}
@@ -88,6 +92,7 @@ public class WaoClient {
 	}
 
 	public void sendMessage(Object message) {
+		map.logInfo("SENT packet");
 		if (client.isConnected()) {
 			client.sendTCP(message);
 		}
@@ -108,18 +113,30 @@ public class WaoClient {
 				map.setStatus(msg.name + " left");
 				map.removePlayer(msg);
 			}
-		} else if (message instanceof MovementChange) {
-			MovementChange msg = (MovementChange) message;
+		} else if (message instanceof MovementState) {
+			MovementState msg = (MovementState) message;
 			map.playerMoved(msg);
 		} else if (message instanceof PlayerShoots) {
 			PlayerShoots msg = (PlayerShoots) message;
-			map.addBullet(msg);
-		} else if (message instanceof GameConfigData) {
-			GameConfigData msg = (GameConfigData) message;
-			map.generateMap(msg);
+			map.onMsgPlayerShoots(msg);
+		} else if (message instanceof GameMapData) {
+			GameMapData msg = (GameMapData) message;
+			map.setStateData(msg);
 		} else if (message instanceof PlayerWasHit) {
 			PlayerWasHit msg = (PlayerWasHit) message;
-			map.onMsgPlayerWasHit(msg);
+			map.onPlayerWasHit(msg);
+		} else if (message instanceof AsteroidWasHit) {
+			AsteroidWasHit msg = (AsteroidWasHit) message;
+			map.removeAsteroid(msg.position);
+		} else if (message instanceof RoundEnd) {
+			RoundEnd msg = (RoundEnd) message;
+			map.onRoundEnd(msg);
+		} else if (message instanceof RoundStart) {
+			RoundStart msg = (RoundStart) message;
+			map.onRoundStart(msg);
+		} else if (message instanceof PlayerSpawns) {
+			PlayerSpawns msg = (PlayerSpawns) message;
+			map.onPlayerSpawn(msg);
 		}
 
 	}
@@ -133,6 +150,10 @@ public class WaoClient {
 	public void shutdown() {
 		client.stop();
 		client.close();
+	}
+
+	public GameMap getMap() {
+		return this.map;
 	}
 
 }
