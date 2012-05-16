@@ -320,16 +320,16 @@ public class Player {
 	}
 
 	public Vector3 getDesiredCameraPosition(Vector3 camPos, float delta) {
-		Vector2 offset = velocity.cpy().mul(400 * delta);
+//		Vector2 offset = velocity.cpy().mul(400 * delta);
+//
+//		// Clamp cam position to always show our player
+//		offset.x = Math.max(-1 * Gdx.graphics.getWidth() * 0.3f, Math.min(Gdx.graphics.getWidth() * 0.3f, offset.x));
+//		offset.y = Math.max(-1 * Gdx.graphics.getHeight() * 0.3f, Math.min(Gdx.graphics.getHeight() * 0.3f, offset.y));
+//
+//		Vector2 dest = getPosition().cpy().add(offset);
+//		camPos.lerp(new Vector3(dest.x, dest.y, 0), 30f * delta);
 
-		// Clamp cam position to always show our player
-		offset.x = Math.max(-1 * Gdx.graphics.getWidth() * 0.3f, Math.min(Gdx.graphics.getWidth() * 0.3f, offset.x));
-		offset.y = Math.max(-1 * Gdx.graphics.getHeight() * 0.3f, Math.min(Gdx.graphics.getHeight() * 0.3f, offset.y));
-
-		Vector2 dest = getPosition().cpy().add(offset);
-		camPos.lerp(new Vector3(dest.x, dest.y, 0), 30f * delta);
-
-		return camPos;
+		return new Vector3(position.x, position.y, 0); // camPos
 	}
 
 	public MovementState getMovementState() {
