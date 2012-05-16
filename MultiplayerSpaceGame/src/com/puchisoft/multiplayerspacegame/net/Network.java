@@ -67,15 +67,18 @@ public class Network {
 		public Color color; // only for joined
 		public int score;
 		public Vector2 position;
+		public float health;
+		
 
 		public PlayerJoinLeave() {}
-		public PlayerJoinLeave(int playerId, String name, boolean hasJoined, Vector2 position, Color color, int score) {
+		public PlayerJoinLeave(int playerId, String name, boolean hasJoined, Vector2 position, Color color, int score, float health) {
 			this.playerId = playerId;
 			this.name = name;
 			this.hasJoined = hasJoined;
 			this.position = position; // remove, we need to send a movementmsg on join anyaway
 			this.color = color;
 			this.score = score;
+			this.health = health;
 		}
 	}
 	

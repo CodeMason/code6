@@ -65,7 +65,7 @@ public class Player {
 	private Color colorOrig;
 	
 	
-	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, boolean isLocal) {
+	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, boolean isLocal, float health) {
 		this.sprite = new Sprite(texture);
 		this.colorOrig = color;
 		this.sprite.setColor(colorOrig);
@@ -74,6 +74,7 @@ public class Player {
 		this.maxPosition = maxPosition;
 		this.map = map;
 		this.isLocal = isLocal;
+		this.health = health;
 	}
 
 	// Returns whether there was a change

@@ -285,7 +285,8 @@ public class GameMap {
 	public void onConnect(String name, Color color) {
 
 		if (this.playerLocal == null) {
-			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, true);
+			// TODO Server should spawn localPlayer too
+			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, true, 100);
 			this.playerLocal.setId(client.id);
 			this.playerLocal.setName(name);
 			players.put(client.id, playerLocal);
@@ -302,14 +303,14 @@ public class GameMap {
 		setStatus("Disconnected");
 	}
 
-	public synchronized void addPlayer(PlayerJoinLeave msg) {
+	public synchronized Player addPlayer(PlayerJoinLeave msg) {
 		Log.debug("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, false);
+		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, false, msg.health);
 		newPlayer.setId(msg.playerId);
 		newPlayer.setName(msg.name);
 		newPlayer.addScore(msg.score);
 		players.put(msg.playerId, newPlayer);
-
+		return newPlayer;
 	}
 
 	public synchronized void removePlayer(PlayerJoinLeave msg) { // synchronized

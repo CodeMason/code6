@@ -64,7 +64,7 @@ public class WaoServer {
 						// Tell new person about map state (asteroids)
 						connection.sendTCP(map.getStateData());
 						// Tell old people about new person
-						PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, new Vector2(50,50), msg.color, 0);
+						PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, true, new Vector2(50,50), msg.color, 0, 100);
 						server.sendToAllExceptTCP(connection.getID(), reply);
 						// Remember for our state too
 						map.addPlayer(reply);
@@ -75,7 +75,7 @@ public class WaoServer {
 							if(conn.getID() != connection.getID() && conn.name != null){ // Not self, Have logged in
 								Player herePlayer = map.getPlayerById(conn.getID());
 								// todo position in here is redundant
-								PlayerJoinLeave hereMsg  = new PlayerJoinLeave(conn.getID(), herePlayer.getName(), true, herePlayer.getPosition(), herePlayer.getColor(), herePlayer.getScore());
+								PlayerJoinLeave hereMsg  = new PlayerJoinLeave(conn.getID(), herePlayer.getName(), true, herePlayer.getPosition(), herePlayer.getColor(), herePlayer.getScore(), herePlayer.getHealth());
 								connection.sendTCP(hereMsg); // basic info
 								connection.sendTCP(herePlayer.getMovementState()); // info about current movement
 							}
@@ -108,7 +108,7 @@ public class WaoServer {
 				WaoConnection connection = (WaoConnection)c;
 				if (connection.name != null) {
 					// Announce to everyone that someone has left.
-					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, false, null, null, 0);
+					PlayerJoinLeave reply  = new PlayerJoinLeave(connection.getID(), connection.name, false, null, null, 0, 0);
 					server.sendToAllExceptTCP(connection.getID(), reply);
 					map.removePlayer(reply);
 				}
