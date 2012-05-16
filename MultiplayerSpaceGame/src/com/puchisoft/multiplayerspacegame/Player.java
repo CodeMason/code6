@@ -232,12 +232,12 @@ public class Player {
 //		if(!mayShoot()){ // Commented out to turn off spam cheat detection
 //			return false;
 //		}
-//		soundShoot.play();
 		PlayerShoots msgPlayerShoots = new PlayerShoots(id,getPosition().cpy(),velocity.cpy(),direction.cpy());
 		map.addBullet(msgPlayerShoots);
 		mayFireTime = System.nanoTime() + FIRE_DELAY;
 		
 		if(isLocal){
+			map.gameSounds().play("shoot");
 			map.clientSendMessage(msgPlayerShoots);
 		}
 		return true;

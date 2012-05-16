@@ -28,6 +28,14 @@ public class GameSounds {
 			sound.setLooping(soundId, true);
 		}
 	}
+	public void play(String name){
+		Sound sound = sounds.get(name);
+		if(sound == null){
+			Log.error("Can't find sound: "+name);
+		}else{
+			sound.play();
+		}
+	}
 	
 	public void stopSound(String name){
 		Sound sound = sounds.get(name);
