@@ -5,6 +5,7 @@ import java.util.Random;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
@@ -31,9 +32,11 @@ public class ScreenMenu extends ScreenCore {
 	private TextField textfieldName;
 	
 	private Random random = new Random();
+	Preferences preferences;
 
 	public ScreenMenu(Game game) {
 		super(game);
+		preferences = Gdx.app.getPreferences("MultiplayerSpaceGame_Settings");
 	}
 
 	@Override
@@ -50,13 +53,13 @@ public class ScreenMenu extends ScreenCore {
 		labelTitle.y = Gdx.graphics.getHeight() - labelTitle.height - 10;
 		labelTitle.x = Gdx.graphics.getWidth()/2 - labelTitle.width/2;
 		
-		textfieldIP = new TextField("puchisoft.servegame.com", "Enter Server IP Here", skin.getStyle(TextFieldStyle.class), "textfield_ip");
+		textfieldIP = new TextField(preferences.getString("ip"), "Enter Server IP Here", skin.getStyle(TextFieldStyle.class), "textfield_ip");
 		textfieldIP.width = 400;
 		textfieldIP.height = 30;
 		textfieldIP.y = Gdx.graphics.getHeight() - textfieldIP.height - 65 -200;
 		textfieldIP.x = Gdx.graphics.getWidth()/2 - textfieldIP.width/2;
 		
-		textfieldName = new TextField("", "Enter Name", skin.getStyle(TextFieldStyle.class), "textfield_name");
+		textfieldName = new TextField(preferences.getString("name"), "Enter Name", skin.getStyle(TextFieldStyle.class), "textfield_name");
 		textfieldName.width = 400;
 		textfieldName.height = 30;
 		textfieldName.y = Gdx.graphics.getHeight() - textfieldName.height - 0 -200;
@@ -131,12 +134,20 @@ public class ScreenMenu extends ScreenCore {
 //		client.close();
 //		
 //	}
+	
+	private void savePrefs(){
+		preferences.putString("name", getName());
+		preferences.putString("ip", textfieldIP.getText());
+		preferences.flush();
+	}
 
 	private void goJoin(){
 		game.setScreen(new ScreenGame(game, false, textfieldIP.getText(), getName()));
+		savePrefs();
 	}
 	private void goHost(){
 		game.setScreen(new ScreenGame(game, true, "localhost", getName()));
+		savePrefs();
 	}
 	
 	private String getName(){
@@ -144,6 +155,7 @@ public class ScreenMenu extends ScreenCore {
 		if(name.isEmpty()){
 			name = "Guest" + random.nextInt(10000); // default name
 		}
+		textfieldName.setText(name);
 		return name;
 	}
 
