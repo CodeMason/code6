@@ -23,7 +23,8 @@ public class WaoServer {
 	private Random random = new Random();
 
 	public WaoServer() throws IOException {
-//		Log.set(Log.LEVEL_DEBUG);
+		Log.set(Log.LEVEL_DEBUG);
+		Log.error("Hi");
 		
 		server = new Server() {
 			protected Connection newConnection() {
@@ -115,7 +116,7 @@ public class WaoServer {
 			}
 		});
 		
-		server.bind(Network.port); //,Network.portUdp);
+		server.bind(Network.port,Network.portUdp); //,Network.portUdp);
 		server.start();
 	}
 	
