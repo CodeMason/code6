@@ -377,10 +377,6 @@ public class GameMap {
 		}
 	}
 	
-	private void cleanUpMap(){
-		
-	}
-	
 	// Run only by server; Needs to clean up; Client will then setState, which also needs to clean up
 	public synchronized void generateMap(int asteroidQuantity){
 		

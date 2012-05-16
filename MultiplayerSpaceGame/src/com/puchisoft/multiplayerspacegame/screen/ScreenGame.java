@@ -1,7 +1,6 @@
 package com.puchisoft.multiplayerspacegame.screen;
 
 import java.io.IOException;
-import java.util.Random;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
