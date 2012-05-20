@@ -8,3 +8,7 @@ Space / 2nd Touch Hold - Shoot
 QE / 2nd Touch Drag(TODO) - Zoom
 
 Alternatively, Arrow Keys / RightCtrl work on the Desktop too.
+
+
+License: Creative Commons Attribution-ShareAlike 3.0 Unported
+http://creativecommons.org/licenses/by-sa/3.0/
