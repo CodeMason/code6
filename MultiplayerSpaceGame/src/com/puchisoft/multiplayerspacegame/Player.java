@@ -25,6 +25,7 @@ public class Player {
 	private static final float SPEED_ACC = 6.0f;
 	private static final int   SPEED_ACC_TURBO = 3; //multiplier
 //	private static final float SPEED_ACC_TOUCH = 1.0f;
+	private static final float ANGLE_INCR_TOUCH = 22.5f; // Angle increment on touch screens / 22.5f / 45f / 90f
 	private static final float SPEED_ROT = 210.0f; // angle degrees per sec
 	private static final float SPEED_MAX = 50.0f;
 	
@@ -116,8 +117,6 @@ public class Player {
 				// Log.info("!!!!! turn debug m " + myDir + " d " + desiredDir +
 				// " || " +diff+" | "+turning);
 				// }
-				direction.set(touchDist.cpy()).nor(); // could be optimized
-				sprite.setRotation(direction.angle()); // update sprite
 
 				if (touchDist.len() < 40) {
 					accelerating = 0;
@@ -138,8 +137,16 @@ public class Player {
 					// touchDist.y + " " + touchDist.len());
 				}
 				
-				//force packet only if last sent angle differs a bit
-				if(Math.abs(direction.angle() - angleLastSent) > 1){
+				float touchAngle = Math.round(touchDist.angle() / ANGLE_INCR_TOUCH) * ANGLE_INCR_TOUCH;
+				if(touchAngle >= 360.0){ touchAngle = 0;} // otherwise thinks 0.02 differs from 360 greatly
+				
+				//force packet only if last sent angle differs a bit after snapping to nearest angle increment
+				if(Math.abs(direction.angle() - touchAngle) > 1){ // Will always be slightly off
+					Log.info("dir change "+direction.angle()+ " "+touchAngle);
+					direction.set(1,0).rotate(touchAngle);
+//					direction.set(touchDist.cpy()).nor(); // could be optimized
+					sprite.setRotation(direction.angle()); // update sprite
+					
 					touchMove = true;
 					angleLastSent = direction.angle();	
 				}
