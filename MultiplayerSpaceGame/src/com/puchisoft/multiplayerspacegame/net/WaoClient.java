@@ -9,6 +9,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
+import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
 import com.puchisoft.multiplayerspacegame.net.Network.Login;
@@ -126,12 +127,15 @@ public class WaoClient {
 		} else if (message instanceof PlayerShoots) {
 			PlayerShoots msg = (PlayerShoots) message;
 			map.onMsgPlayerShoots(msg);
-		} else if (message instanceof GameMapData) {
-			GameMapData msg = (GameMapData) message;
-			map.setStateData(msg);
 		} else if (message instanceof PlayerWasHit) {
 			PlayerWasHit msg = (PlayerWasHit) message;
 			map.onPlayerWasHit(msg);
+		} else if (message instanceof GameMapData) {
+			GameMapData msg = (GameMapData) message;
+			map.setStateData(msg);
+		} else if (message instanceof AsteroidData) {
+			AsteroidData msg = (AsteroidData) message;
+			map.addAsteroid(msg);
 		} else if (message instanceof AsteroidWasHit) {
 			AsteroidWasHit msg = (AsteroidWasHit) message;
 			map.removeAsteroid(msg.position);

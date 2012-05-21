@@ -24,8 +24,7 @@ public class GameSounds {
 		if(sound == null){
 			Log.error("Can't find sound: "+name);
 		}else{
-			long soundId = sound.play();
-			sound.setLooping(soundId, true);
+			sound.loop();
 		}
 	}
 	public void play(String name){

@@ -170,6 +170,7 @@ public class Network {
 		}
 	}
 	
+	// Used in GameMapData, or stand-alone to mean adding a new asteroid
 	static public class AsteroidData {
 		public Vector2 position;
 		public float rotation;
