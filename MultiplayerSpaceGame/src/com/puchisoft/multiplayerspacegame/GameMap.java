@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
@@ -244,7 +243,7 @@ public class GameMap {
 	}
 
 	public synchronized void logInfo(String string) {
-		Log.info((isClient ? "[Client] " : "[Server] ")+string);
+		System.out.println((isClient ? "[Client] " : "[Server] ")+string);
 	}
 
 	public synchronized void render(){
@@ -302,7 +301,7 @@ public class GameMap {
 			hud.setPlayerLocal(playerLocal);
 			setStatus("Connected to " + client.remoteIP);
 		} else {
-			Log.error("setNetworkClient called twice");
+			logInfo("setNetworkClient called twice");
 		}
 	}
 
@@ -313,7 +312,7 @@ public class GameMap {
 	}
 
 	public synchronized Player addPlayer(PlayerJoinLeave msg) {
-		Log.debug("add player");
+		logInfo("add player");
 		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, false, msg.health);
 		newPlayer.setId(msg.playerId);
 		newPlayer.setName(msg.name);
@@ -459,7 +458,7 @@ public class GameMap {
 			}
 		}
 		else{
-			Log.error("PlayerWasHit msg referred to invalid players");
+			logInfo("PlayerWasHit msg referred to invalid players");
 		}
 	}
 	

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.esotericsoftware.minlog.Log;
 
 public class GameSounds {
 	
@@ -22,7 +21,7 @@ public class GameSounds {
 	public void playAndLoopSound(String name){
 		Sound sound = sounds.get(name);
 		if(sound == null){
-			Log.error("Can't find sound: "+name);
+			System.out.println("Can't find sound: "+name);
 		}else{
 			sound.loop();
 		}
@@ -30,7 +29,7 @@ public class GameSounds {
 	public void play(String name){
 		Sound sound = sounds.get(name);
 		if(sound == null){
-			Log.error("Can't find sound: "+name);
+			System.out.println("Can't find sound: "+name);
 		}else{
 			sound.play();
 		}
@@ -39,7 +38,7 @@ public class GameSounds {
 	public void stopSound(String name){
 		Sound sound = sounds.get(name);
 		if(sound == null){
-			Log.error("Can't find sound: "+name);
+			System.out.println("Can't find sound: "+name);
 		}else{
 			sound.stop();
 		}

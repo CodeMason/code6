@@ -8,7 +8,7 @@
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="com.puchisoft.multiplayerspacegame.DesktopStarter"/>
                 <attribute name="Class-Path" value="."/>
-                <attribute name="Rsrc-Class-Path" value="./ gdx-backend-lwjgl-natives.jar gdx-backend-lwjgl.jar gdx-natives.jar gdx.jar kryonet-1.04-all.jar"/>
+                <attribute name="Rsrc-Class-Path" value="./ gdx-backend-lwjgl-natives.jar gdx-backend-lwjgl.jar gdx-natives.jar gdx.jar kryonet-2.09-all.jar"/>
             </manifest>
             <zipfileset src="jar-in-jar-loader.zip"/>
             <fileset dir="bin"/>
@@ -17,7 +17,7 @@
             <zipfileset dir="libs" includes="gdx-backend-lwjgl.jar"/>
             <zipfileset dir="libs" includes="gdx-natives.jar"/>
             <zipfileset dir="libs" includes="gdx.jar"/>
-            <zipfileset dir="libs" includes="kryonet-1.04-all.jar"/>
+            <zipfileset dir="libs" includes="kryonet-2.09-all.jar"/>
         </jar>
     </target>
 </project>

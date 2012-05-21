@@ -24,7 +24,6 @@ public class WaoServer {
 
 	public WaoServer() throws IOException {
 		Log.set(Log.LEVEL_DEBUG);
-		Log.error("Hi");
 		
 		server = new Server() {
 			protected Connection newConnection() {
@@ -59,7 +58,7 @@ public class WaoServer {
 					// Store the name on the connection.
 					connection.name = name;
 					if(msg.version != Network.version){
-						Log.error("wrong version");
+						System.out.println("wrong version");
 						connection.close();
 					}else{
 						// Tell new person about map state (asteroids)
@@ -89,7 +88,7 @@ public class WaoServer {
 					msg.playerId = connection.getID();
 					// TODO Server updates its copy of player from what its told
 					map.playerMoved(msg);
-					Log.info("SERVER "+msg.playerId+" moved");
+//					"SERVER "+msg.playerId+" moved"
 					server.sendToAllExceptUDP(connection.getID(), msg);
 				}
 				else if(message instanceof PlayerShoots) {
@@ -101,7 +100,7 @@ public class WaoServer {
 					}
 				}
 				else if(!(message instanceof Ping) && !(message instanceof KeepAlive)){
-					Log.error("Client tried to send message only server sends/ or unknown");
+					System.out.println("Client tried to send message only server sends/ or unknown");
 				}
 				
 			}

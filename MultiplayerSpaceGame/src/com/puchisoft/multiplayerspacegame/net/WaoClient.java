@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
@@ -84,7 +83,7 @@ public class WaoClient {
 		} catch (IOException e) {
 			// e.printStackTrace();
 			map.setStatus(!host.equals("localhost") ? "Can't connect to " + host +". Hit ESC." : "You didn't enter an IP to connect to. Hit ESC and try again.");
-			Log.error("Can't connect to " + host);
+			System.out.println("Can't connect to " + host);
 		}
 	}
 
