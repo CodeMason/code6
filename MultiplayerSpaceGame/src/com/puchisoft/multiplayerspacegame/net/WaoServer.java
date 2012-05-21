@@ -89,7 +89,8 @@ public class WaoServer {
 					msg.playerId = connection.getID();
 					// TODO Server updates its copy of player from what its told
 					map.playerMoved(msg);
-					server.sendToAllExceptTCP(connection.getID(), msg);
+					Log.info("SERVER "+msg.playerId+" moved");
+					server.sendToAllExceptUDP(connection.getID(), msg);
 				}
 				else if(message instanceof PlayerShoots) {
 					PlayerShoots msg = (PlayerShoots)message;

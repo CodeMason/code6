@@ -141,7 +141,7 @@ public class GameMap {
 			// Handle local input and sent over network if changed
 			if (playerLocal.handleInput(delta)) {
 				logInfo("changed input");
-				client.sendMessage(playerLocal.getMovementState());
+				client.sendMessageUDP(playerLocal.getMovementState());
 			}
 		}
 

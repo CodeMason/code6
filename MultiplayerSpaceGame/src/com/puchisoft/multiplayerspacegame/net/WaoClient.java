@@ -92,9 +92,16 @@ public class WaoClient {
 	}
 
 	public void sendMessage(Object message) {
-		map.logInfo("SENT packet");
+		map.logInfo("SENT packet TCP");
 		if (client.isConnected()) {
 			client.sendTCP(message);
+		}
+	}
+	
+	public void sendMessageUDP(Object message) {
+		map.logInfo("SENT packet UPD");
+		if (client.isConnected()) {
+			client.sendUDP(message);
 		}
 	}
 
