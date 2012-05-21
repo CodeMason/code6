@@ -250,10 +250,10 @@ public class Player {
 		lastHitter = hitterID;
 		
 		health -= damage;
-		if(health <= 0){ // only local player trigger self-death (otherwise wait on server)
+		if(health <= 0){ // On Death, stop movement, set respawn time
 			velocity.set(0,0);
 			maySpawnTime = System.nanoTime() + SPAWN_DELAY;
-			score--;
+//			score--;
 			return true;
 		}
 		return false;

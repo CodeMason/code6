@@ -164,7 +164,9 @@ public class GameMap {
 			}
 			
 			// Spawn dead players (sends a message to clients)
-			if(!isClient && !roundOver) playerCur.spawnIfAppropriate();
+			if(!isClient && !roundOver){
+				playerCur.spawnIfAppropriate();
+			}
 		}
 
 		// Update Bullets
@@ -435,7 +437,7 @@ public class GameMap {
 		Player hitter = players.get(msg.playerIdHitter);
 		Player victim = players.get(msg.playerIdVictim);
 		// give hitter points
-		if(victim != null){ // TODO Won't work if there is not hitter
+		if(victim != null){ 
 			boolean victimDied = victim.hit(msg.damage, msg.playerIdHitter); // might be -1 for non-Player
 			if(hitter != null){
 				hitter.addScore(victimDied ? 2 : 1);
