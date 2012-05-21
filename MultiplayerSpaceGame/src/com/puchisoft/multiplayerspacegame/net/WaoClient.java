@@ -80,7 +80,7 @@ public class WaoClient {
 
 	public void connect(String host) {
 		try {
-			client.connect(5000, host, Network.port);//, Network.portUdp);
+			client.connect(5000, host, Network.port, Network.portUdp);//, Network.portUdp);
 		} catch (IOException e) {
 			// e.printStackTrace();
 			map.setStatus(!host.equals("localhost") ? "Can't connect to " + host +". Hit ESC." : "You didn't enter an IP to connect to. Hit ESC and try again.");
@@ -93,9 +93,16 @@ public class WaoClient {
 	}
 
 	public void sendMessage(Object message) {
-		map.logInfo("SENT packet");
+		map.logInfo("SENT packet TCP");
 		if (client.isConnected()) {
 			client.sendTCP(message);
+		}
+	}
+	
+	public void sendMessageUDP(Object message) {
+		map.logInfo("SENT packet UPD");
+		if (client.isConnected()) {
+			client.sendUDP(message);
 		}
 	}
 

@@ -23,7 +23,8 @@ public class WaoServer {
 	private Random random = new Random();
 
 	public WaoServer() throws IOException {
-//		Log.set(Log.LEVEL_DEBUG);
+		Log.set(Log.LEVEL_DEBUG);
+		Log.error("Hi");
 		
 		server = new Server() {
 			protected Connection newConnection() {
@@ -88,7 +89,8 @@ public class WaoServer {
 					msg.playerId = connection.getID();
 					// TODO Server updates its copy of player from what its told
 					map.playerMoved(msg);
-					server.sendToAllExceptTCP(connection.getID(), msg);
+					Log.info("SERVER "+msg.playerId+" moved");
+					server.sendToAllExceptUDP(connection.getID(), msg);
 				}
 				else if(message instanceof PlayerShoots) {
 					PlayerShoots msg = (PlayerShoots)message;
@@ -115,7 +117,7 @@ public class WaoServer {
 			}
 		});
 		
-		server.bind(Network.port); //,Network.portUdp);
+		server.bind(Network.port,Network.portUdp); //,Network.portUdp);
 		server.start();
 	}
 	

@@ -1,5 +1,6 @@
 package com.puchisoft.multiplayerspacegame.screen;
 
+import java.net.InetAddress;
 import java.util.Random;
 
 import com.badlogic.gdx.Game;
@@ -21,6 +22,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
+import com.esotericsoftware.kryonet.Client;
+import com.puchisoft.multiplayerspacegame.net.Network;
 
 public class ScreenMenu extends ScreenCore {
 	private Texture title;
@@ -65,11 +68,11 @@ public class ScreenMenu extends ScreenCore {
 		textfieldName.y = Gdx.graphics.getHeight() - textfieldName.height - 0 -200;
 		textfieldName.x = Gdx.graphics.getWidth()/2 - textfieldName.width/2;
 		
-//		final Button buttonFind = new TextButton("Find", skin.getStyle(TextButtonStyle.class), "button_join");
-//		buttonFind.width = 60;
-//		buttonFind.height = textfieldIP.height;
-//		buttonFind.y = textfieldIP.y;
-//		buttonFind.x = textfieldIP.x+textfieldIP.width+5;
+		final Button buttonFind = new TextButton("Find", skin.getStyle(TextButtonStyle.class), "button_join");
+		buttonFind.width = 60;
+		buttonFind.height = textfieldIP.height;
+		buttonFind.y = textfieldIP.y;
+		buttonFind.x = textfieldIP.x+textfieldIP.width+5;
 		
 		final Button buttonJoin = new TextButton("Join Game", skin.getStyle(TextButtonStyle.class), "button_join");
 		buttonJoin.width = 400;
@@ -87,7 +90,7 @@ public class ScreenMenu extends ScreenCore {
 		stage.addActor(labelTitle);
 		stage.addActor(textfieldIP);
 		stage.addActor(textfieldName);
-//		stage.addActor(buttonFind);
+		stage.addActor(buttonFind);
 		stage.addActor(buttonJoin);
 		stage.addActor(buttonHost);
 		
@@ -97,13 +100,13 @@ public class ScreenMenu extends ScreenCore {
 				if (key == '\n') textField.getOnscreenKeyboard().show(false);
 			}
 		});
-//		buttonFind.setClickListener(new ClickListener() {
-//			@Override
-//			public void click(Actor actor, float x, float y) {
-//				goFind();
-//				
-//			}
-//		});
+		buttonFind.setClickListener(new ClickListener() {
+			@Override
+			public void click(Actor actor, float x, float y) {
+				goFind();
+				
+			}
+		});
 		buttonJoin.setClickListener(new ClickListener() {
 			@Override
 			public void click(Actor actor, float x, float y) {
@@ -123,17 +126,17 @@ public class ScreenMenu extends ScreenCore {
 		Gdx.input.setInputProcessor(stage);
 	}
 	
-//	private void goFind() {
-//		Client client = new Client();
-//		client.start();
-//		InetAddress found = client.discoverHost(Network.portUdp, 5000);
-//		if(found != null){
-//			textfieldIP.setText(found.getHostAddress().toString());
-//		}
-//		client.stop();
-//		client.close();
-//		
-//	}
+	private void goFind() {
+		Client client = new Client();
+		client.start();
+		InetAddress found = client.discoverHost(Network.portUdp, 5000);
+		if(found != null){
+			textfieldIP.setText(found.getHostAddress().toString());
+		}
+		client.stop();
+		client.close();
+		
+	}
 	
 	private void savePrefs(){
 		preferences.putString("name", getName());
