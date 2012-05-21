@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
+import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementState;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerJoinLeave;
@@ -190,10 +191,10 @@ public class GameMap {
 				if(bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
 					bulletCur.destroy();
 					// Only server makes call whether asteroids are killed
-//					if(!isClient){
-//						server.sendMessage(new AsteroidWasHit(asteroid.getPosition()));
-//						asteroid.destroy();
-//					}
+					if(!isClient){
+						server.sendMessage(new AsteroidWasHit(asteroid.getPosition()));
+						asteroid.destroy();
+					}
 				}
 			}
 			
@@ -208,6 +209,12 @@ public class GameMap {
 			if (asteroids.get(i).destroyed){
 				asteroids.remove(i);
 			}
+		}
+		
+		// Make more asteroids      
+		if(!isClient && asteroids.size() < ASTEROID_QUANITY){
+			AsteroidData asteroidData = addAsteroidRandom();
+			serverSendMessage(asteroidData);
 		}
 		
 		//Check for new Round - Server Only
@@ -358,24 +365,33 @@ public class GameMap {
 		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
 	}
 	
-	private synchronized void addAsteroid(Vector2 position, float rotation){
-		
-		if(position.x < maxPosition.x * 0.6 && position.x > maxPosition.x * 0.3){
-			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, position, rotation, 1));
-		}
-		else{
-			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, position, rotation, 0));
-		}
-		
-	
-	}
-	
-	private synchronized void addAsteroid(AsteroidData asteroidData){
+	public synchronized void addAsteroid(AsteroidData asteroidData){
 		if(asteroidData.position.x < maxPosition.x * 0.6 && asteroidData.position.x > maxPosition.x * 0.3){
 			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, asteroidData.position, asteroidData.rotation, 1));
 		}
 		else {
-		asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, asteroidData.position, asteroidData.rotation, 0));
+			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, asteroidData.position, asteroidData.rotation, 0));
+		}
+	}
+	
+	private AsteroidData addAsteroidRandom(){
+		while(true){
+			int randomX = random.nextInt((int) maxPosition.x - textureAsteroid.getRegionWidth()-100) + 100;
+			int randomY = random.nextInt((int) maxPosition.y - textureAsteroid.getRegionHeight()-100) + 100;
+			Rectangle box = new Rectangle(randomX , randomY, textureAsteroid.getRegionWidth(), textureAsteroid.getRegionHeight());
+			boolean canMakeAsteroid = true;
+			for (int j = 0; j < asteroids.size(); j++) {
+				if(asteroids.get(j).getBoundingRectangle().overlaps(box)){
+					canMakeAsteroid = false;
+					break;
+				}
+			}
+			if(canMakeAsteroid){
+				logInfo("Added Asteroid");
+				AsteroidData asteroidData = new AsteroidData(new Vector2(randomX,randomY),random.nextInt(360));
+				addAsteroid(asteroidData);
+				return asteroidData;
+			}
 		}
 	}
 	
@@ -386,24 +402,8 @@ public class GameMap {
 		asteroids.clear();
 		
 		// Generate asteroids
-		int randomX = 0;
-		int randomY = 0;
-		int loopExit = 0;
-		while(asteroids.size() < asteroidQuantity && loopExit < 1000){
-			loopExit++;
-			randomX = random.nextInt((int) maxPosition.x - textureAsteroid.getRegionWidth()-100) + 100;
-			randomY = random.nextInt((int) maxPosition.y - textureAsteroid.getRegionHeight()-100) + 100;
-			Rectangle box = new Rectangle(randomX , randomY, textureAsteroid.getRegionWidth(), textureAsteroid.getRegionHeight());
-			boolean canMakeAsteroid = true;
-			for (int j = 0; j < asteroids.size(); j++) {
-				if(asteroids.get(j).getBoundingRectangle().overlaps(box)){
-					canMakeAsteroid = false;
-					break;
-				}
-			}
-			if(canMakeAsteroid){
-				addAsteroid(new Vector2(randomX,randomY),random.nextInt(360));
-			}
+		while(asteroids.size() < asteroidQuantity){
+			addAsteroidRandom();
 		}
 		
 		server.sendMessage(getStateData());
