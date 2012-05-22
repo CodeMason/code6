@@ -180,8 +180,8 @@ public class GameMap {
 					bulletCur.destroy();
 					if(!isClient && !roundOver){ // no getting hit once round ends
 						PlayerWasHit msg = new PlayerWasHit(playerCur.getID(),bulletCur.getPlayerID(), 45);
-						this.onPlayerWasHit(msg);
 						server.sendMessage(msg);
+						this.onPlayerWasHit(msg); // causes another message for ROund End, which should be sent after PlayerHit to sync scores right
 					}
 				}
 			}
