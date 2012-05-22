@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidWasHit;
 import com.puchisoft.multiplayerspacegame.net.Network.GameMapData;
@@ -243,7 +244,7 @@ public class GameMap {
 	}
 
 	public synchronized void logInfo(String string) {
-		System.out.println((isClient ? "[Client] " : "[Server] ")+string);
+		Log.info((isClient ? "[Client] " : "[Server] ")+string);
 	}
 
 	public synchronized void render(){

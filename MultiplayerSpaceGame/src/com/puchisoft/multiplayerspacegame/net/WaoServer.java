@@ -58,7 +58,7 @@ public class WaoServer {
 					// Store the name on the connection.
 					connection.name = name;
 					if(msg.version != Network.version){
-						System.out.println("wrong version");
+						logInfo("wrong version");
 						connection.close();
 					}else{
 						// Tell new person about map state (asteroids)
@@ -100,7 +100,7 @@ public class WaoServer {
 					}
 				}
 				else if(!(message instanceof Ping) && !(message instanceof KeepAlive)){
-					System.out.println("Client tried to send message only server sends/ or unknown");
+					logInfo("Client tried to send message only server sends/ or unknown");
 				}
 				
 			}
@@ -120,6 +120,10 @@ public class WaoServer {
 		server.start();
 	}
 	
+	protected void logInfo(String string) {
+		Log.info(string);
+	}
+
 	public void update(float delta) {
 		map.update(delta);
 	}

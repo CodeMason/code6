@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
+import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.GameMap;
 import com.puchisoft.multiplayerspacegame.net.WaoClient;
 import com.puchisoft.multiplayerspacegame.net.WaoServer;
@@ -44,18 +45,22 @@ public class ScreenGame extends ScreenCore {
 		
 		if(isHost){
 			// Start server
-			System.out.println("Starting server...");
+			logInfo("Starting server...");
 			try {
 				server = new WaoServer();
 				client.connectLocal();
 			} catch (IOException e) {
 				e.printStackTrace();
-				System.out.println("Can't start server. Already running?");
+				logInfo("Can't start server. Already running?");
 				game.setScreen(new ScreenMenu(game));
 			}
 		}else{
 			client.connect(ip);
 		}
+	}
+
+	private void logInfo(String string) {
+		Log.info(string);
 	}
 
 	@Override

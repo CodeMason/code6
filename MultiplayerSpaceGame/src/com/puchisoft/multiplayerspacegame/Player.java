@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.esotericsoftware.minlog.Log;
 import com.puchisoft.multiplayerspacegame.net.Network.MovementState;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerShoots;
 import com.puchisoft.multiplayerspacegame.net.Network.PlayerSpawns;
@@ -99,7 +100,7 @@ public class Player {
 				if (!wasTouched) { // touchPos == null // just started touching
 					touchPos = new Vector2(Gdx.input.getX(0), Gdx.input.getY(0));
 					wasTouched = true;
-					System.out.println("Initial touch saved");
+					Log.info("Initial touch saved");
 				}
 				Vector2 touchDist = touchPos.cpy().sub(Gdx.input.getX(0), Gdx.input.getY(0));
 				touchDist.x *= -1;
@@ -141,7 +142,7 @@ public class Player {
 				
 				//force packet only if last sent angle differs a bit after snapping to nearest angle increment
 				if(Math.abs(direction.angle() - touchAngle) > 1){ // Will always be slightly off
-					System.out.println("dir change "+direction.angle()+ " "+touchAngle);
+					Log.info("dir change "+direction.angle()+ " "+touchAngle);
 					direction.set(1,0).rotate(touchAngle);
 //					direction.set(touchDist.cpy()).nor(); // could be optimized
 					sprite.setRotation(direction.angle()); // update sprite
@@ -154,7 +155,7 @@ public class Player {
 			} else if (wasTouched) {
 				wasTouched = false;
 				accelerating = 0;
-				System.out.println("Touch released");
+				Log.info("Touch released");
 			}
 			if (Gdx.input.isTouched(1)) {
 				if(mayShoot()) shoot();
