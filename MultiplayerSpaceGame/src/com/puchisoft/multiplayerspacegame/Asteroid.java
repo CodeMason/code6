@@ -2,7 +2,6 @@ package com.puchisoft.multiplayerspacegame;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
@@ -17,10 +16,10 @@ public class Asteroid {
 	
 	public boolean destroyed = false;
 
-	public Asteroid(TextureRegion texture,TextureRegion textureGold,  Vector2 position, float rotation, int type) {
+	public Asteroid(Sprite sprite, Vector2 position, float rotation, int type) {
 		this.position = position;
 		this.type = type;
-		this.sprite = new Sprite(type == 0 ? texture: textureGold);
+		this.sprite = new Sprite(sprite);
 		this.sprite.setPosition(position.x, position.y);
 		this.sprite.rotate(rotation);
 	}

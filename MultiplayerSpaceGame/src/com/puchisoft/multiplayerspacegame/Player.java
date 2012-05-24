@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -66,8 +65,8 @@ public class Player {
 	private Color colorOrig;
 	
 	
-	public Player(TextureRegion texture, Vector2 position, Vector2 maxPosition, GameMap map, Color color, boolean isLocal, float health) {
-		this.sprite = new Sprite(texture);
+	public Player(Sprite sprite, Vector2 position, Vector2 maxPosition, GameMap map, Color color, boolean isLocal, float health) {
+		this.sprite = new Sprite(sprite);
 		this.colorOrig = color;
 		this.sprite.setColor(colorOrig);
 //		this.sprite.setScale(1.5f);

@@ -2,7 +2,6 @@ package com.puchisoft.multiplayerspacegame;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -23,11 +22,11 @@ public class Bullet {
 	private long expirationTime = System.nanoTime() + TIME_TO_LIVE;
 	private boolean destroyed = false;
 	
-	public Bullet(TextureRegion texture, int playerID, Vector2 position, Vector2 baseVelocity, Vector2 direction, Vector2 maxPosition) {
+	public Bullet(Sprite sprite, int playerID, Vector2 position, Vector2 baseVelocity, Vector2 direction, Vector2 maxPosition) {
 		this.playerID = playerID;
 		this.position = position;
 		
-		this.sprite = new Sprite(texture);
+		this.sprite = new Sprite(sprite);
 		this.sprite.setRotation(direction.angle());
 		this.sprite.setPosition(position.x, position.y);
 		

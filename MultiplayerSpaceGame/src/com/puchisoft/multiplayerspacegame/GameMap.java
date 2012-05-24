@@ -12,8 +12,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.minlog.Log;
@@ -48,17 +49,16 @@ public class GameMap {
 	
 	public BitmapFont fontNameTag;
 
-	private TextureRegion texturePlayer;
-	private TextureRegion textureBullet;
-	private Texture textureBg;
+	private final String[] spriteMapNames = {"player", "bullet", "asteroid", "asteroidGold"};
+	private TextureAtlas textureAtlas;
+	private Map<String, Sprite> spriteMap = new HashMap<String, Sprite>();
+	private Sprite spriteBG;
 
 	private Vector2 maxPosition;
 
 	private WaoClient client; // only if I'm the client
 	private WaoServer server; // only if I'm internal to the server
 	private HUD hud;
-	private TextureRegion textureAsteroid;
-	private TextureRegion textureAsteroidGold;
 	
 	private GameSounds gameSounds;
 	
@@ -99,14 +99,17 @@ public class GameMap {
 	}
 
 	private void initCommon(){
-		textureBg = new Texture(Gdx.files.internal("data/background.png"));
 
-		texturePlayer = new TextureRegion(new Texture(Gdx.files.internal("data/player.png")), 0, 0, 42, 32);
-		textureBullet = new TextureRegion(new Texture(Gdx.files.internal("data/bullet.png")), 0, 0, 32, 6);
-		textureAsteroid = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid.png")), 0, 0, 64, 64);
-		textureAsteroidGold = new TextureRegion(new Texture(Gdx.files.internal("data/asteroid_gold.png")), 0, 0, 64, 64);
+		// Load up all sprites into spriteMap from textureAtlas
+		textureAtlas = new TextureAtlas(Gdx.files.internal("data/packed/pack"));
+		for(String name: spriteMapNames){
+			spriteMap.put(name, textureAtlas.createSprite(name));
+		}
 		
-		maxPosition = new Vector2(textureBg.getWidth() * BG_TILE_COUNT, textureBg.getHeight() * BG_TILE_COUNT);
+		spriteBG = new Sprite(new Texture(Gdx.files.internal("data/background.png")));
+
+		maxPosition = new Vector2(spriteBG.getWidth() * BG_TILE_COUNT, spriteBG.getHeight() * BG_TILE_COUNT);
+		
 	}
 	
 	private void handleInput(float delta){
@@ -256,8 +259,10 @@ public class GameMap {
 		// Background
 		for (int i = 0; i < BG_TILE_COUNT; i++) {
 			for (int j = 0; j < BG_TILE_COUNT; j++) {
-				spriteBatch.draw(textureBg, textureBg.getWidth() * i, textureBg.getHeight() * j, 0, 0, textureBg.getWidth(),
-						textureBg.getHeight());
+				spriteBG.setPosition(spriteBG.getWidth() * i, spriteBG.getHeight() * j);
+				spriteBG.draw(spriteBatch);
+//				spriteBatch.draw(textureBg, textureBg.getWidth() * i, textureBg.getHeight() * j, 0, 0, textureBg.getWidth(),
+//						textureBg.getHeight());
 			}
 		}
 		
@@ -284,8 +289,9 @@ public class GameMap {
 	}
 
 	public void dispose() {
-		texturePlayer.getTexture().dispose();
-		textureBg.dispose();
+		textureAtlas.dispose();
+// TODO Go through spriteMap and dispose that also?
+//		textureBg.dispose();
 		spriteBatch.dispose();
 		hud.dispose();
 		gameSounds.dispose();
@@ -295,7 +301,7 @@ public class GameMap {
 
 		if (this.playerLocal == null) {
 			// TODO Server should spawn localPlayer too
-			playerLocal = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, color, true, 100);
+			playerLocal = new Player(spriteMap.get("player"), new Vector2(50, 50), maxPosition, this, color, true, 100);
 			this.playerLocal.setId(client.id);
 			this.playerLocal.setName(name);
 			players.put(client.id, playerLocal);
@@ -314,7 +320,7 @@ public class GameMap {
 
 	public synchronized Player addPlayer(PlayerJoinLeave msg) {
 		logInfo("add player");
-		Player newPlayer = new Player(texturePlayer, new Vector2(50, 50), maxPosition, this, msg.color, false, msg.health);
+		Player newPlayer = new Player(spriteMap.get("player"), new Vector2(50, 50), maxPosition, this, msg.color, false, msg.health);
 		newPlayer.setId(msg.playerId);
 		newPlayer.setName(msg.name);
 		newPlayer.addScore(msg.score);
@@ -362,23 +368,24 @@ public class GameMap {
 	}
 
 	public synchronized void addBullet(PlayerShoots playerShoots) {
-		bullets.add(new Bullet(textureBullet, playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
+		bullets.add(new Bullet(spriteMap.get("bullet"), playerShoots.playerID, playerShoots.position, playerShoots.baseVelocity, playerShoots.direction, maxPosition));
 	}
 	
 	public synchronized void addAsteroid(AsteroidData asteroidData){
 		if(asteroidData.position.x < maxPosition.x * 0.6 && asteroidData.position.x > maxPosition.x * 0.3){
-			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, asteroidData.position, asteroidData.rotation, 1));
+			asteroids.add(new Asteroid(spriteMap.get("asteroidGold"), asteroidData.position, asteroidData.rotation, 1));
 		}
 		else {
-			asteroids.add(new Asteroid(textureAsteroid, textureAsteroidGold, asteroidData.position, asteroidData.rotation, 0));
+			asteroids.add(new Asteroid(spriteMap.get("asteroid"), asteroidData.position, asteroidData.rotation, 0));
 		}
 	}
 	
 	private AsteroidData addAsteroidRandom(){
+		Rectangle asteroidBB = spriteMap.get("asteroid").getBoundingRectangle();
 		while(true){
-			int randomX = random.nextInt((int) maxPosition.x - textureAsteroid.getRegionWidth()-100) + 100;
-			int randomY = random.nextInt((int) maxPosition.y - textureAsteroid.getRegionHeight()-100) + 100;
-			Rectangle box = new Rectangle(randomX , randomY, textureAsteroid.getRegionWidth(), textureAsteroid.getRegionHeight());
+			float randomX = random.nextFloat()*(maxPosition.x - asteroidBB.getWidth() -100) + 100;
+			float randomY = random.nextFloat()*(maxPosition.y - asteroidBB.getHeight() -100) + 100;
+			Rectangle box = new Rectangle(randomX , randomY, asteroidBB.getWidth(), asteroidBB.getHeight());
 			boolean canMakeAsteroid = true;
 			for (int j = 0; j < asteroids.size(); j++) {
 				if(asteroids.get(j).getBoundingRectangle().overlaps(box)){
