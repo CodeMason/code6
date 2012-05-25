@@ -12,7 +12,7 @@ public class DesktopStarter {
 		config.title = "Multiplayer Space Game";
 		config.width = 800;
 		config.height = 600;
-		config.useCPUSynch = false; // Doesn't work on some graphics cards in windowed mode... but looks way better
+		config.useCPUSynch = false; // Doesn't work on some graphics cards in windowed mode... but looks way better; makes two instances of game run poorly
 		
 //		config.width = LwjglApplicationConfiguration.getDesktopDisplayMode().width;
 //		config.height = LwjglApplicationConfiguration.getDesktopDisplayMode().height;
