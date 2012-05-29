@@ -10,14 +10,18 @@ public class HUD {
 	private SpriteBatch spriteBatchStationary;
 	public OrthographicCamera cam;
 	private BitmapFont font;
+	private BitmapFont fontBig;
 	private String status = "Loading";
+	private String statusCenter = "";
 	private Player playerLocal;
 	
 
 	public HUD() {
 		font = new BitmapFont();
 		font.setColor(Color.GREEN);
-//		font.setScale(1.2f);
+		fontBig = new BitmapFont();
+		fontBig.setColor(Color.toFloatBits(255, 215, 0, 255));
+		fontBig.setScale(2.0f);
 
 		spriteBatchStationary = new SpriteBatch();
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -26,7 +30,14 @@ public class HUD {
 	public void render() {
 		spriteBatchStationary.setProjectionMatrix(cam.combined);
 		spriteBatchStationary.begin();
+
+		// Bottom left status
 		font.draw(spriteBatchStationary, status, 5, font.getLineHeight());
+		
+		// Center status
+		fontBig.draw(spriteBatchStationary, statusCenter, 30, Gdx.graphics.getHeight()*0.5f);
+		
+		// HUD
 		if(playerLocal != null){
 			font.draw(spriteBatchStationary, "Score: "+playerLocal.getScore(), 5, Gdx.graphics.getHeight() - font.getXHeight());
 			if(playerLocal.getHealth() > 0)
@@ -39,6 +50,9 @@ public class HUD {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public void setStatusCenter(String status) {
+		this.statusCenter = status;
 	}
 	
 	public void setPlayerLocal(Player playerLocal) {

@@ -1,16 +1,6 @@
-
--Randomly seed Asteroids (map generation?), set rotation
-_Goal - score?
--Death respawn delay - kill cam of killer in mean time
--Lower collision bounding box
--Boost with shift
--Restructure server to have own copy of map
--Fuel items, running out of fuel decreasing your max speed
--Afterburner graphic for local player only
--Shift to accellerate in PC? Android can just drag faster
--TexturePacker
--Trails
--Ships get random colors
+-Android receives messages delayed?
 -Input circle (tap to shoot, drag to insta-turn and move (magnitude of drag matters?))
+-- Show center of circle, change colors for 3 speed levels?
 
--Player mutators: Size, cloak, fire rate?
+-Collisions between two moving objects: Bounce both first, then do actual overlap preventing?
+-Inheritance: Player/Asteroids/Bullets all have a spite + boundingBox

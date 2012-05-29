@@ -2,21 +2,24 @@ package com.puchisoft.multiplayerspacegame;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.puchisoft.multiplayerspacegame.net.Network.AsteroidData;
 
 public class Asteroid {
 	
 	private static final float BOUNDINGBOX_REDUCTION = 0.17f; // percentage
 	private Sprite sprite;
-	Vector2 position;
+	private Vector2 position;
 	private Rectangle boundingRectangle = new Rectangle();
-
+	private int type; //0 = normal, 1 = gold
 	
-	public Asteroid(TextureRegion texture, Vector2 position, float rotation) {
+	public boolean destroyed = false;
+
+	public Asteroid(Sprite sprite, Vector2 position, float rotation, int type) {
 		this.position = position;
-		this.sprite = new Sprite(texture);
+		this.type = type;
+		this.sprite = new Sprite(sprite);
 		this.sprite.setPosition(position.x, position.y);
 		this.sprite.rotate(rotation);
 	}
@@ -44,6 +47,14 @@ public class Asteroid {
 		boundingRectangle.height = sprite.getBoundingRectangle().height-(scaleY * 2);
 		
 		return boundingRectangle;
+	}
+	
+	public AsteroidData getStateData(){
+		return new AsteroidData(position,sprite.getRotation());
+	}
+	
+	public void destroy(){
+		destroyed = true;
 	}
 	
 }

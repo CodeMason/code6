@@ -1,0 +1,40 @@
+
+imagesRaw1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+asteroidGold
+  rotate: false
+  xy: 2, 2
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+asteroid
+  rotate: false
+  xy: 68, 2
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+player
+  rotate: false
+  xy: 2, 68
+  size: 42, 32
+  orig: 42, 32
+  offset: 0, 0
+  index: -1
+asteroid2
+  rotate: false
+  xy: 68, 68
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+bullet
+  rotate: false
+  xy: 2, 102
+  size: 32, 6
+  orig: 32, 6
+  offset: 0, 0
+  index: -1
