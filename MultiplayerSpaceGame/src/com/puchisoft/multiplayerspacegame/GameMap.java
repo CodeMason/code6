@@ -380,6 +380,28 @@ public class GameMap {
 		}
 	}
 	
+	private AsteroidData addAsteroidRegion(float minX, float minY, float maxX, float maxY){
+		Rectangle asteroidBB = spriteMap.get("asteroid").getBoundingRectangle();
+		while(true){
+			float randomX = random.nextFloat()*(maxX - asteroidBB.getWidth() - minX) + minX;
+			float randomY = random.nextFloat()*(maxY - asteroidBB.getHeight() - minY) + minY;
+			Rectangle box = new Rectangle(randomX , randomY, asteroidBB.getWidth(), asteroidBB.getHeight());
+			boolean canMakeAsteroid = true;
+			for (int j = 0; j < asteroids.size(); j++) {
+				if(asteroids.get(j).getBoundingRectangle().overlaps(box)){
+					canMakeAsteroid = false;
+					break;
+				}
+			}
+			if(canMakeAsteroid){
+				logInfo("Added Asteroid");
+				AsteroidData asteroidData = new AsteroidData(new Vector2(randomX,randomY),random.nextInt(360));
+				addAsteroid(asteroidData);
+				return asteroidData;
+			}
+		}
+	}
+	
 	private AsteroidData addAsteroidRandom(){
 		Rectangle asteroidBB = spriteMap.get("asteroid").getBoundingRectangle();
 		while(true){
@@ -409,8 +431,16 @@ public class GameMap {
 		asteroids.clear();
 		
 		// Generate asteroids
+		while(asteroids.size() < asteroidQuantity * 0.2f){
+			addAsteroidRegion(0, 0, maxPosition.x * 0.33f, maxPosition.y);
+		}
+		
+		while(asteroids.size() < asteroidQuantity * 0.8f){
+			addAsteroidRegion(maxPosition.x * 0.33f, 0, maxPosition.x * 0.66f, maxPosition.y);
+		}
+		
 		while(asteroids.size() < asteroidQuantity){
-			addAsteroidRandom();
+			addAsteroidRegion(maxPosition.x * 0.66f, 0, maxPosition.x, maxPosition.y);
 		}
 		
 		server.sendMessage(getStateData());
