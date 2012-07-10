@@ -187,22 +187,28 @@ public class GameMap {
 						server.sendMessage(msg);
 						this.onPlayerWasHit(msg); // causes another message for ROund End, which should be sent after PlayerHit to sync scores right
 					}
+					// TODO break inner for loop here
 				}
 			}
-			// Collision with Asteroids
-			for(Asteroid asteroid : asteroids){
-				if(bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
-					bulletCur.destroy();
-					// Only server makes call whether asteroids are killed
-					if(!isClient){
-						server.sendMessage(new AsteroidWasHit(asteroid.getPosition()));
-						asteroid.destroy();
+			
+			// only check for further collision if it wasn't hit key
+			if(!bulletCur.destroyed()){
+				// Collision with Asteroids
+				for(Asteroid asteroid : asteroids){
+					// a living bullet hits an asteroid
+					if(bulletCur.getBoundingRectangle().overlaps(asteroid.getBoundingRectangle())){
+						bulletCur.destroy();
+						// Only server makes call whether asteroids are killed
+						if(!isClient){
+							server.sendMessage(new AsteroidWasHit(asteroid.getPosition()));
+							asteroid.destroy();
+						}
 					}
 				}
 			}
 			
-			// Remove impacted bullets
-			if (bullets.get(i).destroyed()){
+			// Remove bullet if impacted
+			if (bulletCur.destroyed()){
 				bullets.remove(i);
 			}
 		}
@@ -214,23 +220,26 @@ public class GameMap {
 			}
 		}
 		
-		// Make more asteroids      
-		if(!isClient && asteroids.size() < ASTEROID_QUANITY){
-			AsteroidData asteroidData = addAsteroidRandom();
-			serverSendMessage(asteroidData);
-		}
-		
-		//Check for new Round - Server Only
-		if(!isClient && roundOver && System.nanoTime() > timeRoundBegins){
-			generateMap(ASTEROID_QUANITY);
-			RoundStart msg = new RoundStart();
-			onRoundStart(msg);
-			server.sendMessage(msg);
+		// Server-only logic
+		if(!isClient){			
+			// Make more asteroids (Server only)     
+			if(asteroids.size() < ASTEROID_QUANITY){
+				AsteroidData asteroidData = addAsteroidRandom();
+				serverSendMessage(asteroidData);
+			}
 			
-			// Respawn everyone
-			for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
-				Player playerCur = playerEntry.getValue();
-				playerCur.spawn(); // make their position reset, regardless of whether they are dead or how healthy they were
+			//Check for new Round - Server Only
+			if(roundOver && System.nanoTime() > timeRoundBegins){
+				generateMap(ASTEROID_QUANITY);
+				RoundStart msg = new RoundStart();
+				onRoundStart(msg);
+				server.sendMessage(msg);
+				
+				// Respawn everyone
+				for (Map.Entry<Integer, Player> playerEntry : players.entrySet()) {
+					Player playerCur = playerEntry.getValue();
+					playerCur.spawn(); // make their position reset, regardless of whether they are dead or how healthy they were
+				}
 			}
 		}
 	}

@@ -4,3 +4,16 @@
 
 -Collisions between two moving objects: Bounce both first, then do actual overlap preventing?
 -Inheritance: Player/Asteroids/Bullets all have a spite + boundingBox
+
+
+>Interesting
+-LibGDX (cross platform in Java)
+-KyroNet (auto-compression, easy message declaration)
+-Delta Time
+-Anti-Cheat (anti-too rapid fire, but issue: no guarantee that shooting messages arrive with min offset that they were sent with)
+
+>Overview
+2 Simple starters in 2 projects that then use the same codebase
+Screens: Menu, Game
+Map class (all Game logic)
+NetCode (both client and server keep instance of Map class)
