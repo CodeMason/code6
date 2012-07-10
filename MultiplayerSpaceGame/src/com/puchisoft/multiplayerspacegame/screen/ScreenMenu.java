@@ -169,12 +169,19 @@ public class ScreenMenu extends ScreenCore {
 		batch.draw(title, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.end();
 		
-		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+		
+		stage.act(Math.min(delta, 1 / 30f)); // frame limited
 		stage.draw();
 
 		if (Gdx.input.isKeyPressed(Keys.ALT_LEFT)) {
 			goHost();
 		}
+	}
+	
+	@Override
+	public void resize(int width, int height) {
+		stage.getCamera().viewportHeight = height;
+		stage.getCamera().viewportWidth = width;
 	}
 
 	@Override

@@ -64,7 +64,7 @@ public class GameMap {
 	
 	private long timeRoundBegins = 0; // ms
 	
-	boolean isClient;
+	private boolean isClient;
 	private boolean roundOver = false;
 
 	/*
