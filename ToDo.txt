@@ -8,7 +8,7 @@
 
 >Interesting
 -LibGDX (cross platform in Java)
--KyroNet (auto-compression, easy message declaration)
+-KryoNet (auto-compression, easy message declaration)
 -Delta Time
 -Anti-Cheat (anti-too rapid fire, but issue: no guarantee that shooting messages arrive with min offset that they were sent with)
 

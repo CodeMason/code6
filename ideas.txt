@@ -1,0 +1,28 @@
+Game:
+
+2 Teams CTF, in Space
+
+Different Ship classes
+
+Engineer -
+	Slow moving,
+	Sets turrets,
+	drops bombs, just inherit ship momentum, destroy turrets / bounce off objects?
+
+Assault -
+	fast bullet shooting
+	Fast moving,
+
+
+How to make turrents?
+-Pay gold, mined from asteroids?
+-Set limit turrent count per player?
+==================
+
+-Gold
+--Buy temporary things like a shotgun
+--Player mutators: Size, cloak, fire rate?
+--Mines turrets
+-Fuel items, running out of fuel prevents boosting
+-Goal - score?
+-Afterburner graphic for local player only /-Trails
