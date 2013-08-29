@@ -2,6 +2,7 @@ package com.puchisoft.multiplayerspacegame;
 
 import java.util.Random;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -20,6 +21,7 @@ public class Player {
 	private static final int FIRE_DELAY = 500 * 1000000;
 	private static final float speedAcc = 10.0f;
 	private static final float speedAccTouch = 1.0f;
+	private static final float ANGLE_INCR_TOUCH = 22.5f; // Angle increment on touch screens / 22.5f / 45f / 90f
 	private static final float speedRot = 180.0f; // angle degrees
 	private static final float speedMax = 60.0f;
 
@@ -41,6 +43,7 @@ public class Player {
 	private int turningOld = turning;
 	private int accelerating = 0; // -1, 0, 1
 	private int acceleratingOld = turning;
+	private float angleLastSent = direction.angle();
 
 	boolean wasTouched = false;
 	long mayFireTime = System.nanoTime(); // ms
@@ -70,28 +73,74 @@ public class Player {
 
 		boolean touchMove = false;
 
-//		// Android
-//		// Movement
-//		if (Gdx.input.isTouched()) {
-//			if (!wasTouched) { // touchPos == null // just started touching
-//				touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-//			}
-//			wasTouched = true;
-//		} else if (wasTouched) { // just stopped touching
-//			touchPos.sub(Gdx.input.getX(), Gdx.input.getY());
-//			if (touchPos.len() > 10) { // deadzone ... to short to be counted
-//										// as a drag
-//				touchPos.x *= -1;
-//				Log.info("drag " + touchPos.x + " " + touchPos.y + " " + touchPos.len2());
-//				direction.set(touchPos.tmp()).nor();
-//				velocity.add(touchPos.mul(speedAccTouch * delta));
-//			} else {
-//				shoot();
-//				Log.info("touch");
-//			}
-//			wasTouched = false;
-//			touchMove = true;
-//		}
+		// Android
+				// Movement
+				if(Gdx.app.getType() == ApplicationType.Android){
+					if (Gdx.input.isTouched(0)) {
+						if (!wasTouched) { // touchPos == null // just started touching
+							touchPos = new Vector2(Gdx.input.getX(0), Gdx.input.getY(0));
+							wasTouched = true;
+							Log.info("Initial touch saved");
+						}
+						Vector2 touchDist = touchPos.cpy().sub(Gdx.input.getX(0), Gdx.input.getY(0));
+						touchDist.x *= -1;
+						// Turn towards goal direction
+						// float myDir = direction.angle();
+						// float desiredDir = touchDist.angle();
+						// // turning = (Math.abs(desiredDir - myDir)) > 180 ? 1 : -1;
+						// // 1 = counter, -1 = clockwise
+						// // turning = (desiredDir - ((myDir-180)%360)) > 0 ? -1 : 1;
+						// if(Math.abs(desiredDir - myDir) >5){
+						// float diff = desiredDir - myDir;
+						// if(diff < 0){ diff += 360; }
+						// turning = diff < 180 ? 1 : -1;
+						// Log.info("!!!!! turn debug m " + myDir + " d " + desiredDir +
+						// " || " +diff+" | "+turning);
+						// }
+
+//						if (touchDist.len() < 40) {
+//							accelerating = 0;
+//							// Log.info("short drag (turn) " + touchDist.x + " " +
+//							// touchDist.y + " " + touchDist.len())
+////								soundTurn.play();
+//						} else if (touchDist.len() < 80) {
+//							accelerating = 1;
+////								long soundId = soundAccel.play();
+////								soundAccel.setLooping(soundId, false);
+////								Gdx.audio.
+//							// Log.info("medium drag (accel) " + touchDist.x + " " +
+//							// touchDist.y + " " + touchDist.len());
+//						} else {
+//							accelerating = SPEED_ACC_TURBO;
+////								soundBoost.play();
+//							// Log.info("long drag (boost) " + touchDist.x + " " +
+//							// touchDist.y + " " + touchDist.len());
+//						}
+						
+						float touchAngle = Math.round(touchDist.angle() / ANGLE_INCR_TOUCH) * ANGLE_INCR_TOUCH;
+						if(touchAngle >= 360.0){ touchAngle = 0;} // otherwise thinks 0.02 differs from 360 greatly
+						
+						//force packet only if last sent angle differs a bit after snapping to nearest angle increment
+						if(Math.abs(direction.angle() - touchAngle) > 1){ // Will always be slightly off
+							Log.info("dir change "+direction.angle()+ " "+touchAngle);
+							direction.set(1,0).rotate(touchAngle);
+//							direction.set(touchDist.cpy()).nor(); // could be optimized
+							sprite.setRotation(direction.angle()); // update sprite
+							
+							touchMove = true;
+							angleLastSent = direction.angle();	
+						}
+						
+						
+					} else if (wasTouched) {
+						wasTouched = false;
+						accelerating = 0;
+						Log.info("Touch released");
+					}
+					if (Gdx.input.isTouched(1)) {
+						if(mayShoot()) shoot();
+					}
+				}else{
 
 		// Desktop
 		// Movement
@@ -113,6 +162,7 @@ public class Player {
 		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
 			shoot();
 		}
+					}
 
 		return turning != turningOld || accelerating != acceleratingOld || touchMove || moon.handleInput(delta);
 	}
@@ -145,6 +195,10 @@ public class Player {
 		
 		sprite.setPosition(getPosition().x, getPosition().y); // update sprite
 		
+	}
+	
+	public boolean mayShoot(){
+		return System.nanoTime() > mayFireTime;
 	}
 
 	public void shoot() {
