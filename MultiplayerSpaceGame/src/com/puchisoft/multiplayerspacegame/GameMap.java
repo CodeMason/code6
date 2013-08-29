@@ -220,7 +220,7 @@ public class GameMap {
 					}
 					Vector2 gravityVector = asteroidCurJ.getPosition().cpy().sub(playerEntry.getValue().moon.getPosition()).nor().mul(gravityForce);
 					playerEntry.getValue().moon.velocity.add(gravityVector.mul(delta));
-					Log.info(String.valueOf(gravityForce));
+					//Log.info(String.valueOf(gravityForce));
 				}
 
 			}
