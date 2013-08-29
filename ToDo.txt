@@ -17,3 +17,12 @@
 Screens: Menu, Game
 Map class (all Game logic)
 NetCode (both client and server keep instance of Map class)
+
+ImprovedCrazyGravity
+
+Add gravity
+Add Moon Class
+Make Moon class the movable object
+Make Player class follow moon, but still turn and shoot
+Add gravity well in center
+Add gravity between moons, players, bullets
